@@ -35,6 +35,7 @@ const MAIN_COLOR = 0xff9800;
 let groupBtn;
 let quiz;
 let score;
+let titre_question;
 
 function preload() {
     this.load.json('questions', './assets/donnes/questions.json');
@@ -53,6 +54,9 @@ function create() {
     //titre
 
     const infoTexte = this.add.text(screenCenterX, screenCenterY - 370, "Choisir une catégorie de question", { fontFamily: "FFFTusj", fontSize: 30, wordWrap: { width: window.innerWidth }}).setOrigin(0.5);
+    const { width } = scene.sys.game.canvas;
+    this.titre_question = scene.add.text(screenCenterX, 110, "", { fontFamily: "FFFTusj", fontSize: 30, color: ' #ffffff ', wordWrap: { width } });
+    this.titre_question.setOrigin(0.5)
 
     //ajout des boutons dans un groupe avec le nom de la catégorie
     groupBtn = this.add.group();
@@ -94,14 +98,14 @@ function commencerQuestion(categorie, self) {
     score = self.add.text(10, 10, ``, { fontFamily: "FFFTusj", fontSize: 30, color: ' #ffffff ',  wordWrap: { width: window.innerWidth }});
     score.setData('score', 0)
 
+    //affiche les résultas vrai ou faux répondu ou non sous forme de points
     const points = [];
     for (let index = 0; index < totalQuestion; index++) {
         points.push("⚫");
     }
 
-    self.scoreTotal = self.add.text(self.screenCenterX, 55, points.join(' '), { fontFamily: "FFFTusj", fontSize: 30, color: ' #ffffff ', align: 'center' }).setAlpha(0.7).setOrigin(0.5);
+    self.scoreTotal = self.add.text(self.screenCenterX, 37, points.join(' '), { fontFamily: "FFFTusj", fontSize: 30, color: ' #ffffff ', align: 'center' }).setAlpha(0.7).setOrigin(0.5);
     self.scoreTotal.points = points;
-
 
     afficherQuestion(categorieChoisie, self, 0, totalQuestion)
 }
@@ -111,19 +115,24 @@ function afficherQuestion(categorieChoisie, scene, index, max) {
     groupBtn.clear();
     const groupReponse = scene.add.group();
 
-    const { width } = scene.sys.game.canvas;
     //titre question
-    const titre_q = scene.add.text(scene.screenCenterX, scene.screenCenterY, categorieChoisie[index].titre, { fontFamily: "FFFTusj", fontSize: 30, color: ' #ffffff ', wordWrap: { width: width }});
-    titre_q.setOrigin(0.5)
+    tween(scene, scene.titre_question, () => {
+        scene.titre_question.setText(categorieChoisie[index].titre);
+        scene.tweens.add({
+            targets: groupReponse.getChildren(),
+            alpha: 1,
+            delay: 400,
+            duration: 200
+        })
+    })
 
     //map dans les reponses possible
     categorieChoisie[index].reponse.forEach((element, i) => {
-        const btnReponse = scene.add.text(scene.screenCenterX, scene.screenCenterY - 100, element, { fontFamily: "FFFTusj", fontSize: 30, color: ' #ffffff ' , wordWrap: { width: window.innerWidth }});
+        const btnReponse = scene.add.text(scene.screenCenterX, scene.screenCenterY - 100, element, { fontFamily: "FFFTusj", fontSize: 30, color: ' #ffffff ' , wordWrap: { width: window.innerWidth }}).setAlpha(0);
         btnReponse
             .setOrigin(0.5)
             .setInteractive({ cursor: 'pointer' })
             .on('pointerdown', () => {
-                titre_q.text = "";
                 groupReponse.propertyValueSet("alpha", 0);
                 if (categorieChoisie[index].indexBonneReponse === i)
                 {
@@ -147,13 +156,14 @@ function afficherQuestion(categorieChoisie, scene, index, max) {
         groupReponse.add(btnReponse)
     });
 
-    groupBtn.add(titre_q)
+    groupBtn.add(scene.titre_question)
     Phaser.Actions.SetXY(groupBtn.getChildren(), scene.screenCenterX, scene.screenCenterY / 2, 0, 60);
     Phaser.Actions.SetXY(groupReponse.getChildren(), scene.screenCenterX, scene.screenCenterY - scene.screenCenterY / 2 + 130, 0, 80);
 }
 
 function finDePartie(scene, max, categorieChoisie) {
     //!4
+    scene.titre_question.text = ""
     //affiche score
     const text_score = scene.add.text(scene.screenCenterX, scene.screenCenterY -100, `Votre score ${score.getData('score')}/` + max, { fontFamily: "FFFTusj", fontSize: 30, color: ' #ffffff ', wordWrap: { width: window.innerWidth }}).setOrigin(0.5, 0.5);
     const groupeResultatTitre = scene.add.group();
@@ -206,4 +216,21 @@ function finDePartie(scene, max, categorieChoisie) {
         .on('pointerout', function () {
             this.clearTint();
         });
+}
+
+function tween(scene, target, cb = () => {}, cb2 = () => {}) {
+    scene.tweens.add({
+        targets: target,
+        scale: "-=0.02",
+        alpha: 0,
+        duration: 200,
+        onYoyo: () => {
+            cb();
+            console.log("YOYO");
+        },
+        onComplete: () => {
+            cb2();
+        },
+        yoyo: true
+    })
 }
