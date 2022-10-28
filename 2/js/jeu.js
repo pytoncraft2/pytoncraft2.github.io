@@ -5,14 +5,8 @@ window.verificationMobile = function() {
 };
 
 const scale = () => {
-    if (window.verificationMobile()) {
-        return { mode: Phaser.Scale.RESIZE, }
-    } else {
-        return {
-            mode: Phaser.Scale.ScaleModes.FIT,
-            autoCenter: Phaser.Scale.Center.CENTER_BOTH
-        }
-    }
+    if (window.verificationMobile()) return { mode: Phaser.Scale.RESIZE }
+    else return { mode: Phaser.Scale.ScaleModes.FIT, autoCenter: Phaser.Scale.Center.CENTER_BOTH }
 }
 
 const config = {
@@ -25,17 +19,13 @@ const config = {
     physics: {
         default: 'arcade'
     },
-    scene: { preload, create, update, },
+    scene: { preload, create, },
     autoCenter: true
 }
 
-
 const game = new Phaser.Game(config);
 const MAIN_COLOR = 0xff9800;
-let groupBtn;
-let quiz;
-let score;
-let titre_question;
+let groupeCategories, quiz, score, titre_question, screenCenterX, screenCenterY;
 
 function preload() {
     this.load.json('questions', './assets/donnes/questions.json');
@@ -46,191 +36,126 @@ function create() {
     const scene = this;
     console.log(quiz);
 
-    const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
-    const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
+    screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
+    screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
-    this.screenCenterX = screenCenterX
-    this.screenCenterY = screenCenterX
     //titre
-
-    const infoTexte = this.add.text(screenCenterX, screenCenterY - 370, "Choisir une catégorie de question", { fontFamily: "FFFTusj", fontSize: 30, wordWrap: { width: window.innerWidth }}).setOrigin(0.5);
+    const infoTexte = txt(scene, screenCenterX, screenCenterY - 370, "Choisir une catégorie de question");
     const { width } = scene.sys.game.canvas;
-    this.titre_question = scene.add.text(screenCenterX, 110, "", { fontFamily: "FFFTusj", fontSize: 30, color: ' #ffffff ', wordWrap: { width } });
+    this.titre_question = txt(scene, screenCenterX, 110, "").setWordWrapWidth(width)
     this.titre_question.setOrigin(0.5)
 
     //ajout des boutons dans un groupe avec le nom de la catégorie
-    groupBtn = this.add.group();
+    groupeCategories = this.add.group();
 
-    groupBtn.add(infoTexte)
+    groupeCategories.add(infoTexte)
 
-
+    //stockage des titre des catégories dans un groupe
     Object.entries(quiz).map((v, i) => {
-        const btn = this.add.text(screenCenterX, screenCenterY, v[0], { fontFamily: "FFFTusj", fontSize: 30, color: ' #ffffff ' });
-        btn.setInteractive({ cursor: 'pointer' })
-            .setOrigin(0.5)
-            .on('pointerdown', () => {
-                //!1
-                commencerQuestion(v[0], this)
-            })
-            .on('pointerover', function () {
-                this.setTint(MAIN_COLOR);
-            }).on('pointerout', function () {
-                this.clearTint();
-            });
-        groupBtn.add(btn)
+        const btn = txt(scene, screenCenterX, screenCenterY, v[0], ...[,], true, () => commencerQuestion(v[0], this))
+        groupeCategories.add(btn)
     });
 
-
-    //alignement verticale du groupe de bouton
-    Phaser.Actions.SetXY(groupBtn.getChildren(), screenCenterX, screenCenterY / 2 - 40, 0, 60);
-    groupBtn.getFirst(true).setY(80);
+    //alignement verticale du groupe des catégories
+    centrer(groupeCategories.getChildren(), screenCenterX, screenCenterY / 2 - 40, 0, 60)
+    groupeCategories.getFirst(true).setY(80);
 }
-
-function update() { }
 
 function commencerQuestion(categorie, self) {
     //cache les boutons d'acceuil (catégories)
-    groupBtn.toggleVisible()
+    groupeCategories.toggleVisible()
     categorieChoisie = quiz[categorie]
     const totalQuestion = Object.keys(quiz[categorie]).length;
     
-    //!2
-    score = self.add.text(10, 10, ``, { fontFamily: "FFFTusj", fontSize: 30, color: ' #ffffff ',  wordWrap: { width: window.innerWidth }});
-    score.setData('score', 0)
+    score = txt(self, 10, 10, "");
+    score.setData('score', 0);
 
     //affiche les résultas vrai ou faux répondu ou non sous forme de points
     const points = [];
-    for (let index = 0; index < totalQuestion; index++) {
+    for (let key in Object.keys(quiz[categorie]))
         points.push("⚫");
-    }
 
-    self.scoreTotal = self.add.text(self.screenCenterX, 37, points.join(' '), { fontFamily: "FFFTusj", fontSize: 30, color: ' #ffffff ', align: 'center' }).setAlpha(0.7).setOrigin(0.5);
+    self.scoreTotal = txt(self, screenCenterX, 37, points.join(' ')).setAlpha(0.7).setOrigin(0.5).setAlign('center');
     self.scoreTotal.points = points;
 
+    //!2
     afficherQuestion(categorieChoisie, self, 0, totalQuestion)
 }
 
 function afficherQuestion(categorieChoisie, scene, index, max) {
     if ((max - index) == 0) return finDePartie(scene, max, categorieChoisie)
-    groupBtn.clear();
+    groupeCategories.clear();
     const groupReponse = scene.add.group();
 
-    //titre question
-    tween(scene, scene.titre_question, () => {
+    //affichage avec transition du titre de la question
+    animation(scene, scene.titre_question, ...[,], () => {
         scene.titre_question.setText(categorieChoisie[index].titre);
-        scene.tweens.add({
-            targets: groupReponse.getChildren(),
-            alpha: 1,
-            delay: 400,
-            duration: 200
-        })
+        animation(scene, groupReponse.getChildren(), { alpha: 1, delay: 130, duration: 200 })
     })
 
     //map dans les reponses possible
-    categorieChoisie[index].reponse.forEach((element, i) => {
-        const btnReponse = scene.add.text(scene.screenCenterX, scene.screenCenterY - 100, element, { fontFamily: "FFFTusj", fontSize: 30, color: ' #ffffff ' , wordWrap: { width: window.innerWidth }}).setAlpha(0);
-        btnReponse
-            .setOrigin(0.5)
-            .setInteractive({ cursor: 'pointer' })
-            .on('pointerdown', () => {
-                groupReponse.propertyValueSet("alpha", 0);
-                if (categorieChoisie[index].indexBonneReponse === i)
-                {
-                    score.data.list.score += 1;
-                    scene.scoreTotal.points[index] = "✅";
-                } else
-                {
-                    scene.scoreTotal.points[index] = "❌";
-                }
-
-                scene.scoreTotal.text = scene.scoreTotal.points.join(' ')
-
-                //!3
-                afficherQuestion(categorieChoisie, scene, index + 1, max);
-            })
-            .on('pointerover', function () {
-                this.setTint(MAIN_COLOR);
-            }).on('pointerout', function () {
-                this.clearTint();
-            });
+    categorieChoisie[index].reponse.map((element, i) => {
+        const btnReponse = txt(scene, screenCenterX, screenCenterY - 100, element, ...[,], true, () => {
+            groupReponse.propertyValueSet("alpha", 0);
+            if (categorieChoisie[index].indexBonneReponse === i) { score.data.list.score += 1; scene.scoreTotal.points[index] = "✅"; }
+            else scene.scoreTotal.points[index] = "❌";
+            scene.scoreTotal.text = scene.scoreTotal.points.join(' ')
+            //!3
+            afficherQuestion(categorieChoisie, scene, index + 1, max);
+        }).setAlpha(0);
         groupReponse.add(btnReponse)
     });
 
-    groupBtn.add(scene.titre_question)
-    Phaser.Actions.SetXY(groupBtn.getChildren(), scene.screenCenterX, scene.screenCenterY / 2, 0, 60);
-    Phaser.Actions.SetXY(groupReponse.getChildren(), scene.screenCenterX, scene.screenCenterY - scene.screenCenterY / 2 + 130, 0, 80);
+    groupeCategories.add(scene.titre_question)
+    centrer(groupeCategories.getChildren(), screenCenterX, screenCenterY / 2)
+    centrer(groupReponse.getChildren(), screenCenterX, screenCenterY - screenCenterY / 2 + 130, 0, 80)
 }
 
+
+//COMPOSANTS
 function finDePartie(scene, max, categorieChoisie) {
     //!4
     scene.titre_question.text = ""
     //affiche score
-    const text_score = scene.add.text(scene.screenCenterX, scene.screenCenterY -100, `Votre score ${score.getData('score')}/` + max, { fontFamily: "FFFTusj", fontSize: 30, color: ' #ffffff ', wordWrap: { width: window.innerWidth }}).setOrigin(0.5, 0.5);
+    const text_score = txt(scene, screenCenterX, screenCenterY -30, `Votre score ${score.getData('score')}/` + max).setAlpha(0);
     const groupeResultatTitre = scene.add.group();
     const groupeResultatReponse = scene.add.group();
 
     const ancienResultat = scene.scoreTotal.text.split(' ');
+    const { width } = scene.sys.game.canvas;
     categorieChoisie.map((v, i) => {
         const couleur = ancienResultat[i] == "✅" ? '#049f21' : '#ff0000';
-        const titre = scene.add.text(scene.screenCenterX, scene.screenCenterY, [v.titre],
-            {
-                fontFamily: "FFFTusj",
-                height: 200,
-                fontSize: 23,
-                color: '#ffffff',
-                wordWrap: { width: window.innerWidth },
-                align: 'center'
-            }).setOrigin(0.5).setShadow(2, 2, "#333333", 2, true, true)
-        const reponse = scene.add.text(scene.screenCenterX, scene.screenCenterY, [v.reponse[v.indexBonneReponse]],
-            {
-                fontFamily: "FFFTusj",
-                height: 200,
-                fontSize: 23,
-                color: couleur,
-                wordWrap: { width: window.innerWidth },
-                align: 'center'
-            }).setOrigin(0.5).setShadow(2, 2, "#333333", 2, true, true) 
-
+        const titre = txt(scene, screenCenterX, screenCenterY, [v.titre]).setShadow(2, 2, "#333333", 2, true, true).setAlign('center').setWordWrapWidth(width).setFontSize(23)
+        const reponse = txt(scene, screenCenterX, screenCenterY, [v.reponse[v.indexBonneReponse]]).setShadow(2, 2, "#333333", 2, true, true).setColor(couleur).setFontSize(23)
         groupeResultatTitre.add(titre)
         groupeResultatReponse.add(reponse)
     })
-    Phaser.Actions.SetXY(groupeResultatTitre.getChildren(), scene.screenCenterX, scene.screenCenterY / 2 + 200, 0, 60);
-    Phaser.Actions.SetXY(groupeResultatReponse.getChildren(), scene.screenCenterX, scene.screenCenterY / 2 + 225, 0, 60);
+    centrer(groupeResultatTitre.getChildren(), screenCenterX, screenCenterY / 2 + 200, 0, 60)
+    centrer(groupeResultatReponse.getChildren(), screenCenterX, screenCenterY / 2 + 225, 0, 60)
+
+    animation(scene, text_score, {y: "-=40", alpha: 1, duration: 300})
 
     //Redémarre la scene au clique
-    const rejouer = scene.add.text(scene.screenCenterX, scene.screenCenterY + 400, "Rejouer",
-    {
-        fontFamily: "FFFTusj",
-        fontSize: 30,
-        color: ' #ffffff',
-        wordWrap: { width: window.innerWidth }
-    })
-    .setOrigin(0.5, 0.5)
-    .setInteractive({ cursor: 'pointer' })
-        .on("pointerdown", () => {
-            scene.scene.restart();
-        })
-        .on('pointerover', function () {
-            this.setTint(MAIN_COLOR);
-        })
-        .on('pointerout', function () {
-            this.clearTint();
-        });
+    const rejouer = txt(scene, screenCenterX, screenCenterY + 400, "Rejouer", ...[,], true, () => scene.scene.restart());
 }
 
-function tween(scene, target, cb = () => {}, cb2 = () => {}) {
+function animation(scene, target, params = { scale: "-=0.02", alpha: 0, duration: 200, yoyo: true }, cb = () => {}, cb2 = () => {}) {
     scene.tweens.add({
         targets: target,
-        scale: "-=0.02",
-        alpha: 0,
-        duration: 200,
-        onYoyo: () => {
-            cb();
-            console.log("YOYO");
-        },
-        onComplete: () => {
-            cb2();
-        },
-        yoyo: true
+        ...params,
+        onYoyo: () => cb(),
+        onComplete: () => cb2()
     })
 }
+
+function txt(scene, x, y, text, params = { fontFamily: "FFFTusj", fontSize: 30, color: ' #ffffff', wordWrap: { width: window.innerWidth } }, interactif = false, cb = () => { }) {
+    const textCreer = scene.add.text(x, y, text, { ...params }).setOrigin(0.5, 0.5)
+    interactif && textCreer
+        .setInteractive({ cursor: 'pointer' })
+        .once("pointerdown", (ev, go, event) => cb())
+        .on('pointerover', function () { this.setTint(MAIN_COLOR); })
+        .on('pointerout', function () { this.clearTint(); });
+    return textCreer;
+}
+
+centrer = (cible, x, y) => Phaser.Actions.SetXY(cible, x, y, 0, 60);
