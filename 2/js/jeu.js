@@ -25,7 +25,7 @@ const config = {
 
 const game = new Phaser.Game(config);
 const MAIN_COLOR = 0xff9800;
-let groupeCategories, quiz, score, titre_question, screenCenterX, screenCenterY;
+let groupeCategories, quiz, score, titre_question, screenCenterX, screenCenterY, titreAccueil;
 
 function preload() {
     this.load.json('questions', './assets/donnes/questions.json');
@@ -40,42 +40,39 @@ function create() {
     screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
     //titre
-    const infoTexte = txt(scene, screenCenterX, screenCenterY - 370, "Choisir une catégorie de question");
+    titreAccueil = texte(scene, screenCenterX, 40, "Choisir une catégorie de question").setFontStyle('bold italic');
     const { width } = scene.sys.game.canvas;
-    this.titre_question = txt(scene, screenCenterX, 110, "").setWordWrapWidth(width)
+    this.titre_question = texte(scene, screenCenterX, 110, "").setWordWrapWidth(width)
     this.titre_question.setOrigin(0.5)
 
     //ajout des boutons dans un groupe avec le nom de la catégorie
     groupeCategories = this.add.group();
 
-    groupeCategories.add(infoTexte)
-
     //stockage des titre des catégories dans un groupe
     Object.entries(quiz).map((v, i) => {
-        const btn = txt(scene, screenCenterX, screenCenterY, v[0], ...[,], true, () => commencerQuestion(v[0], this))
+        const btn = texte(scene, screenCenterX, screenCenterY, v[0], ...[,], () => commencerQuestion(v[0], this))
         groupeCategories.add(btn)
     });
 
-    //alignement verticale du groupe des catégories
-    centrer(groupeCategories.getChildren(), screenCenterX, screenCenterY / 2 - 40, 0, 60)
-    groupeCategories.getFirst(true).setY(80);
+    //alignerment verticale du groupe des catégories
+    aligner(groupeCategories.getChildren(), screenCenterX, 125)
 }
 
 function commencerQuestion(categorie, self) {
-    //cache les boutons d'acceuil (catégories)
+    //cache le titre et les boutons d'acceuil (catégories)
     groupeCategories.toggleVisible()
+    titreAccueil.destroy()
     categorieChoisie = quiz[categorie]
     const totalQuestion = Object.keys(quiz[categorie]).length;
     
-    score = txt(self, 10, 10, "");
+    score = texte(self, 10, 10, "");
     score.setData('score', 0);
 
     //affiche les résultas vrai ou faux répondu ou non sous forme de points
     const points = [];
-    for (let key in Object.keys(quiz[categorie]))
-        points.push("⚫");
+    for (let key in Object.keys(quiz[categorie])) points.push("⚫");
 
-    self.scoreTotal = txt(self, screenCenterX, 37, points.join(' ')).setAlpha(0.7).setOrigin(0.5).setAlign('center');
+    self.scoreTotal = texte(self, screenCenterX, 37, points.join(' ')).setAlpha(0.7).setOrigin(0.5).setAlign('center');
     self.scoreTotal.points = points;
 
     //!2
@@ -87,7 +84,7 @@ function afficherQuestion(categorieChoisie, scene, index, max) {
     groupeCategories.clear();
     const groupReponse = scene.add.group();
 
-    //affichage avec transition du titre de la question
+    //affichage avec transition le titre de la question
     animation(scene, scene.titre_question, ...[,], () => {
         scene.titre_question.setText(categorieChoisie[index].titre);
         animation(scene, groupReponse.getChildren(), { alpha: 1, delay: 130, duration: 200 })
@@ -95,10 +92,11 @@ function afficherQuestion(categorieChoisie, scene, index, max) {
 
     //map dans les reponses possible
     categorieChoisie[index].reponse.map((element, i) => {
-        const btnReponse = txt(scene, screenCenterX, screenCenterY - 100, element, ...[,], true, () => {
-            groupReponse.propertyValueSet("alpha", 0);
+        const btnReponse = texte(scene, screenCenterX, screenCenterY - 100, element, ...[,], () => {
+            // groupReponse.propertyValueSet("alpha", 0);
+            groupReponse.destroy(true)
             if (categorieChoisie[index].indexBonneReponse === i) { score.data.list.score += 1; scene.scoreTotal.points[index] = "✅"; }
-            else scene.scoreTotal.points[index] = "❌";
+            else { scene.scoreTotal.points[index] = "❌"; categorieChoisie[index].reponseDonne = element }
             scene.scoreTotal.text = scene.scoreTotal.points.join(' ')
             //!3
             afficherQuestion(categorieChoisie, scene, index + 1, max);
@@ -107,38 +105,32 @@ function afficherQuestion(categorieChoisie, scene, index, max) {
     });
 
     groupeCategories.add(scene.titre_question)
-    centrer(groupeCategories.getChildren(), screenCenterX, screenCenterY / 2)
-    centrer(groupReponse.getChildren(), screenCenterX, screenCenterY - screenCenterY / 2 + 130, 0, 80)
+    aligner(groupeCategories.getChildren(), screenCenterX, screenCenterY / 2)
+    aligner(groupReponse.getChildren(), screenCenterX, screenCenterY - screenCenterY / 2 + 130, 0, 80)
 }
 
-
-//COMPOSANTS
 function finDePartie(scene, max, categorieChoisie) {
     //!4
     scene.titre_question.text = ""
     //affiche score
-    const text_score = txt(scene, screenCenterX, screenCenterY -30, `Votre score ${score.getData('score')}/` + max).setAlpha(0);
-    const groupeResultatTitre = scene.add.group();
-    const groupeResultatReponse = scene.add.group();
+    const text_score = texte(scene, screenCenterX, 150, `Votre score ${score.getData('score')}/` + max).setAlpha(0);
+    const groupeResultatQuestionReponse = scene.add.group();
 
-    const ancienResultat = scene.scoreTotal.text.split(' ');
     const { width } = scene.sys.game.canvas;
     categorieChoisie.map((v, i) => {
-        const couleur = ancienResultat[i] == "✅" ? '#049f21' : '#ff0000';
-        const titre = txt(scene, screenCenterX, screenCenterY, [v.titre]).setShadow(2, 2, "#333333", 2, true, true).setAlign('center').setWordWrapWidth(width).setFontSize(23)
-        const reponse = txt(scene, screenCenterX, screenCenterY, [v.reponse[v.indexBonneReponse]]).setShadow(2, 2, "#333333", 2, true, true).setColor(couleur).setFontSize(23)
-        groupeResultatTitre.add(titre)
-        groupeResultatReponse.add(reponse)
+        const couleur = v.reponseDonne ? '#ff0000' : '#049f21';
+        const titre = texte(scene, screenCenterX, screenCenterY, [v.titre, [v.reponse[v.indexBonneReponse].concat(v.reponseDonne ? ` ⬅️ ${v.reponseDonne}` : '  ✅')]]).setShadow(2, 2, couleur, 2, true, true).setAlign('center').setWordWrapWidth(width).setFontSize(23)
+        groupeResultatQuestionReponse.add(titre)
     })
-    centrer(groupeResultatTitre.getChildren(), screenCenterX, screenCenterY / 2 + 200, 0, 60)
-    centrer(groupeResultatReponse.getChildren(), screenCenterX, screenCenterY / 2 + 225, 0, 60)
-
+    aligner(groupeResultatQuestionReponse.getChildren(), screenCenterX, 200, 0, 100)
     animation(scene, text_score, {y: "-=40", alpha: 1, duration: 300})
 
     //Redémarre la scene au clique
-    const rejouer = txt(scene, screenCenterX, screenCenterY + 400, "Rejouer", ...[,], true, () => scene.scene.restart());
+    const { height } = scene.sys.game.canvas;
+    const rejouer = texte(scene, screenCenterX, height - 50, "Rejouer", ...[,], () => scene.scene.restart()).setScrollFactor(0);
 }
 
+//UTILITAIRES
 function animation(scene, target, params = { scale: "-=0.02", alpha: 0, duration: 200, yoyo: true }, cb = () => {}, cb2 = () => {}) {
     scene.tweens.add({
         targets: target,
@@ -148,14 +140,14 @@ function animation(scene, target, params = { scale: "-=0.02", alpha: 0, duration
     })
 }
 
-function txt(scene, x, y, text, params = { fontFamily: "FFFTusj", fontSize: 30, color: ' #ffffff', wordWrap: { width: window.innerWidth } }, interactif = false, cb = () => { }) {
+function texte(scene, x, y, text, params = { fontFamily: "FFFTusj", fontSize: 30, color: ' #ffffff', wordWrap: { width: window.innerWidth } }, callback = undefined) {
     const textCreer = scene.add.text(x, y, text, { ...params }).setOrigin(0.5, 0.5)
-    interactif && textCreer
+    callback && textCreer
         .setInteractive({ cursor: 'pointer' })
-        .once("pointerdown", (ev, go, event) => cb())
+        .once("pointerdown", (ev, go, event) => callback())
         .on('pointerover', function () { this.setTint(MAIN_COLOR); })
         .on('pointerout', function () { this.clearTint(); });
     return textCreer;
 }
 
-centrer = (cible, x, y) => Phaser.Actions.SetXY(cible, x, y, 0, 60);
+aligner = (cible, x, y, stepX = 0, stepY = 60) => Phaser.Actions.SetXY(cible, x, y, stepX, stepY);
