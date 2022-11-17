@@ -24,7 +24,9 @@ const config = {
 }
 
 const game = new Phaser.Game(config);
-const MAIN_COLOR = 0xff9800;
+// const MAIN_COLOR = 0xff9800;
+const MAIN_COLOR = 0x000000;
+const BLEU_PRIMAIRE = 0x006699;
 let groupeCategories, quiz, score, titre_question, screenCenterX, screenCenterY, titreAccueil;
 
 function preload() {
@@ -38,6 +40,8 @@ function create() {
 
     screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
     screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
+
+
 
     //titre
     titreAccueil = texte(scene, screenCenterX, 40, "Choisir une catégorie de question").setFontStyle('bold italic');
@@ -63,6 +67,7 @@ function commencerQuestion(categorie, self) {
     groupeCategories.toggleVisible()
     titreAccueil.destroy()
     categorieChoisie = quiz[categorie]
+
     const totalQuestion = Object.keys(quiz[categorie]).length;
     
     score = texte(self, 10, 10, "");
@@ -83,30 +88,170 @@ function afficherQuestion(categorieChoisie, scene, index, max) {
     if ((max - index) == 0) return finDePartie(scene, max, categorieChoisie)
     groupeCategories.clear();
     const groupReponse = scene.add.group();
+    const groupTexte = scene.add.group();
 
     //affichage avec transition le titre de la question
     animation(scene, scene.titre_question, ...[,], () => {
         scene.titre_question.setText(categorieChoisie[index].titre);
-        animation(scene, groupReponse.getChildren(), { alpha: 1, delay: 130, duration: 200 })
+        animation(scene, groupReponse.getChildren(), { alpha: 1, delay: 130, duration: 200, delay: function (target, targetKey, value, targetIndex, totalTargets, tween) { return targetIndex * 100; }})
+        animation(scene, groupTexte.getChildren(), { scale: 1, alpha: 1, delay: 130, duration: 200, delay: function (target, targetKey, value, targetIndex, totalTargets, tween) { return targetIndex * 100; }})
     })
 
     //map dans les reponses possible
+    const { width } = scene.sys.game.canvas;
+    // var r1 = scene.add.rectangle(screenCenterX, screenCenterY - 80, width, 50, 0x000000).setAlpha(0.9);
+    // var r2 = scene.add.rectangle(screenCenterX, screenCenterY, width, 50, 0x000000).setAlpha(0.9);
+    // var r3 = scene.add.rectangle(screenCenterX, screenCenterY + 80, width, 50, 0x000000).setAlpha(0.9);
+    // var r4 = scene.add.rectangle(screenCenterX, screenCenterY - 160, width, 50, 0x000000).setAlpha(0.9);
+    let base = 280;
+    
     categorieChoisie[index].reponse.map((element, i) => {
-        const btnReponse = texte(scene, screenCenterX, screenCenterY - 100, element, ...[,], () => {
-            // groupReponse.propertyValueSet("alpha", 0);
-            groupReponse.destroy(true)
-            if (categorieChoisie[index].indexBonneReponse === i) { score.data.list.score += 1; scene.scoreTotal.points[index] = "✅"; }
-            else { scene.scoreTotal.points[index] = "❌"; categorieChoisie[index].reponseDonne = element }
-            scene.scoreTotal.text = scene.scoreTotal.points.join(' ')
-            //!3
-            afficherQuestion(categorieChoisie, scene, index + 1, max);
-        }).setAlpha(0);
+        console.log(element);
+        var btnReponse = scene.add.rectangle(screenCenterX, base, width, 50, 0x000000)
+        .setInteractive({cursor: 'pointer'})
+        .on('pointerover', function () { this.fillColor = BLEU_PRIMAIRE; this.fillAlpha = 0.7; })
+        .on('pointerout', function () { this.fillColor = 0x0000; this.fillAlpha = 1; })
+        .once('pointerdown', function () {
+                    if (categorieChoisie[index].indexBonneReponse === i) {
+                        // score.data.list.score += 1;
+                        scene.scoreTotal.points[index] = "✅";
+                        scene.scoreTotal.text = scene.scoreTotal.points.join(' ')
+                        console.log(scene.scoreTotal.points);
+                        this.fillColor = 0x008000;
+                        console.log(this.text);
+                        // this.text.text += " ✅"
+
+                        var timer = scene.time.delayedCall(200, () => {
+                            groupReponse.getChildren().forEach(element => {
+                                element.text.destroy()                                
+                            });
+                            groupReponse.destroy(true)
+                            afficherQuestion(categorieChoisie, scene, index + 1, max);
+                        }, undefined, this);  // delay in ms
+
+                    //  animation(scene, groupReponse.getChildren()[categorieChoisie[index].indexBonneReponse], {delay: 100, alpha: 0, duration: 100, repeat: 1}, () => {}, () => {
+                        // groupReponse.destroy(true)
+                        // afficherQuestion(categorieChoisie, scene, index + 1, max);
+                    // })               
+                    }
+                    else {
+                        scene.scoreTotal.points[index] = "❌";
+                        // categorieChoisie[index].reponseDonne = element;
+                        // this.setStyle({ backgroundColor: '#ff0000' });
+                        this.fillColor = 0xff0000;
+                        // this.text.text += " ❌"
+                    // animation(scene, groupReponse.getChildren()[categorieChoisie[index].indexBonneReponse], {delay: 1000, scale: '+=0.5', yoyo: true, duration: 300, repeat: 1}, () => {}, () => {
+                        // groupReponse.destroy(true)
+                        groupReponse.getChildren()[categorieChoisie[index].indexBonneReponse].fillColor = 0x008000;
+                        animation(scene, groupReponse.getChildren()[categorieChoisie[index].indexBonneReponse], {alpha: 0, duration: 500, repeat: 2, scale: 1.3});
+                        // animation(scene, this, {alpha: 0, duration: 1000})
+                        var timer = scene.time.delayedCall(1000, () => {
+                            scene.scoreTotal.text = scene.scoreTotal.points.join(' ')
+                            groupReponse.getChildren().forEach(element => {
+                                element.text.destroy()                                
+                            });
+                            groupReponse.destroy(true)
+                            // groupReponse.destroy(true)
+                            afficherQuestion(categorieChoisie, scene, index + 1, max);
+                        }, undefined, this);  // delay in ms
+                    // })
+
+                    }
+                //     scene.scoreTotal.text = scene.scoreTotal.points.join(' ')
+                //     // animation(scene, groupReponse.getChildren()[categorieChoisie[index].indexBonneReponse], undefined, () => {}, () => {
+                //     //     groupReponse.destroy(true)
+                //     //     afficherQuestion(categorieChoisie, scene, index + 1, max);
+                //     // })
+                //     // groupReponse.getChildren()[categorieChoisie[index].indexBonneReponse].setAlpha(0.2)
+                //     //     var timer = scene.time.delayedCall(800, () => {
+                //     //         groupReponse.destroy(true)
+                //     //         //!3
+                //     //         afficherQuestion(categorieChoisie, scene, index + 1, max);
+                //     //     }, undefined, this);
+
+                //     // afficherQuestion(categorieChoisie, scene, index + 1, max);
+            })
+        .setAlpha(0.1);
+        btnReponse.text = scene.add.text(screenCenterX, base, element, { fontFamily: "FFFTusj", fontSize: 30, color: ' #ffffff', wordWrap: { width: window.innerWidth } }).setOrigin(0.5, 0.5).setAlpha(0.1)
+        groupTexte.add(btnReponse.text)
+        base+=80;
+        // const btnReponse = texte(scene, screenCenterX, screenCenterY - 100, element, ...[,], (bouton) => {
+        //     if (categorieChoisie[index].indexBonneReponse === i) {
+        //         score.data.list.score += 1;
+        //         scene.scoreTotal.points[index] = "✅";
+        //         bouton.setStyle({ backgroundColor: '#008000' });
+
+        //      animation(scene, groupReponse.getChildren()[categorieChoisie[index].indexBonneReponse], {delay: 100, alpha: 0, duration: 100, repeat: 1}, () => {}, () => {
+        //         groupReponse.destroy(true)
+        //         afficherQuestion(categorieChoisie, scene, index + 1, max);
+        //     })               
+        //     }
+        //     else {
+        //         scene.scoreTotal.points[index] = "❌";
+        //         categorieChoisie[index].reponseDonne = element;
+        //         bouton.setStyle({ backgroundColor: '#ff0000' });
+        //     animation(scene, groupReponse.getChildren()[categorieChoisie[index].indexBonneReponse], {delay: 1000, scale: '+=0.5', yoyo: true, duration: 300, repeat: 1}, () => {}, () => {
+        //         groupReponse.destroy(true)
+        //         afficherQuestion(categorieChoisie, scene, index + 1, max);
+        //     })
+
+        //     }
+        //     scene.scoreTotal.text = scene.scoreTotal.points.join(' ')
+        //     // animation(scene, groupReponse.getChildren()[categorieChoisie[index].indexBonneReponse], undefined, () => {}, () => {
+        //     //     groupReponse.destroy(true)
+        //     //     afficherQuestion(categorieChoisie, scene, index + 1, max);
+        //     // })
+        //     // groupReponse.getChildren()[categorieChoisie[index].indexBonneReponse].setAlpha(0.2)
+        //     //     var timer = scene.time.delayedCall(800, () => {
+        //     //         groupReponse.destroy(true)
+        //     //         //!3
+        //     //         afficherQuestion(categorieChoisie, scene, index + 1, max);
+        //     //     }, undefined, this);
+
+        //     // afficherQuestion(categorieChoisie, scene, index + 1, max);
+        // }).setAlpha(0);
+        // btnReponse.text = texte(scene, screenCenterX, screenCenterY - 100, element, ...[,], (bouton) => {
+
+            // if (categorieChoisie[index].indexBonneReponse === i) {
+        //         score.data.list.score += 1;
+                // scene.scoreTotal.points[index] = "✅";
+        //         bouton.setStyle({ backgroundColor: '#008000' });
+
+        //      animation(scene, groupReponse.getChildren()[categorieChoisie[index].indexBonneReponse], {delay: 100, alpha: 0, duration: 100, repeat: 1}, () => {}, () => {
+        //         groupReponse.destroy(true)
+        //         afficherQuestion(categorieChoisie, scene, index + 1, max);
+        //     })               
+            // }
+            // else {
+                // scene.scoreTotal.points[index] = "❌";
+        //         categorieChoisie[index].reponseDonne = element;
+        //         bouton.setStyle({ backgroundColor: '#ff0000' });
+        //     animation(scene, groupReponse.getChildren()[categorieChoisie[index].indexBonneReponse], {delay: 1000, scale: '+=0.5', yoyo: true, duration: 300, repeat: 1}, () => {}, () => {
+        //         groupReponse.destroy(true)
+        //         afficherQuestion(categorieChoisie, scene, index + 1, max);
+        //     })
+
+            // }
+        //     scene.scoreTotal.text = scene.scoreTotal.points.join(' ')
+        //     // animation(scene, groupReponse.getChildren()[categorieChoisie[index].indexBonneReponse], undefined, () => {}, () => {
+        //     //     groupReponse.destroy(true)
+        //     //     afficherQuestion(categorieChoisie, scene, index + 1, max);
+        //     // })
+        //     // groupReponse.getChildren()[categorieChoisie[index].indexBonneReponse].setAlpha(0.2)
+        //     //     var timer = scene.time.delayedCall(800, () => {
+        //     //         groupReponse.destroy(true)
+        //     //         //!3
+        //     //         afficherQuestion(categorieChoisie, scene, index + 1, max);
+        //     //     }, undefined, this);
+
+        //     // afficherQuestion(categorieChoisie, scene, index + 1, max);
+        // })
         groupReponse.add(btnReponse)
     });
 
     groupeCategories.add(scene.titre_question)
     aligner(groupeCategories.getChildren(), screenCenterX, screenCenterY / 2)
-    aligner(groupReponse.getChildren(), screenCenterX, screenCenterY - screenCenterY / 2 + 130, 0, 80)
+    // aligner(groupReponse.getChildren(), screenCenterX, screenCenterY - screenCenterY / 2 + 130, 0, 80)
 }
 
 function finDePartie(scene, max, categorieChoisie) {
@@ -135,16 +280,19 @@ function animation(scene, target, params = { scale: "-=0.02", alpha: 0, duration
     scene.tweens.add({
         targets: target,
         ...params,
-        onYoyo: () => cb(),
-        onComplete: () => cb2()
+        onYoyo: () => cb(target),
+        onComplete: () => cb2(target)
     })
 }
 
 function texte(scene, x, y, text, params = { fontFamily: "FFFTusj", fontSize: 30, color: ' #ffffff', wordWrap: { width: window.innerWidth } }, callback = undefined) {
     const textCreer = scene.add.text(x, y, text, { ...params }).setOrigin(0.5, 0.5)
     callback && textCreer
+        .setOrigin(0.5)
+        .setPadding(10)
+        .setStyle({ backgroundColor: '#111'})
         .setInteractive({ cursor: 'pointer' })
-        .once("pointerdown", (ev, go, event) => callback())
+        .once("pointerdown", (ev, go, event) => callback(textCreer))
         .on('pointerover', function () { this.setTint(MAIN_COLOR); })
         .on('pointerout', function () { this.clearTint(); });
     return textCreer;
