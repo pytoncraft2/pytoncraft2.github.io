@@ -13,6 +13,9 @@ const config = {
     type: Phaser.AUTO,
     parent: "parent",
     scale: scale(),
+    dom: {
+        createContainer: true
+    },
     width: 600,
     height: 890,
     transparent: true,
@@ -31,18 +34,11 @@ let groupeCategories, quiz, score, titre_question, screenCenterX, screenCenterY,
 
 function preload() {
     this.load.json('questions', './assets/donnes/questions.json');
-    this.load.image('fond', 'https://media.scoutwiki.org/images/e/e6/BP_jagger_complete.jpg');
-    this.load.image('bg', 'https://media.scoutwiki.org/images/archive/e/e6/20130621152135%21BP_jagger_complete.jpg');
-    // this.load.image('autre', "https://media.gettyimages.com/id/973204082/fr/photo/1969-brooke-bond-collectors-tea-card-depicting-lieutenant-general-robert-baden-powell-british.jpg?s=2048x2048&w=gi&k=20&c=UyD6VTmo0SrSReJ--P2BmWuk54WAFdUGkPu-_US3VBk=");
 }
 
 function create() {
     quiz = this.cache.json.get('questions');
     const scene = this;
-    // const bar1 = this.add.nineslice(400, 200, 'ui', 'ButtonOrange');
-    // const panel = this.add.nineslice(0, 0, 'fond', 'https://media.scoutwiki.org/images/e/e6/BP_jagger_complete.jpg', 400, 275, 160, 160, 100, 100).setOrigin(0, 0);
-
-
 
     screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
     screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
@@ -52,9 +48,7 @@ function create() {
     const { width } = scene.sys.game.canvas;
     this.titre_question = texte(scene, screenCenterX, 160, "").setWordWrapWidth(width)
 
-    // this.add.image(screenCenterX, screenCenterY, 'fond').setAlpha(1).setPosition(this.titre_question.x, this.titre_question.y).setScale(0.4)
-    this.image_question = this.add.image(screenCenterX, screenCenterY, 'fond').setAlpha(0).setPosition(this.titre_question.x, this.titre_question.y + 15).setActive(false).setScale(0.4);
-    // this.image_question.setDisplaySize(this.image_question.displayWidth, 150)
+    this.image_question = this.add.image(screenCenterX, screenCenterY, 'fond').setAlpha(0).setPosition(this.titre_question.x, this.titre_question.y + 15).setActive(false);
     this.titre_question.setOrigin(0.5)
 
     //ajout des boutons dans un groupe avec le nom de la catégorie
@@ -108,20 +102,9 @@ function afficherQuestion(categorieChoisie, scene, index, max) {
     const groupReponse = scene.add.group();
     const groupTexte = scene.add.group();
 
-
-
-    // categorieChoisie[index].image && scene.add.image(screenCenterX, 200, categorieChoisie[index].image).setScale(0.4);
-
     if (categorieChoisie[index].image) {
-        // scene.load.image(`${categorieChoisie[index].image}`, categorieChoisie[index].image)
-        // scene.load.once(Phaser.Loader.Events.COMPLETE, () => {
-        //     // texture loaded so use instead of the placeholder
-            scene.image_question.setTexture(`${categorieChoisie[index].image}`)
-        // })
-        // scene.load.start()
-        // scene.add.image(scene.screenCenterX, scene.screenCenterY, 'fond').setAlpha(1).setPosition(scene.titre_question.x, scene.titre_question.y + 15).setScale(0.4)       
+        scene.image_question.setTexture(`${categorieChoisie[index].image}`)
         animation(scene, scene.image_question, { alpha: 1, duration: 200 }, () => {
-            // scene.image_question.destroy();
         })
     }
 
@@ -146,6 +129,8 @@ function afficherQuestion(categorieChoisie, scene, index, max) {
                 if (categorieChoisie[index].indexBonneReponse === i)
                 {
                     scene.scoreTotal.points[index] = "✅";
+
+                    score.setData('score', score.getData('score') + 1);
                     scene.scoreTotal.text = scene.scoreTotal.points.join(' ')
                     this.fillColor = 0x008000;
 
@@ -200,30 +185,30 @@ function finDePartie(scene, max, categorieChoisie) {
     let base = 280;
     const { width } = scene.sys.game.canvas;
     categorieChoisie.map((v, i) => {
-        console.log(v);
-        // const couleur = v.reponseDonne ? '#ff0000' : '#049f21';
-        // const titre = texte(scene, screenCenterX, screenCenterY, [v.titre, [v.reponse[v.indexBonneReponse].concat(v.reponseDonne ? ` ⬅️ ${v.reponseDonne}` : '  ✅')]]).setShadow(2, 2, couleur, 2, true, true).setAlign('center').setWordWrapWidth(width).setFontSize(23)
-        // const titre = texte(scene, screenCenterX, screenCenterY, "En savoir plus sur " + v.reponse[v.indexBonneReponse]).setShadow(2, 2, couleur, 2, true, true).setAlign('center').setWordWrapWidth(width).setFontSize(23).setAlign('center')
-        
-        // groupeResultatQuestionReponse.add(titre)
-
-
         const couleur = v.reponseDonne ? '#ff0000' : '#049f21';
         var btnReponse = scene.add.rectangle(screenCenterX, base, width, 50, couleur)
             .setInteractive({ cursor: 'pointer' })
             .on('pointerover', function () { this.fillColor = BLEU_PRIMAIRE; this.fillAlpha = 0.7; })
             .on('pointerout', function () { this.fillColor = 0x0000; this.fillAlpha = 1; })
             .once('pointerdown', function () {
+                var url = `https://www.latoilescoute.net/spip.php?page=recherche&recherche=${this.text.text.replaceAll(' ', '+').toLowerCase()}`;
 
-            })
+                var s = window.open(url, '_blank');
 
-        btnReponse.text = scene.add.text(screenCenterX, base, v.reponse[v.indexBonneReponse] + ">", { fontFamily: "FFFTusj", fontSize: 20, color: ' #ffffff', wordWrap: { width: window.innerWidth } }).setOrigin(0.5, 0.5)
-
-
-            base+= 80;
+                if (s && s.focus) {
+                    s.focus();
+                }
+                else if (!s) {
+                    window.location.href = url;
+                }
+            });
+        btnReponse.text = scene.add.text(screenCenterX, base, v.reponse[v.indexBonneReponse], { fontFamily: "FFFTusj", fontSize: 20, color: ' #ffffff', wordWrap: { width: window.innerWidth } }).setOrigin(0.5, 0.5);
+        base += 80;
     })
 
-    // aligner(groupeResultatQuestionReponse.getChildren(), screenCenterX, 200, 0, 100)
+    
+
+
     animation(scene, text_score, { y: "-=40", alpha: 1, duration: 300 })
 
     //Redémarre la scene au clique
