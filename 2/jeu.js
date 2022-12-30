@@ -1,6 +1,6 @@
 /**
  * @author Timothée Hennequin @timd57
- * @date 20/12/2022
+ * @date 30/12/2022
  * @file [(jeu.js)](./jeu.js) fichier racine du jeu. [jouer au quiz 🎮](https://pytoncraft2.github.io/2/).
  * @version 0.1.0
  * @module JEU
@@ -42,7 +42,7 @@ function create() {
     //titre
     titreAccueil = texte(scene, centreEcranX, 40, "Choisir une catégorie de question").setFontStyle('bold italic');
     const { width } = scene.sys.game.canvas;
-    this.titre_question = texte(scene, centreEcranX, 160, "").setWordWrapWidth(width).setOrigin(0.5)
+    this.titre_question = texte(scene, centreEcranX, 160, "").setWordWrapWidth(width - 5).setOrigin(0.5).setFontSize(23);
 
     this.image_question = this.add.image(centreEcranX, centreEcranY + 500, 'fond').setAlpha(0).setPosition(this.titre_question.x, this.titre_question.y + 15).setActive(false);
 
@@ -63,16 +63,9 @@ function create() {
     });
 
     aligner(groupeBoutonsCategories.getChildren(), centreEcranX, 125)
-    var progressBox = this.add.graphics();
-    var progressBar = this.add.graphics();
-    progressBox.fillStyle(0x222222, 1);
-    progressBox.fillRect(0, 0, width, 10);
-    var timer = scene.time.delayedCall(1000, () => {
-        progressBar.clear();
-        progressBar.fillStyle(0x009936, 1);
-        progressBar.fillRect(0, 0, width / 2, 10);
-    }, undefined, this);
 }
+
+
 
 /**
  * @memberof module:JEU
@@ -93,8 +86,6 @@ function commencerQuestion(categorie, scene) {
 
     const totalQuestion = Object.keys(quizParCategorie[categorie]).length;
 
-    
-
     texteScore = texte(scene, 10, 10, "");
     texteScore.setData('score', 0);
 
@@ -102,7 +93,7 @@ function commencerQuestion(categorie, scene) {
     const points = [];
     for (let key in Object.keys(quizParCategorie[categorie])) points.push("⚫");
 
-    scene.scoreTotal = texte(scene, centreEcranX, 37, points.join(' ')).setAlpha(0.7).setOrigin(0.5).setAlign('center');
+    scene.scoreTotal = texte(scene, centreEcranX, 37, points.join(' ')).setAlpha(0.7).setOrigin(0.5).setAlign('center').setFontSize(20);
     scene.scoreTotal.points = points;
 
     // préchargement des images de la catégorie séléctionné
@@ -119,8 +110,9 @@ function commencerQuestion(categorie, scene) {
         })
         scene.load.start()
     }
-    //!2
 }
+
+
 
 /**
  * @memberof module:JEU
@@ -155,44 +147,35 @@ function commencerQuestion(categorie, scene) {
 }, scene, 0, 12)
 */
 function afficherQuestion(categorieChoisie, scene, index, max) {
-    console.log(categorieChoisie);
     if ((max - index) == 0) return finDePartie(scene, max, categorieChoisie)
     groupeBoutonsCategories.clear();
     const groupReponse = scene.add.group();
     const groupTexte = scene.add.group();
 
-    if (categorieChoisie[index]?.image == "" && categorieChoisie[index].question) {
-        // scene.titre_question.setPosition(300, 160)
-        scene.titre_question.setPosition(scene.titre_question.x, 160)
-    }
-
-    if (categorieChoisie[index]?.image != "" && categorieChoisie[index].question) {
-        console.log("image et question");
-        scene.image_question.setPosition(scene.image_question.x, 200)
-        scene.titre_question.setPosition(scene.titre_question.x, 110)
-    }
-
-    if (categorieChoisie[index]?.image == "" && categorieChoisie[index].question == "") {
-        console.log("question uniquement");
-        scene.titre_question.setPosition(scene.titre_question.x, 180)
-    }
-
-    if (categorieChoisie[index]?.image != "") {
-        scene.image_question.setTexture(`${categorieChoisie[index].image}`)
-        // scene.image_question.setPosition(scene.image_question.x, scene.image_question.y + 20)
-        scene.image_question.setAlpha(1)
-        // const container = scene.add.container(0, 0);
-        console.log(scene.titre_question.x, scene.titre_question.y);
-        // const btnReponse = rectangleInteractif(scene, 0, 0, width, 50, () => commencerQuestion(donnes[0], scene));
-        // btnReponse.text = scene.add.text(0, 0, donnes[0], { fontFamily: "FFFTusj", fontSize: 26, color: ' #ffffff', wordWrap: { width: window.innerWidth } }).setOrigin(0.5, 0.5);
-        // scene.titre_question.setPosition(scene.titre_question.x, scene.titre_question.y - 50)
-        // container.add([scene.image_question, scene.titre_question]);
-
-        animation(scene, scene.image_question, { alpha: 1, duration: 200 })
-    }
-
     //affichage avec transition le titre de la question
     animation(scene, scene.titre_question, ...[,], () => {
+        if (categorieChoisie[index]?.image == "" && categorieChoisie[index].question) {
+            scene.titre_question.setPosition(scene.titre_question.x, 160)
+        }
+
+        if (categorieChoisie[index]?.image != "" && categorieChoisie[index].question) {
+            console.log("image et question");
+            scene.image_question.setPosition(scene.image_question.x, 200)
+            scene.titre_question.setPosition(scene.titre_question.x, 110)
+        }
+
+        if (categorieChoisie[index]?.image == "" && categorieChoisie[index].question == "") {
+            console.log("question uniquement");
+            scene.titre_question.setPosition(scene.titre_question.x, 180)
+        }
+
+        if (categorieChoisie[index]?.image != "") {
+            scene.image_question.setTexture(`${categorieChoisie[index].image}`)
+            animation(scene, scene.image_question, { alpha: 1, duration: 200 })
+        }
+
+        //responsivité du titre de la question
+        scene.titre_question.text.length > 300 ? scene.titre_question.setFontSize(20) : scene.titre_question.setFontSize(23);
         scene.titre_question.setText(categorieChoisie[index].question);
         animation(scene, groupReponse.getChildren(), { alpha: 1, delay: 130, duration: 200, delay: function (target, targetKey, value, targetIndex, totalTargets, tween) { return targetIndex * 100; } })
         animation(scene, groupTexte.getChildren(), { scale: 1, alpha: 1, delay: 130, duration: 200, delay: function (target, targetKey, value, targetIndex, totalTargets, tween) { return targetIndex * 100; } })
@@ -234,7 +217,9 @@ function afficherQuestion(categorieChoisie, scene, index, max) {
                     bouton.fillColor = 0xff0000;
                 }
         }).setAlpha(0);
-        btnReponse.text = scene.add.text(centreEcranX, base, element, { fontFamily: "FFFTusj", fontSize: 30, color: ' #ffffff', wordWrap: { width: window.innerWidth } }).setOrigin(0.5, 0.5).setAlpha(0.1)
+        btnReponse.text = scene.add.text(centreEcranX, base, element, { fontFamily: "FFFTusj", fontSize: 30, color: ' #ffffff', wordWrap: { width: window.innerWidth } }).setFontSize(21).setOrigin(0.5, 0.5).setAlpha(0.1).setMaxLines(2);
+        //responsivité texte
+        if (btnReponse.text.text.length > 53) btnReponse.text.setWordWrapWidth(width, true);
         groupTexte.add(btnReponse.text)
         base += 80;
         groupReponse.add(btnReponse)
@@ -242,6 +227,8 @@ function afficherQuestion(categorieChoisie, scene, index, max) {
 
     aligner(groupeBoutonsCategories.getChildren(), centreEcranX, centreEcranY / 2)
 }
+
+
 
 /**
  * @memberof module:JEU
