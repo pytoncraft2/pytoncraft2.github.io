@@ -6,9 +6,12 @@ var filesToCache = [
   '/img/icon-192.png',
   '/img/icon-256.png',
   '/img/icon-512.png',
-  '/js/game.js',
-  '/css/style.css',
-  'https://cdn.jsdelivr.net/gh/photonstorm/phaser@3.10.1/dist/phaser.min.js'
+  '/jeu.js',
+  '/utilitaires.js',
+  '/assets/style.css',
+  '/assets/questions.json',
+  '/assets/arrierePlan.jpg',
+  '/lib/phaser.min.js'
 ];
 
 self.addEventListener('install', function(event) {

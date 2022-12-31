@@ -190,8 +190,10 @@ function afficherQuestion(categorieChoisie, scene, index, max) {
 
     //map dans les reponses possible
     listeChoix.map((element, i) => {
-        var btnReponse = rectangleInteractif(scene, centreEcranX, base, width, 50, (bouton) => {
+        var btnReponse = rectangleInteractif(scene, centreEcranX, base, width, 66, (bouton) => {
                 bouton.removeInteractive()
+                
+            const retour = texte(scene, centreEcranX, centreEcranY, categorieChoisie[index]?.retour, undefined).setWordWrapWidth(width).setFontSize(25).setAlpha(0)
                 if (categorieChoisie[index]?.indexBonneReponse == i)
                 {
                     scene.scoreTotal.points[index] = "✅";
@@ -200,15 +202,27 @@ function afficherQuestion(categorieChoisie, scene, index, max) {
                     scene.scoreTotal.text = scene.scoreTotal.points.join(' ')
                     bouton.fillColor = 0x008000;
 
-                    var timer = scene.time.delayedCall(200, () => {
-                        groupReponse.getChildren().forEach(element => {
-                            element.text.destroy()
-                        });
-                        groupReponse.destroy(true)
-                        //suppression de l'image de la question si elle existe
-                        categorieChoisie[index]?.image != "" && animation(scene, scene.image_question, { alpha: 0, duration: 200 });
+                    animation(scene, bouton, { y: groupReponse.getChildren()[groupReponse.getLength() - 2].y, duration: 200 })
+                    animation(scene, bouton.text, { y: groupReponse.getChildren()[groupReponse.getLength() - 2].y, duration: 200 })
+                    animation(scene, retour, { y: centreEcranY, duration: 400, alpha: 1 })
+
+                    groupReponse.remove(bouton);
+
+                    groupReponse.getChildren().forEach(element => {
+                        element.text.destroy()
+                    });
+                    groupReponse.destroy(true)
+
+                    categorieChoisie[index]?.image != "" && animation(scene, scene.image_question, { alpha: 0, duration: 200 });
+
+                    // animation(scene, bouton, { y: retour.y, duration: 400, alpha: 1 })
+                    var timer = scene.time.delayedCall(2000, () => {
+                        bouton.destroy(true)
+                        bouton.text.destroy(true)
+                        retour.destroy(true)
                         afficherQuestion(categorieChoisie, scene, index + 1, max);
-                    }, undefined, this);
+                    }, undefined);
+
                 }
                 else
                 {
@@ -217,7 +231,7 @@ function afficherQuestion(categorieChoisie, scene, index, max) {
                     bouton.fillColor = 0xff0000;
                 }
         }).setAlpha(0);
-        btnReponse.text = scene.add.text(centreEcranX, base, element, { fontFamily: "FFFTusj", fontSize: 30, color: ' #ffffff', wordWrap: { width: window.innerWidth } }).setFontSize(21).setOrigin(0.5, 0.5).setAlpha(0.1).setMaxLines(2);
+        btnReponse.text = scene.add.text(centreEcranX, base, element, { fontFamily: "FFFTusj", fontSize: 30, color: ' #ffffff', wordWrap: { width: window.innerWidth } }).setFontSize(21).setOrigin(0.5, 0.5).setAlpha(0.1).setMaxLines(3);
         //responsivité texte
         if (btnReponse.text.text.length > 53) btnReponse.text.setWordWrapWidth(width, true);
         groupTexte.add(btnReponse.text)
