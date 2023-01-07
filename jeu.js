@@ -26,6 +26,7 @@ function preload() {
  * <b>5</b>. Ajoute et rend invisble l'image et le titre de la question pour quelle soit utilisable plus tard dans les questions<br>
  */
 function create() {
+
     const quiz_fichier = this.cache.json.get('questions');
 
     // regroupe les questions par catégories
@@ -40,11 +41,21 @@ function create() {
     centreEcranY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
     //titre
-    titreAccueil = texte(scene, centreEcranX, 40, "Choisir une catégorie de question").setFontStyle('bold italic');
-    const { width } = scene.sys.game.canvas;
-    this.titre_question = texte(scene, centreEcranX, 160, "").setWordWrapWidth(width - 5).setOrigin(0.5).setFontSize(23);
+    titreAccueil = texte(scene, centreEcranX, 40, "Choisir une catégorie de question")
+        .setFontStyle('bold')
+        .setShadow(0, 0, '#000000', 7, false, true);
 
-    this.image_question = this.add.image(centreEcranX, centreEcranY + 500, 'fond').setAlpha(0).setPosition(this.titre_question.x, this.titre_question.y + 15).setActive(false);
+    const { width } = scene.sys.game.canvas;
+
+    this.titre_question = texte(scene, centreEcranX, 160, "")
+        .setWordWrapWidth(width - 5)
+        .setOrigin(0.5)
+        .setFontSize(23);
+
+    this.image_question = this.add.image(centreEcranX, centreEcranY + 500, 'fond')
+        .setAlpha(0)
+        .setPosition(this.titre_question.x, this.titre_question.y + 15)
+        .setActive(false);
 
     //ajout des boutons dans un groupe avec le nom de la catégorie
     groupeBoutonsCategories = this.add.group();
@@ -96,14 +107,23 @@ function commencerQuestion(categorie, scene) {
     scene.scoreTotal = texte(scene, centreEcranX, 37, points.join(' ')).setAlpha(0.7).setOrigin(0.5).setAlign('center').setFontSize(20);
     scene.scoreTotal.points = points;
 
+    scene.video = scene.add.video(centreEcranX, 100, "");
+
     // préchargement des images de la catégorie séléctionné
     for (let key in categorieChoisie) {
-        if (categorieChoisie[key].image)
+        if (categorieChoisie[key].media)
         {
-            scene.load.image(`${categorieChoisie[key].image}`, categorieChoisie[key].image)
+            if (categorieChoisie[key].media.includes("mp4"))
+            {
+                scene.load.video(`${categorieChoisie[key].media}`, categorieChoisie[key].media, 'loadeddata', false, true);
+            }
+            else
+            {
+                scene.load.image(`${categorieChoisie[key].media}`, categorieChoisie[key].media)
+            }
         }
         scene.load.once(Phaser.Loader.Events.COMPLETE, () => {
-            scene.image_question.setTexture(`${categorieChoisie[key].image}`)
+            scene.image_question.setTexture(`${categorieChoisie[key].media}`)
             if (key == categorieChoisie.length - 1) {
                 return afficherQuestion(categorieChoisie, scene, 0, totalQuestion);
             }
@@ -111,7 +131,6 @@ function commencerQuestion(categorie, scene) {
         scene.load.start()
     }
 }
-
 
 
 /**
@@ -123,14 +142,16 @@ function commencerQuestion(categorie, scene) {
  * @param {Number} max nombre de question total
  * 
  * @description <h3 style="color: lightseagreen;""><em><u>Affiche le questionnaire</u></em></h3>
- * Affichage la page de fin de partie si on arrive au bout du quizParCategorie<br>
- * Création d'un groupe pour les réponses et le titre de la question<br>
- * Assigne la source de l'image si l'objet des question contient une url dans l'objet l'url d'une image<br>
- * Affiche l'image avec une animation si l'objet avec la clé <i>image</i> contient une valeur<br>
- * Affiche le titre de la question et la liste des choix avec une animation<br>
- * Transforme la chaine de charactère de l'objet choix en tableau le séparateur correspond à 2 espaces <br>
- * Implémente sur chaque bouton la logique pour les réponses juste/fausse au clique<br>
- * Change le score et les points en fonction de la réponse
+ * - Affichage la page de fin de partie si on arrive au bout du quizParCategorie<br>
+ * - Création d'un groupe pour les réponses et le titre de la question<br>
+ * - La source de l'image/video est la valeur de la cle media<br>
+ * - Affiche l'image avec une animation si l'objet avec la clé <i>media</i> contient une valeur<br>
+ * - Affiche la video avec si l'objet avec la clé <i>media</i> contient une valeur<br>
+ * - Affiche le titre de la question et la liste des choix avec une animation<br>
+ * - Ajuste la position de l'image et du titre selon la présence ou non d'une image/video/titre<br>
+ * - Transforme la chaine de charactère de l'objet choix en tableau le séparateur correspond à 2 espaces <a href="CONTRIBUTING.md#excel">voir le lien avec excel ici</a><br>
+ * - Implémente sur chaque bouton la logique pour les réponses juste/fausse au clique<br>
+ * - Change le score et les points en fonction de la réponse
  * 
  * @example
  * "choix 1,  choix 2,  choix 3,  choix 4".split(',  ')
@@ -142,7 +163,7 @@ function commencerQuestion(categorie, scene) {
     "question": "Que veut dire la devise scout \"Toujours prêt\" ?",
     "choix": "Etre prêt en anticipant et en s'entraînant à réagir face à n'importe quel accident pour ne jamais être pris au dépourvu.,  Etre prêt à tout (voler, tricher) pour avoir son insigne.,  Etre prêt à ranger sa chambre, faire le ménage et d'autres corvées quand les parents le demandent.,  Rien en particulier, c'était un tic de langage de Robert Baden-Powell.",
     "indexBonneReponse": "0",
-    "image": "./mon_image_d'accompagnement.png",
+    "media": "./mon_image_d'accompagnement.png",
     "retour": "Devise de la branche éclaireur, elle est la traduction de l'anglais : Be prepared (BP, en abrégé, ce qui a toujours amusé Baden-Powell)"
 }, scene, 0, 12)
 */
@@ -152,33 +173,56 @@ function afficherQuestion(categorieChoisie, scene, index, max) {
     const groupReponse = scene.add.group();
     const groupTexte = scene.add.group();
 
+    if (categorieChoisie[index]?.media.includes("mp4")) {
+        scene.video = scene.add.video(centreEcranX, 100);
+        scene.video.loadURL(`${categorieChoisie[index].media}`);
+        scene.video.playsinline = true;
+        scene.video
+            .setPaused(false)
+            .setInteractive({ cursor: 'pointer' })
+            .once("pointerdown", () => scene.video.play(true))
+            .setDepth(2)
+            .setLoop(true)
+            .setScale(0.6)
+            .setActive(true)
+            .play(true);
+    }
+
+    //TODO Améliorer ou factoriser le code ci-dessous (trop de conditions 😵)
     //affichage avec transition le titre de la question
-    animation(scene, scene.titre_question, ...[,], () => {
-        if (categorieChoisie[index]?.image == "" && categorieChoisie[index].question) {
-            scene.titre_question.setPosition(scene.titre_question.x, 160)
-        }
+    animation(scene, scene.titre_question, undefined, () => {
 
-        if (categorieChoisie[index]?.image != "" && categorieChoisie[index].question) {
-            console.log("image et question");
-            scene.image_question.setPosition(scene.image_question.x, 200)
-            scene.titre_question.setPosition(scene.titre_question.x, 110)
-        }
+        if (!categorieChoisie[index].media.includes("mp4")) {
+            if (categorieChoisie[index]?.media == "" && categorieChoisie[index].question) {
+                scene.titre_question.setPosition(scene.titre_question.x, 160)
+            }
 
-        if (categorieChoisie[index]?.image == "" && categorieChoisie[index].question == "") {
-            console.log("question uniquement");
-            scene.titre_question.setPosition(scene.titre_question.x, 180)
-        }
+            if (categorieChoisie[index]?.media != "" && categorieChoisie[index].question) {
+                //image et question
+                scene.image_question.setPosition(scene.image_question.x, 200)
+                scene.titre_question.setPosition(scene.titre_question.x, 110)
+            }
 
-        if (categorieChoisie[index]?.image != "") {
-            scene.image_question.setTexture(`${categorieChoisie[index].image}`)
-            animation(scene, scene.image_question, { alpha: 1, duration: 200 })
+            if (categorieChoisie[index]?.media == "" && categorieChoisie[index].question == "") {
+                //question uniquement
+                scene.titre_question.setPosition(scene.titre_question.x, 180)
+            }
+
+            if (categorieChoisie[index]?.media != "") {
+                scene.image_question.setTexture(`${categorieChoisie[index].media}`)
+                animation(scene, scene.image_question, { alpha: 1, duration: 200 })
+            }
         }
 
         //responsivité du titre de la question
         scene.titre_question.text.length > 300 ? scene.titre_question.setFontSize(20) : scene.titre_question.setFontSize(23);
-        scene.titre_question.setText(categorieChoisie[index].question);
+        const titre_question = scene.titre_question;
+
+        animation(scene, titre_question, { alpha: 1, delay: 130, duration: 200 })
         animation(scene, groupReponse.getChildren(), { alpha: 1, delay: 130, duration: 200, delay: function (target, targetKey, value, targetIndex, totalTargets, tween) { return targetIndex * 100; } })
         animation(scene, groupTexte.getChildren(), { scale: 1, alpha: 1, delay: 130, duration: 200, delay: function (target, targetKey, value, targetIndex, totalTargets, tween) { return targetIndex * 100; } })
+
+        scene.titre_question.setText(categorieChoisie[index].question);
     })
 
     const { width } = scene.sys.game.canvas;
@@ -191,47 +235,51 @@ function afficherQuestion(categorieChoisie, scene, index, max) {
     //map dans les reponses possible
     listeChoix.map((element, i) => {
         var btnReponse = rectangleInteractif(scene, centreEcranX, base, width, 66, (bouton) => {
-                bouton.removeInteractive()
+            bouton.removeInteractive()
                 
             const retour = texte(scene, centreEcranX, centreEcranY, categorieChoisie[index]?.retour, undefined).setWordWrapWidth(width).setFontSize(25).setAlpha(0)
                 if (categorieChoisie[index]?.indexBonneReponse == i)
                 {
-                    scene.scoreTotal.points[index] = "✅";
-
                     texteScore.setData('score', texteScore.getData('score') + 1);
+                    scene.scoreTotal.points[index] = "✅";
                     scene.scoreTotal.text = scene.scoreTotal.points.join(' ')
                     bouton.fillColor = 0x008000;
 
-                    animation(scene, bouton, { y: groupReponse.getChildren()[groupReponse.getLength() - 2].y, duration: 200 })
-                    animation(scene, bouton.text, { y: groupReponse.getChildren()[groupReponse.getLength() - 2].y, duration: 200 })
-                    animation(scene, retour, { y: centreEcranY, duration: 400, alpha: 1 })
-
+                    if (categorieChoisie[index].retour != "") {
+                        animation(scene, bouton, { y: scene.titre_question.y, duration: 200, ease: 'Power1'})
+                        animation(scene, bouton.text, { y: scene.titre_question.y, duration: 200, ease: 'Power1'})
+                    }
                     groupReponse.remove(bouton);
+                    // scene.video?.destroy();
+                    scene.video.destroy(true)
+                    animation(scene, retour, { y: centreEcranY, duration: 400, alpha: 1 })
+                    // animation(scene, scene.titre_question, { alpha: 0, duration: 100 })
+                    categorieChoisie[index]?.retour != "" && animation(scene, scene.titre_question, { alpha: 0, duration: 100 })
 
                     groupReponse.getChildren().forEach(element => {
                         element.text.destroy()
                     });
                     groupReponse.destroy(true)
 
-                    categorieChoisie[index]?.image != "" && animation(scene, scene.image_question, { alpha: 0, duration: 200 });
+                    categorieChoisie[index]?.media != "" && animation(scene, scene.image_question, { alpha: 0, duration: 200 });
 
-                    // animation(scene, bouton, { y: retour.y, duration: 400, alpha: 1 })
-                    var timer = scene.time.delayedCall(2000, () => {
+                    // passer à la question suivante au clique
+                    scene.input.once('pointerdown', function (pointer) {
                         bouton.destroy(true)
                         bouton.text.destroy(true)
                         retour.destroy(true)
                         afficherQuestion(categorieChoisie, scene, index + 1, max);
-                    }, undefined);
+                    }, this);
 
                 }
                 else
                 {
-                    scene.scoreTotal.points[index] = "❌";
-                    scene.cameras.main.shake(500);
+                    bouton.fillColor = 0x008000;                   
+                    scene.cameras.main.shake(180);
                     bouton.fillColor = 0xff0000;
                 }
         }).setAlpha(0);
-        btnReponse.text = scene.add.text(centreEcranX, base, element, { fontFamily: "FFFTusj", fontSize: 30, color: ' #ffffff', wordWrap: { width: window.innerWidth } }).setFontSize(21).setOrigin(0.5, 0.5).setAlpha(0.1).setMaxLines(3);
+        btnReponse.text = scene.add.text(centreEcranX, base, element, { fontFamily: "FFFTusj", fontSize: 30, color: ' #ffffff', wordWrap: { width: window.innerWidth } }).setFontSize(21).setOrigin(0.5, 0.5).setAlpha(0).setMaxLines(3);
         //responsivité texte
         if (btnReponse.text.text.length > 53) btnReponse.text.setWordWrapWidth(width, true);
         groupTexte.add(btnReponse.text)
@@ -262,12 +310,6 @@ function finDePartie(scene, max, categorieChoisie) {
 
     let base = 280;
     const { width } = scene.sys.game.canvas;
-    categorieChoisie.map((v, i) => {
-        const couleur = v.reponseDonne ? '#ff0000' : '#049f21';
-        var btnReponse = scene.add.rectangle(centreEcranX, base, width, 50, couleur)
-        btnReponse.text = scene.add.text(centreEcranX, base, v.choix[v.indexBonneReponse], { fontFamily: "FFFTusj", fontSize: 20, color: ' #ffffff', wordWrap: { width: window.innerWidth } }).setOrigin(0.5, 0.5);
-        base += 80;
-    })
 
     animation(scene, text_score, { y: "-=40", alpha: 1, duration: 300 })
 
