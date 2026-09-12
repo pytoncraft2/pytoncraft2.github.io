@@ -1,0 +1,45 @@
+<script lang="ts">
+	import '$lib/styles/tokens.css';
+	import '$lib/styles/typography.css';
+	import '$lib/styles/global.css';
+	import favicon from '$lib/assets/favicon.svg';
+	import Header from '$lib/components/Header.svelte';
+	import Footer from '$lib/components/Footer.svelte';
+
+	let { children } = $props();
+</script>
+
+<svelte:head>
+	<link rel="icon" href={favicon} />
+	<meta name="color-scheme" content="light dark" />
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+	<link
+		href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+		rel="stylesheet"
+	/>
+</svelte:head>
+
+<a class="skip-link" href="#contenu">Aller au contenu</a>
+<div class="app">
+	<Header />
+	<main id="contenu">
+		{@render children()}
+	</main>
+	<Footer />
+</div>
+
+<style>
+	.app {
+		display: flex;
+		flex-direction: column;
+		min-height: 100vh;
+	}
+
+	main {
+		flex: 1;
+		width: min(100% - var(--spacing-8), 72rem);
+		margin-inline: auto;
+		padding-block: var(--spacing-10);
+	}
+</style>

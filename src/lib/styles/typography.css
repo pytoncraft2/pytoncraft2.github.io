@@ -1,0 +1,31 @@
+.ds-display-l {
+  font: 700 var(--text-display-l-size) / var(--text-display-l-line) var(--font-sans);
+}
+
+.ds-h1 {
+  font: 700 var(--text-h1-size) / var(--text-h1-line) var(--font-sans);
+}
+
+.ds-h2 {
+  font: 600 var(--text-h2-size) / var(--text-h2-line) var(--font-sans);
+}
+
+.ds-h3 {
+  font: 600 var(--text-h3-size) / var(--text-h3-line) var(--font-sans);
+}
+
+.ds-body-l {
+  font: 400 var(--text-body-l-size) / var(--text-body-l-line) var(--font-sans);
+}
+
+.ds-body-m {
+  font: 400 var(--text-body-m-size) / var(--text-body-m-line) var(--font-sans);
+}
+
+.ds-body-s {
+  font: 400 var(--text-body-s-size) / var(--text-body-s-line) var(--font-sans);
+}
+
+.ds-label-m {
+  font: 500 var(--text-label-m-size) / var(--text-label-m-line) var(--font-sans);
+}
