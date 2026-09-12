@@ -1,10 +1,13 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { prefersReducedMotion } from 'svelte/motion';
 	import { resolve } from '$app/paths';
 
 	const brandName = 'Timothée Hennequin';
+	const themeDuration = 220;
 
 	let theme = $state<'light' | 'dark'>('light');
+	let themeTimer = 0;
 
 	onMount(() => {
 		const current = document.documentElement.dataset.theme;
@@ -15,8 +18,24 @@
 
 	function applyTheme(next: 'light' | 'dark') {
 		theme = next;
-		document.documentElement.dataset.theme = next;
 		localStorage.setItem('theme', next);
+
+		const root = document.documentElement;
+		window.clearTimeout(themeTimer);
+
+		if (prefersReducedMotion.current) {
+			root.classList.remove('theme-transition');
+			root.dataset.theme = next;
+			return;
+		}
+
+		root.classList.add('theme-transition');
+		requestAnimationFrame(() => {
+			root.dataset.theme = next;
+			themeTimer = window.setTimeout(() => {
+				root.classList.remove('theme-transition');
+			}, themeDuration);
+		});
 	}
 
 	function toggleTheme() {
@@ -34,7 +53,26 @@
 			onclick={toggleTheme}
 			aria-label={theme === 'dark' ? 'Activer le thème clair' : 'Activer le thème sombre'}
 		>
-			{theme === 'dark' ? 'Clair' : 'Sombre'}
+			{#if theme === 'dark'}
+				<svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+					<circle cx="12" cy="12" r="3.25" stroke="currentColor" stroke-width="1.75" />
+					<path
+						d="M12 5V3.25M12 20.75V19M5 12H3.25M20.75 12H19M6.9 6.9 5.7 5.7M18.3 18.3 17.1 17.1M6.9 17.1 5.7 18.3M18.3 5.7 17.1 6.9"
+						stroke="currentColor"
+						stroke-width="1.75"
+						stroke-linecap="round"
+					/>
+				</svg>
+			{:else}
+				<svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+					<path
+						d="M15.5 13.5A6.25 6.25 0 0 1 10.5 4.4 7.25 7.25 0 1 0 19.6 13.5 6.25 6.25 0 0 1 15.5 13.5Z"
+						stroke="currentColor"
+						stroke-width="1.75"
+						stroke-linejoin="round"
+					/>
+				</svg>
+			{/if}
 		</button>
 	</div>
 </header>
@@ -91,13 +129,21 @@
 		justify-self: end;
 		min-width: 44px;
 		min-height: 44px;
-		padding: var(--spacing-2) var(--spacing-3);
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: var(--spacing-2);
 		border: 1px solid var(--border-default);
 		border-radius: var(--radius-md);
 		background: var(--surface-elevated);
 		color: var(--text-primary);
-		font: 500 var(--text-label-m-size) / var(--text-label-m-line) var(--font-sans);
 		cursor: pointer;
+	}
+
+	.icon {
+		display: block;
+		width: 1.25rem;
+		height: 1.25rem;
 	}
 
 	.theme:hover {

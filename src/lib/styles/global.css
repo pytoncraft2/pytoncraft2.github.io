@@ -31,6 +31,18 @@ html {
 	animation-timing-function: ease;
 }
 
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+	transition:
+		background-color 200ms ease,
+		color 200ms ease,
+		border-color 200ms ease,
+		fill 200ms ease,
+		stroke 200ms ease;
+}
+
 @media (prefers-reduced-motion: reduce) {
 	html {
 		scroll-behavior: auto;
