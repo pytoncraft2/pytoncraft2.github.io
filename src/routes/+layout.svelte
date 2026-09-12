@@ -44,10 +44,11 @@
 </svelte:head>
 
 <a class="skip-link" href="#contenu">Aller au contenu</a>
+<a class="skip-link" href="#menu">Aller au menu</a>
 <div class="app">
 	<Header />
 	<div class="stage">
-		<main id="contenu">
+		<main id="contenu" tabindex="-1">
 			{@render children()}
 		</main>
 	</div>
@@ -73,6 +74,10 @@
 		width: min(100% - var(--spacing-8), 72rem);
 		margin-inline: auto;
 		padding-block: var(--spacing-8);
+	}
+
+	main:focus {
+		outline: none;
 	}
 
 	@media (min-width: 40rem) {

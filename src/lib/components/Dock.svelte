@@ -205,6 +205,7 @@
 />
 
 <nav
+	id="menu"
 	class="dock"
 	class:dragging
 	style:--drag-x="{dragX}px"
@@ -213,22 +214,9 @@
 	style:--grab-y="{grabY}px"
 	aria-label="Principale"
 	data-placement={placement}
+	tabindex="-1"
 	{@attach dockDrag}
 >
-	<button
-		class="handle"
-		type="button"
-		aria-label="Déplacer le dock"
-	>
-		<svg class="grip" viewBox="0 0 12 18" aria-hidden="true">
-			<circle cx="3" cy="3" r="1.5" />
-			<circle cx="9" cy="3" r="1.5" />
-			<circle cx="3" cy="9" r="1.5" />
-			<circle cx="9" cy="9" r="1.5" />
-			<circle cx="3" cy="15" r="1.5" />
-			<circle cx="9" cy="15" r="1.5" />
-		</svg>
-	</button>
 	<ul class="items">
 		{#each items as item (item.id)}
 			<li>
@@ -320,6 +308,20 @@
 			</li>
 		{/each}
 	</ul>
+	<button
+		class="handle"
+		type="button"
+		aria-label="Déplacer le dock"
+	>
+		<svg class="grip" viewBox="0 0 12 18" aria-hidden="true">
+			<circle cx="3" cy="3" r="1.5" />
+			<circle cx="9" cy="3" r="1.5" />
+			<circle cx="3" cy="9" r="1.5" />
+			<circle cx="9" cy="9" r="1.5" />
+			<circle cx="3" cy="15" r="1.5" />
+			<circle cx="9" cy="15" r="1.5" />
+		</svg>
+	</button>
 </nav>
 
 <style>
@@ -333,6 +335,11 @@
 		border-top: 1px solid var(--border-default);
 		background: var(--surface-elevated);
 		view-transition-name: app-dock;
+	}
+
+	.dock:focus {
+		outline: 2px solid var(--action-focus);
+		outline-offset: 4px;
 	}
 
 	.items {
@@ -423,6 +430,7 @@
 		.handle {
 			display: flex;
 			flex-shrink: 0;
+			order: -1;
 			align-items: center;
 			justify-content: center;
 			min-width: 28px;
