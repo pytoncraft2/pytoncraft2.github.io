@@ -159,6 +159,9 @@
 		}
 	});
 
+	const dropEdges = ['bottom', 'left', 'right'] as const;
+	const preview = $derived(dragging ? nearestPlacement(dragX, dragY) : null);
+
 	const routeId = $derived(page.route.id ?? '');
 	const hash = $derived(page.url.hash);
 
@@ -203,6 +206,14 @@
 	onpointercancel={onPointerUp}
 	onkeydown={onKeydown}
 />
+
+{#if dragging}
+	<div class="slots" aria-hidden="true">
+		{#each dropEdges as edge (edge)}
+			<div class={['slot', preview === edge && 'active']} data-edge={edge}></div>
+		{/each}
+	</div>
+{/if}
 
 <nav
 	id="menu"
@@ -401,6 +412,10 @@
 		display: none;
 	}
 
+	.slots {
+		display: none;
+	}
+
 	@media (min-width: 40rem) {
 		.dock {
 			right: auto;
@@ -493,6 +508,51 @@
 		:global(html[data-dock='left']) .items,
 		:global(html[data-dock='right']) .items {
 			flex-direction: column;
+		}
+
+		.slots {
+			display: contents;
+		}
+
+		.slot {
+			position: fixed;
+			z-index: 14;
+			pointer-events: none;
+			border: 1px dashed var(--border-strong);
+			border-radius: var(--radius-xl);
+			background: color-mix(in srgb, var(--action-primary) 8%, transparent);
+			opacity: 0.45;
+		}
+
+		.slot.active {
+			border-color: var(--action-primary);
+			border-style: solid;
+			background: color-mix(in srgb, var(--action-primary) 18%, transparent);
+			opacity: 1;
+		}
+
+		.slot[data-edge='bottom'] {
+			left: 50%;
+			bottom: var(--spacing-5);
+			width: min(28rem, 70vw);
+			height: 4.75rem;
+			transform: translateX(-50%);
+		}
+
+		.slot[data-edge='left'] {
+			top: 50%;
+			left: var(--spacing-5);
+			width: 5.75rem;
+			height: min(28rem, 70vh);
+			transform: translateY(-50%);
+		}
+
+		.slot[data-edge='right'] {
+			top: 50%;
+			right: var(--spacing-5);
+			width: 5.75rem;
+			height: min(28rem, 70vh);
+			transform: translateY(-50%);
 		}
 	}
 </style>
