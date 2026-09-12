@@ -5,6 +5,7 @@
 	import { getNextProject, projectPath } from '$lib/data/projects';
 	import Button from './Button.svelte';
 	import ProjectImage from './ProjectImage.svelte';
+	import WindowFrame from './WindowFrame.svelte';
 
 	let {
 		project,
@@ -22,8 +23,9 @@
 	<meta name="description" content={project.description} />
 </svelte:head>
 
-<article>
-	<header class="hero">
+<WindowFrame title={project.title}>
+	<article>
+		<header class="hero">
 		<p class="meta ds-label-m">{project.meta}</p>
 		<h1 class="ds-h1">{project.title}</h1>
 		<p class="subtitle ds-body-l">{project.subtitle}</p>
@@ -57,7 +59,8 @@
 			</Button>
 		</nav>
 	{/if}
-</article>
+	</article>
+</WindowFrame>
 
 <style>
 	.hero {

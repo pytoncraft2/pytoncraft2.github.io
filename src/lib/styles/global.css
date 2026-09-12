@@ -6,6 +6,23 @@
 
 html {
 	scroll-behavior: smooth;
+	scroll-padding-top: 4.5rem;
+	scroll-padding-bottom: 6.5rem;
+}
+
+@media (min-width: 40rem) {
+	html[data-dock='left'],
+	html[data-dock='right'] {
+		scroll-padding-bottom: 1.5rem;
+	}
+
+	html[data-dock='left'] {
+		scroll-padding-left: 6.5rem;
+	}
+
+	html[data-dock='right'] {
+		scroll-padding-right: 6.5rem;
+	}
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -23,6 +40,7 @@ html {
 body {
 	margin: 0;
 	min-height: 100vh;
+	background: var(--surface-subtle);
 }
 
 img {

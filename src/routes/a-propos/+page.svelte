@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { asset } from '$app/paths';
 	import Button from '$lib/components/Button.svelte';
+	import WindowFrame from '$lib/components/WindowFrame.svelte';
 
 	const name = 'Timothée Hennequin';
 	const email = 'timothennequin@gmail.com';
@@ -16,8 +17,9 @@
 	/>
 </svelte:head>
 
-<article>
-	<header class="hero">
+<WindowFrame title="Parcours">
+	<article>
+		<header class="hero">
 		<h1 class="ds-h1">À propos</h1>
 		<p class="lead ds-body-l">
 			Développeur web de formation, je complète mon profil avec une formation Product Designer afin
@@ -93,7 +95,8 @@
 			<a href={linkedInHref} target="_blank" rel="noreferrer">LinkedIn</a>
 		</div>
 	</section>
-</article>
+	</article>
+</WindowFrame>
 
 <style>
 	.hero {

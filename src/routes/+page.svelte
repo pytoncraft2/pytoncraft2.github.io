@@ -92,7 +92,11 @@
 		flex-direction: column;
 		align-items: flex-start;
 		gap: var(--spacing-4);
-		padding-block: var(--spacing-8) var(--spacing-16);
+		margin-bottom: var(--spacing-8);
+		padding: var(--spacing-8);
+		border: 1px solid var(--border-default);
+		border-radius: var(--radius-lg);
+		background: var(--surface-elevated);
 	}
 
 	.eyebrow {
@@ -124,7 +128,11 @@
 	}
 
 	.section {
-		padding-block: var(--spacing-12);
+		margin-bottom: var(--spacing-8);
+		padding: var(--spacing-8);
+		border: 1px solid var(--border-default);
+		border-radius: var(--radius-lg);
+		background: var(--surface-elevated);
 	}
 
 	.section h2 {

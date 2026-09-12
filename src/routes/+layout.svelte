@@ -3,8 +3,9 @@
 	import '$lib/styles/typography.css';
 	import '$lib/styles/global.css';
 	import favicon from '$lib/assets/favicon.svg';
-	import Header from '$lib/components/Header.svelte';
+	import Dock from '$lib/components/Dock.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import Header from '$lib/components/Header.svelte';
 
 	let { children } = $props();
 </script>
@@ -23,10 +24,13 @@
 <a class="skip-link" href="#contenu">Aller au contenu</a>
 <div class="app">
 	<Header />
-	<main id="contenu">
-		{@render children()}
-	</main>
+	<div class="stage">
+		<main id="contenu">
+			{@render children()}
+		</main>
+	</div>
 	<Footer />
+	<Dock />
 </div>
 
 <style>
@@ -36,10 +40,26 @@
 		min-height: 100vh;
 	}
 
+	.stage {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+	}
+
 	main {
 		flex: 1;
 		width: min(100% - var(--spacing-8), 72rem);
 		margin-inline: auto;
-		padding-block: var(--spacing-10);
+		padding-block: var(--spacing-8);
+	}
+
+	@media (min-width: 40rem) {
+		:global(html[data-dock='left']) .stage {
+			padding-left: 6rem;
+		}
+
+		:global(html[data-dock='right']) .stage {
+			padding-right: 6rem;
+		}
 	}
 </style>

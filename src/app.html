@@ -12,6 +12,11 @@
 					var theme =
 						stored === 'light' || stored === 'dark' ? stored : prefersDark ? 'dark' : 'light';
 					document.documentElement.setAttribute('data-theme', theme);
+
+					var dock = localStorage.getItem('dock-placement');
+					if (dock === 'left' || dock === 'right' || dock === 'bottom') {
+						document.documentElement.setAttribute('data-dock', dock);
+					}
 				} catch (e) {}
 			})();
 		</script>
