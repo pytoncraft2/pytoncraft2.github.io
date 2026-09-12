@@ -23,7 +23,7 @@
 	<meta name="description" content={project.description} />
 </svelte:head>
 
-<WindowFrame title={project.title}>
+<WindowFrame title={project.title} parent={{ href: `${resolve('/')}#projets`, label: 'Projets' }}>
 	<article>
 		<header class="hero">
 		<p class="meta ds-label-m">{project.meta}</p>

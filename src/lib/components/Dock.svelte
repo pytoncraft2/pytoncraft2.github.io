@@ -332,6 +332,7 @@
 		padding: var(--spacing-2) var(--spacing-3) calc(var(--spacing-2) + env(safe-area-inset-bottom));
 		border-top: 1px solid var(--border-default);
 		background: var(--surface-elevated);
+		view-transition-name: app-dock;
 	}
 
 	.items {

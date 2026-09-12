@@ -46,6 +46,7 @@
 		z-index: 15;
 		border-bottom: 1px solid var(--border-default);
 		background: var(--surface-elevated);
+		view-transition-name: app-header;
 	}
 
 	.inner {

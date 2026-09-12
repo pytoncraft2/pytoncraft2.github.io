@@ -3,20 +3,29 @@
 
 	let {
 		title,
+		parent,
 		children
 	}: {
 		title: string;
+		parent: { href: string; label: string };
 		children: Snippet;
 	} = $props();
 </script>
 
 <section class="window" aria-label={title}>
 	<div class="titlebar">
-		<span class="dots" aria-hidden="true">
-			<span></span>
-			<span></span>
-			<span></span>
-		</span>
+		<a class="back" href={parent.href}>
+			<svg class="chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+				<path
+					d="M14 6 8 12l6 6"
+					stroke="currentColor"
+					stroke-width="1.75"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				/>
+			</svg>
+			{parent.label}
+		</a>
 		<p class="title">{title}</p>
 	</div>
 	<div class="body">
@@ -42,24 +51,44 @@
 		border-bottom: 1px solid var(--border-default);
 	}
 
-	.dots {
-		display: flex;
-		gap: var(--spacing-2);
+	.back {
 		justify-self: start;
+		min-height: 44px;
+		display: inline-flex;
+		align-items: center;
+		gap: var(--spacing-1);
+		margin-left: calc(var(--spacing-2) * -1);
+		padding-inline: var(--spacing-2);
+		border-radius: var(--radius-sm);
+		color: var(--text-primary);
+		font: 500 var(--text-label-m-size) / var(--text-label-m-line) var(--font-sans);
+		text-decoration: none;
 	}
 
-	.dots span {
-		width: 0.75rem;
-		height: 0.75rem;
-		border-radius: var(--radius-full);
-		background: var(--border-strong);
+	.back:hover {
+		background: var(--surface-elevated);
+	}
+
+	.back:focus-visible {
+		outline: 2px solid var(--action-focus);
+		outline-offset: 2px;
+	}
+
+	.chevron {
+		width: 1rem;
+		height: 1rem;
+		flex-shrink: 0;
 	}
 
 	.title {
 		margin: 0;
+		max-width: 42vw;
+		overflow: hidden;
 		justify-self: center;
 		color: var(--text-primary);
 		font: 500 var(--text-label-m-size) / var(--text-label-m-line) var(--font-sans);
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	.body {
@@ -67,6 +96,10 @@
 	}
 
 	@media (min-width: 40rem) {
+		.title {
+			max-width: none;
+		}
+
 		.body {
 			padding: var(--spacing-8);
 		}

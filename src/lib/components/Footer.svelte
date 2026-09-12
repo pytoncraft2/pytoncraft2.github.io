@@ -11,6 +11,7 @@
 	.footer {
 		margin-top: auto;
 		padding: var(--spacing-6) var(--spacing-4) calc(5.5rem + env(safe-area-inset-bottom));
+		view-transition-name: app-footer;
 	}
 
 	.copy {

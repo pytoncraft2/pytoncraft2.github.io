@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { asset } from '$app/paths';
+	import { asset, resolve } from '$app/paths';
 	import Button from '$lib/components/Button.svelte';
 	import WindowFrame from '$lib/components/WindowFrame.svelte';
 
@@ -17,7 +17,7 @@
 	/>
 </svelte:head>
 
-<WindowFrame title="Parcours">
+<WindowFrame title="Parcours" parent={{ href: resolve('/'), label: 'Accueil' }}>
 	<article>
 		<header class="hero">
 		<h1 class="ds-h1">À propos</h1>
