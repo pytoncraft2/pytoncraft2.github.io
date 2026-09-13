@@ -17,11 +17,11 @@ html {
 	}
 
 	html[data-dock='left'] {
-		scroll-padding-left: 6.5rem;
+		scroll-padding-left: var(--dock-gutter);
 	}
 
 	html[data-dock='right'] {
-		scroll-padding-right: 6.5rem;
+		scroll-padding-right: var(--dock-gutter);
 	}
 }
 

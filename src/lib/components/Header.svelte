@@ -163,11 +163,11 @@
 		}
 
 		:global(html[data-dock='left']) .header {
-			padding-left: 6rem;
+			padding-left: var(--dock-gutter);
 		}
 
 		:global(html[data-dock='right']) .header {
-			padding-right: 6rem;
+			padding-right: var(--dock-gutter);
 		}
 	}
 </style>

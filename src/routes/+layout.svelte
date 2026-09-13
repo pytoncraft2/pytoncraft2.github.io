@@ -163,11 +163,11 @@
 
 	@media (min-width: 40rem) {
 		:global(html[data-dock='left']) .stage {
-			padding-left: 6rem;
+			padding-left: var(--dock-gutter);
 		}
 
 		:global(html[data-dock='right']) .stage {
-			padding-right: 6rem;
+			padding-right: var(--dock-gutter);
 		}
 	}
 </style>
