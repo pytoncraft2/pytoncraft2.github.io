@@ -113,38 +113,38 @@ summary:focus-visible {
 	inherits: false;
 }
 
+@property --highlight-strength {
+	syntax: '<number>';
+	initial-value: 0;
+	inherits: false;
+}
+
 #projets.is-highlighted,
 #contact.is-highlighted {
 	position: relative;
 	z-index: 1;
 	overflow: visible;
+	border: 2px solid transparent;
 	border-radius: var(--radius-lg);
-	animation: highlight-glow 1.6s ease;
-}
-
-#projets.is-highlighted::after,
-#contact.is-highlighted::after {
-	content: '';
-	position: absolute;
-	inset: 0;
-	border-radius: inherit;
-	pointer-events: none;
-	padding: 2px;
-	background: conic-gradient(
-		from var(--highlight-angle),
-		transparent 35%,
-		var(--action-primary) 50%,
-		transparent 65%
-	);
-	mask:
-		linear-gradient(#000 0 0) content-box,
-		linear-gradient(#000 0 0);
-	mask-composite: exclude;
-	-webkit-mask:
-		linear-gradient(#000 0 0) content-box,
-		linear-gradient(#000 0 0);
-	-webkit-mask-composite: xor;
-	animation: highlight-ring 1.6s linear;
+	background-color: var(--surface-elevated);
+	background-image:
+		linear-gradient(var(--surface-elevated), var(--surface-elevated)),
+		conic-gradient(
+			from var(--highlight-angle),
+			transparent 35%,
+			color-mix(
+				in srgb,
+				var(--action-primary) calc(var(--highlight-strength) * 100%),
+				transparent
+			)
+			50%,
+			transparent 65%
+		);
+	background-origin: padding-box, border-box;
+	background-clip: padding-box, border-box;
+	animation:
+		highlight-glow 1.6s ease,
+		highlight-ring 1.6s linear;
 }
 
 @keyframes highlight-glow {
@@ -164,44 +164,41 @@ summary:focus-visible {
 @keyframes highlight-ring {
 	0% {
 		--highlight-angle: 0deg;
-		opacity: 0;
+		--highlight-strength: 0;
 	}
 
 	8% {
-		opacity: 1;
+		--highlight-strength: 1;
 	}
 
 	78% {
-		opacity: 1;
+		--highlight-strength: 1;
 	}
 
 	100% {
 		--highlight-angle: 720deg;
-		opacity: 0;
+		--highlight-strength: 0;
 	}
 }
 
 @keyframes highlight-ring-static {
 	0%,
 	100% {
-		opacity: 0;
+		--highlight-strength: 0;
 	}
 
 	10%,
 	78% {
-		opacity: 1;
+		--highlight-strength: 1;
 	}
 }
 
 @media (prefers-reduced-motion: reduce) {
 	#projets.is-highlighted,
 	#contact.is-highlighted {
-		animation: highlight-glow 0.9s ease;
-	}
-
-	#projets.is-highlighted::after,
-	#contact.is-highlighted::after {
-		animation: highlight-ring-static 0.9s ease;
+		animation:
+			highlight-glow 0.9s ease,
+			highlight-ring-static 0.9s ease;
 	}
 }
 
