@@ -3,6 +3,7 @@
 	import Button from '$lib/components/Button.svelte';
 	import ProjectCard from '$lib/components/ProjectCard.svelte';
 	import { getFeaturedProjects, projectPath } from '$lib/data/projects';
+	import { snapBlocks } from '$lib/snap-blocks';
 
 	const name = 'Timothée Hennequin';
 	const email = 'timothennequin@gmail.com';
@@ -18,75 +19,81 @@
 	/>
 </svelte:head>
 
-<section class="hero" aria-labelledby="hero-title">
-	<p class="eyebrow ds-label-m">Portfolio</p>
-	<h1 id="hero-title" class="ds-h1">{name}</h1>
-	<p class="role ds-body-l">Développeur web</p>
-	<p class="intro ds-body-m">
-		Je conçois et développe des applications web en gardant un lien direct entre besoins utilisateurs,
-		contraintes produit et faisabilité technique. Ma formation Product Designer complète aujourd’hui
-		mon profil de développeur.
-	</p>
-	<div class="actions">
-		<Button href="#projets">Voir mes projets</Button>
-		<Button href="#contact" variant="secondary">Me contacter</Button>
-	</div>
-</section>
+<div class="page" {@attach snapBlocks}>
+	<section class="hero snap-block" aria-labelledby="hero-title">
+		<p class="eyebrow ds-label-m">Portfolio</p>
+		<h1 id="hero-title" class="ds-h1">{name}</h1>
+		<p class="role ds-body-l">Développeur web</p>
+		<p class="intro ds-body-m">
+			Je conçois et développe des applications web en gardant un lien direct entre besoins utilisateurs,
+			contraintes produit et faisabilité technique. Ma formation Product Designer complète aujourd’hui
+			mon profil de développeur.
+		</p>
+		<div class="actions">
+			<Button href="#projets">Voir mes projets</Button>
+			<Button href="#contact" variant="secondary">Me contacter</Button>
+		</div>
+	</section>
 
-<section id="projets" class="section" aria-labelledby="projets-title">
-	<h2 id="projets-title" class="ds-h2">Projets sélectionnés</h2>
-	<p class="section-intro ds-body-m">
-		Une sélection de projets réels et de formation qui montrent mon approche du développement, de la
-		conception produit et de l’amélioration continue.
-	</p>
-	<ul class="grid">
-		{#each featuredProjects as project (project.slug)}
-			<li>
-				<ProjectCard
-					title={project.title}
-					meta={project.meta}
-					description={project.description}
-					href={resolve(projectPath(project.slug))}
-					imageSrc={project.image ? asset(project.image) : undefined}
-					imageAlt={project.imageAlt}
-				/>
-			</li>
-		{/each}
-	</ul>
-</section>
+	<section id="projets" class="section snap-block" aria-labelledby="projets-title">
+		<h2 id="projets-title" class="ds-h2">Projets sélectionnés</h2>
+		<p class="section-intro ds-body-m">
+			Une sélection de projets réels et de formation qui montrent mon approche du développement, de la
+			conception produit et de l’amélioration continue.
+		</p>
+		<ul class="grid">
+			{#each featuredProjects as project (project.slug)}
+				<li>
+					<ProjectCard
+						title={project.title}
+						meta={project.meta}
+						description={project.description}
+						href={resolve(projectPath(project.slug))}
+						imageSrc={project.image ? asset(project.image) : undefined}
+						imageAlt={project.imageAlt}
+					/>
+				</li>
+			{/each}
+		</ul>
+	</section>
 
-<section id="profil" class="section" aria-labelledby="profil-title">
-	<h2 id="profil-title" class="ds-h2">Profil</h2>
-	<p class="ds-body-m">
-		Développeur web diplômé d’Epitech, j’ai travaillé plusieurs années sur des produits web en contexte
-		professionnel et associatif. Je poursuis aujourd’hui une formation Product Designer pour renforcer
-		ma capacité à concevoir des interfaces pertinentes avant de les développer.
-	</p>
-	<h3 class="ds-h3">Compétences</h3>
-	<ul class="skills">
-		<li>Front-end : SvelteKit, React, Twig</li>
-		<li>Back-end : FastAPI, Flask, Symfony, Node.js</li>
-		<li>Données et qualité : PostgreSQL, MySQL, Playwright</li>
-		<li>Delivery : Git, GitLab CI, Docker</li>
-		<li>Product Design : Figma, prototypage, design system, accessibilité</li>
-	</ul>
-	<p>
-		<a class="about-link" href={resolve('/a-propos')}>En savoir plus sur mon parcours</a>
-	</p>
-</section>
+	<section id="profil" class="section snap-block" aria-labelledby="profil-title">
+		<h2 id="profil-title" class="ds-h2">Profil</h2>
+		<p class="ds-body-m">
+			Développeur web diplômé d’Epitech, j’ai travaillé plusieurs années sur des produits web en contexte
+			professionnel et associatif. Je poursuis aujourd’hui une formation Product Designer pour renforcer
+			ma capacité à concevoir des interfaces pertinentes avant de les développer.
+		</p>
+		<h3 class="ds-h3">Compétences</h3>
+		<ul class="skills">
+			<li>Front-end : SvelteKit, React, Twig</li>
+			<li>Back-end : FastAPI, Flask, Symfony, Node.js</li>
+			<li>Données et qualité : PostgreSQL, MySQL, Playwright</li>
+			<li>Delivery : Git, GitLab CI, Docker</li>
+			<li>Product Design : Figma, prototypage, design system, accessibilité</li>
+		</ul>
+		<p>
+			<a class="about-link" href={resolve('/a-propos')}>En savoir plus sur mon parcours</a>
+		</p>
+	</section>
 
-<section id="contact" class="section" aria-labelledby="contact-title">
-	<h2 id="contact-title" class="ds-h2">Contact</h2>
-	<p class="ds-body-m">
-		Pour un échange autour d’un poste, d’un projet ou d’une collaboration, vous pouvez me contacter directement.
-	</p>
-	<div class="contact-links">
-		<a href={`mailto:${email}`}>{email}</a>
-		<a href={linkedInHref} target="_blank" rel="noreferrer">LinkedIn</a>
-	</div>
-</section>
+	<section id="contact" class="section snap-block" aria-labelledby="contact-title">
+		<h2 id="contact-title" class="ds-h2">Contact</h2>
+		<p class="ds-body-m">
+			Pour un échange autour d’un poste, d’un projet ou d’une collaboration, vous pouvez me contacter directement.
+		</p>
+		<div class="contact-links">
+			<a href={`mailto:${email}`}>{email}</a>
+			<a href={linkedInHref} target="_blank" rel="noreferrer">LinkedIn</a>
+		</div>
+	</section>
+</div>
 
 <style>
+	.page {
+		display: contents;
+	}
+
 	.hero {
 		display: flex;
 		flex-direction: column;
