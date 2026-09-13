@@ -107,6 +107,104 @@ summary:focus-visible {
 	margin-inline: auto;
 }
 
+@property --highlight-angle {
+	syntax: '<angle>';
+	initial-value: 0deg;
+	inherits: false;
+}
+
+#projets.is-highlighted,
+#contact.is-highlighted {
+	position: relative;
+	z-index: 1;
+	overflow: visible;
+	border-radius: var(--radius-lg);
+	animation: highlight-glow 1.6s ease;
+}
+
+#projets.is-highlighted::after,
+#contact.is-highlighted::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	pointer-events: none;
+	padding: 2px;
+	background: conic-gradient(
+		from var(--highlight-angle),
+		transparent 35%,
+		var(--action-primary) 50%,
+		transparent 65%
+	);
+	mask:
+		linear-gradient(#000 0 0) content-box,
+		linear-gradient(#000 0 0);
+	mask-composite: exclude;
+	-webkit-mask:
+		linear-gradient(#000 0 0) content-box,
+		linear-gradient(#000 0 0);
+	-webkit-mask-composite: xor;
+	animation: highlight-ring 1.6s linear;
+}
+
+@keyframes highlight-glow {
+	0%,
+	100% {
+		box-shadow: none;
+	}
+
+	12%,
+	68% {
+		box-shadow:
+			0 0 28px 6px color-mix(in srgb, var(--action-primary) 32%, transparent),
+			inset 0 0 24px color-mix(in srgb, var(--action-primary) 16%, transparent);
+	}
+}
+
+@keyframes highlight-ring {
+	0% {
+		--highlight-angle: 0deg;
+		opacity: 0;
+	}
+
+	8% {
+		opacity: 1;
+	}
+
+	78% {
+		opacity: 1;
+	}
+
+	100% {
+		--highlight-angle: 720deg;
+		opacity: 0;
+	}
+}
+
+@keyframes highlight-ring-static {
+	0%,
+	100% {
+		opacity: 0;
+	}
+
+	10%,
+	78% {
+		opacity: 1;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#projets.is-highlighted,
+	#contact.is-highlighted {
+		animation: highlight-glow 0.9s ease;
+	}
+
+	#projets.is-highlighted::after,
+	#contact.is-highlighted::after {
+		animation: highlight-ring-static 0.9s ease;
+	}
+}
+
 @media (max-width: 39.99rem) {
 	.ds-display-l {
 		font-size: 2.5rem;
