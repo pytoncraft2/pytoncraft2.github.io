@@ -11,8 +11,8 @@
 		<CaseStudySection title="Contexte" id="contexte">
 			<p>
 				Les Bambinets est un projet réalisé dans le cadre de ma formation Product Designer. L’objectif
-				était de construire l’identité visuelle et les premiers éléments d’une application éducative
-				autour de la langue des signes, puis de les assembler dans un prototype Figma cohérent.
+				était de concevoir une application éducative autour de la langue des signes, puis de
+				l’assembler dans un prototype Figma cohérent.
 			</p>
 		</CaseStudySection>
 
@@ -27,9 +27,9 @@
 
 		<CaseStudySection title="Mon rôle" id="role">
 			<p>
-				J’ai pris en charge la conception UI du projet : direction visuelle, moodboard, style guide,
-				design system, composants et variants Figma, écrans haute fidélité, prototype interactif et
-				prise en compte de l’accessibilité.
+				J’ai pris en charge la conception UI du projet. Cela couvre la direction visuelle, la
+				conception des interfaces, le design system, le prototype interactif et la prise en compte de
+				l’accessibilité.
 			</p>
 		</CaseStudySection>
 
@@ -41,10 +41,8 @@
 				accessible.
 			</p>
 			<p>
-				À partir de ces fondations, j’ai construit un design system dans Figma avec des composants,
-				des variants et des états réutilisables. Les écrans ont ensuite été assemblés dans un
-				prototype permettant de vérifier la cohérence de la navigation entre les principales
-				fonctionnalités.
+				Les écrans ont ensuite été assemblés dans un prototype Figma afin de vérifier la cohérence de
+				la navigation entre les principales fonctionnalités.
 			</p>
 		</CaseStudySection>
 
@@ -86,8 +84,7 @@
 		<CaseStudySection title="Résultats" id="resultats">
 			<p>
 				Le projet aboutit à un flow FigJam, une direction visuelle documentée, un style guide, un
-				design system Figma avec composants et variants, ainsi qu’un prototype haute fidélité couvrant
-				l’accueil, le glossaire, le détail d’un signe, le quiz, les favoris et la FAQ.
+				design system Figma et un prototype haute fidélité.
 			</p>
 			<p>
 				Ce projet de formation n’a pas produit de métriques d’usage réelles ; je le présente donc

@@ -5,6 +5,7 @@
 	import { getNextProject, projectPath } from '$lib/data/projects';
 	import Button from './Button.svelte';
 	import ProjectImage from './ProjectImage.svelte';
+	import ProjectTags from './ProjectTags.svelte';
 	import WindowFrame from './WindowFrame.svelte';
 
 	let {
@@ -26,27 +27,13 @@
 <WindowFrame title={project.title} parent={{ href: `${resolve('/')}#projets`, label: 'Projets' }}>
 	<article>
 		<header class="hero">
-		<p class="meta ds-label-m">{project.meta}</p>
-		<h1 class="ds-h1">{project.title}</h1>
-		<p class="subtitle ds-body-l">{project.subtitle}</p>
-		<dl class="facts">
-			<div>
-				<dt class="ds-label-m">Rôle</dt>
-				<dd class="ds-body-s">{project.role}</dd>
-			</div>
-			<div>
-				<dt class="ds-label-m">Stack</dt>
-				<dd class="ds-body-s">{project.stack.join(', ')}</dd>
-			</div>
-			<div>
-				<dt class="ds-label-m">Année</dt>
-				<dd class="ds-body-s">{project.year}</dd>
-			</div>
-		</dl>
-		{#if project.image}
-			<ProjectImage src={asset(project.image)} alt={project.imageAlt} />
-		{/if}
-	</header>
+			<h1 class="ds-h1">{project.title}</h1>
+			<p class="subtitle ds-body-l">{project.subtitle}</p>
+			<ProjectTags tags={project.tags} />
+			{#if project.image}
+				<ProjectImage src={asset(project.image)} alt={project.imageAlt} />
+			{/if}
+		</header>
 
 	{@render children()}
 
@@ -71,7 +58,6 @@
 		padding-bottom: var(--spacing-8);
 	}
 
-	.meta,
 	.subtitle {
 		margin: 0;
 		color: var(--text-secondary);
@@ -79,24 +65,6 @@
 
 	h1 {
 		margin: 0;
-	}
-
-	.facts {
-		display: grid;
-		grid-template-columns: 1fr;
-		gap: var(--spacing-4);
-		width: 100%;
-		margin: var(--spacing-2) 0 0;
-	}
-
-	.facts dt {
-		margin: 0 0 var(--spacing-1);
-		color: var(--text-secondary);
-	}
-
-	.facts dd {
-		margin: 0;
-		color: var(--text-primary);
 	}
 
 	.next {
@@ -116,11 +84,5 @@
 
 	.next-label {
 		color: var(--text-secondary);
-	}
-
-	@media (min-width: 40rem) {
-		.facts {
-			grid-template-columns: repeat(3, minmax(0, 1fr));
-		}
 	}
 </style>

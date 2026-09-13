@@ -2,7 +2,9 @@
 	import { asset, resolve } from '$app/paths';
 	import Button from '$lib/components/Button.svelte';
 	import ProjectCard from '$lib/components/ProjectCard.svelte';
+	import TechIcon from '$lib/components/TechIcon.svelte';
 	import { getFeaturedProjects, projectPath } from '$lib/data/projects';
+	import { homeTechs, uxSkills } from '$lib/data/skills';
 	import { snapBlocks } from '$lib/snap-blocks';
 
 	const name = 'Timothée Hennequin';
@@ -35,18 +37,31 @@
 		</div>
 	</section>
 
+	<section class="proofs snap-block" aria-label="Points clés">
+		<dl class="proofs-list">
+			<div>
+				<dt>Développement web</dt>
+				<dd>Expérience professionnelle</dd>
+			</div>
+			<div>
+				<dt>UX/UI Design</dt>
+				<dd>Certification niveau 6 en cours</dd>
+			</div>
+			<div>
+				<dt>Produit en production</dt>
+				<dd>Vroum · +90 000 visites en 2025</dd>
+			</div>
+		</dl>
+	</section>
+
 	<section id="projets" class="section snap-block" aria-labelledby="projets-title">
 		<h2 id="projets-title" class="ds-h2">Projets sélectionnés</h2>
-		<p class="section-intro ds-body-m">
-			Une sélection de projets réels et de formation qui montrent mon approche du développement web, de
-			l’UX/UI Design et de l’amélioration continue.
-		</p>
 		<ul class="grid">
 			{#each featuredProjects as project (project.slug)}
 				<li>
 					<ProjectCard
 						title={project.title}
-						meta={project.meta}
+						tags={project.tags}
 						description={project.description}
 						href={resolve(projectPath(project.slug))}
 						imageSrc={project.image ? asset(project.image) : undefined}
@@ -66,13 +81,25 @@
 			de l’analyse des besoins jusqu’à la conception et l’implémentation des interfaces.
 		</p>
 		<h3 class="ds-h3">Compétences</h3>
-		<ul class="skills">
-			<li>Front-end : SvelteKit, React, Twig</li>
-			<li>Back-end : FastAPI, Flask, Symfony, Node.js</li>
-			<li>Données et qualité : PostgreSQL, MySQL, Playwright</li>
-			<li>Delivery : Git, GitLab CI, Docker</li>
-			<li>UX/UI Design : recherche utilisateur, tests utilisateurs, prototypage Figma, design system, accessibilité, audit UX</li>
-		</ul>
+		<div class="skills">
+			<section class="skill-block" aria-labelledby="tech-title">
+				<h4 id="tech-title" class="skill-heading">Technologies & outils</h4>
+				<ul class="tech-grid">
+					{#each homeTechs as item (item.id)}
+						<li>
+							<span class="tech-item">
+								<TechIcon name={item.id} />
+								<span>{item.label}</span>
+							</span>
+						</li>
+					{/each}
+				</ul>
+			</section>
+			<section class="skill-block" aria-labelledby="ux-title">
+				<h4 id="ux-title" class="skill-heading">UX/UI Design</h4>
+				<p class="ux-skills">{uxSkills.join(' · ')}</p>
+			</section>
+		</div>
 		<p>
 			<a class="about-link" href={resolve('/a-propos')}>En savoir plus sur mon parcours</a>
 		</p>
@@ -122,10 +149,36 @@
 		color: var(--text-primary);
 	}
 
-	.intro,
-	.section-intro {
+	.intro {
 		max-width: 40rem;
 		color: var(--text-secondary);
+	}
+
+	.proofs {
+		margin-bottom: var(--spacing-8);
+		padding: var(--spacing-6) var(--spacing-8);
+		border: 1px solid var(--border-default);
+		border-radius: var(--radius-lg);
+		background: var(--surface-elevated);
+	}
+
+	.proofs-list {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: var(--spacing-5);
+		margin: 0;
+	}
+
+	.proofs-list dt {
+		margin: 0 0 var(--spacing-1);
+		color: var(--text-primary);
+		font: 600 var(--text-body-m-size) / var(--text-body-m-line) var(--font-sans);
+	}
+
+	.proofs-list dd {
+		margin: 0;
+		color: var(--text-secondary);
+		font: 400 var(--text-body-s-size) / var(--text-body-s-line) var(--font-sans);
 	}
 
 	.actions {
@@ -156,10 +209,6 @@
 		max-width: 40rem;
 	}
 
-	.section-intro {
-		margin-bottom: var(--spacing-6) !important;
-	}
-
 	.grid {
 		display: grid;
 		grid-template-columns: 1fr;
@@ -174,15 +223,48 @@
 	}
 
 	.skills {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-4);
 		margin: 0 0 var(--spacing-4);
-		padding-left: 1.25rem;
-		max-width: 40rem;
-		color: var(--text-primary);
-		font: 400 var(--text-body-m-size) / var(--text-body-m-line) var(--font-sans);
 	}
 
-	.skills li + li {
-		margin-top: var(--spacing-2);
+	.skill-heading {
+		margin: 0 0 var(--spacing-2);
+		color: var(--text-primary);
+		font: 600 var(--text-body-m-size) / var(--text-body-m-line) var(--font-sans);
+	}
+
+	.tech-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: var(--spacing-3) var(--spacing-2);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.tech-item {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--spacing-1);
+		min-width: 0;
+		--tech-icon-size: 1.25rem;
+		color: var(--text-secondary);
+		text-align: center;
+		font: 500 0.75rem / 1rem var(--font-sans);
+	}
+
+	.tech-item span {
+		color: var(--text-primary);
+	}
+
+	.ux-skills {
+		margin: 0;
+		max-width: 40rem;
+		color: var(--text-secondary);
+		font: 400 var(--text-body-s-size) / var(--text-body-s-line) var(--font-sans);
 	}
 
 	.about-link,
@@ -217,11 +299,29 @@
 		.grid {
 			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}
+
+		.tech-grid {
+			grid-template-columns: repeat(5, minmax(0, 1fr));
+		}
 	}
 
 	@media (min-width: 64rem) {
+		.proofs-list {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: var(--spacing-6);
+		}
+
+		.proofs-list > div + div {
+			padding-left: var(--spacing-6);
+			border-left: 1px solid var(--border-default);
+		}
+
 		.grid {
 			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+
+		.tech-grid {
+			grid-template-columns: repeat(9, minmax(0, 1fr));
 		}
 	}
 </style>

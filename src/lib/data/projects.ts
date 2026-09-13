@@ -5,6 +5,7 @@ export type Project = {
 	title: string;
 	subtitle: string;
 	meta: string;
+	tags: string[];
 	description: string;
 	stack: string[];
 	role: string;
@@ -20,8 +21,8 @@ export const projects: Project[] = [
 		title: 'Vroum',
 		subtitle: 'Outil collaboratif de covoiturage pour les scouts',
 		meta: 'Production · SvelteKit, FastAPI, PostgreSQL',
-		description:
-			'Application réelle de covoiturage collaboratif, utilisée en production par des groupes scouts.',
+		tags: ['2023–Aujourd’hui', 'Production', 'Développement web', 'Produit'],
+		description: 'Outil de covoiturage collaboratif utilisé par des groupes scouts.',
 		stack: ['SvelteKit', 'FastAPI', 'PostgreSQL'],
 		role: 'Développement web et participation aux décisions produit',
 		year: '2023-present',
@@ -34,8 +35,8 @@ export const projects: Project[] = [
 		title: 'EasySAV',
 		subtitle: 'Amélioration de formulaires métiers et de l’expérience utilisateur',
 		meta: 'Startup · Symfony, Twig, EasyAdmin',
-		description:
-			'Expérience professionnelle en startup : formulaires métiers et interface d’administration.',
+		tags: ['2021–2025', 'Expérience pro', 'Développement web'],
+		description: 'Formulaires métiers et interface d’administration.',
 		stack: ['Symfony', 'Twig', 'EasyAdmin'],
 		role: 'Développement web',
 		year: '2020-2025',
@@ -48,8 +49,8 @@ export const projects: Project[] = [
 		title: 'Les Bambinets',
 		subtitle: 'Application éducative autour de la langue des signes',
 		meta: 'Formation UX/UI · Figma',
-		description:
-			'Projet de formation UX/UI : design system, prototype et accessibilité.',
+		tags: ['2026', 'Formation', 'UX/UI Design'],
+		description: 'Application éducative autour de la langue des signes.',
 		stack: ['Figma'],
 		role: 'UX/UI Design',
 		year: '2026-2027',

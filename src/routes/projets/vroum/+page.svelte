@@ -10,10 +10,9 @@
 	<CaseStudyLayout {project}>
 		<CaseStudySection title="Contexte" id="contexte">
 			<p>
-				Vroum est un outil collaboratif de covoiturage destiné aux scouts. Il aide les
-				organisateurs à répartir participants, matériel et véhicules pour les trajets aller et
-				retour d’un événement. Le projet est réel, utilisé en production et développé au sein de
-				l’association LaToileScoute.
+				Vroum aide les organisateurs scouts à répartir participants, matériel et véhicules pour les
+				trajets aller et retour d’un événement. Le projet est développé au sein de l’association
+				LaToileScoute.
 			</p>
 		</CaseStudySection>
 
@@ -42,15 +41,9 @@
 
 		<CaseStudySection title="Démarche" id="demarche">
 			<p>
-				Le produit évolue de manière itérative à partir des usages réels. Les retours collectés via
-				le sondage et les échanges avec les utilisateurs servent à identifier les irritants, puis à
-				prioriser les corrections et améliorations avec l’équipe.
-			</p>
-			<p>
-				Cette démarche ne repose pas sur un processus de design isolé : les décisions sont prises
-				collectivement en confrontant besoin utilisateur, simplicité d’usage, faisabilité technique
-				et contraintes d’exploitation. Le projet a également évolué techniquement au fil du temps,
-				notamment avec une migration du backend de Flask vers FastAPI.
+				Le produit évolue de manière itérative à partir des usages réels. Les retours du sondage et
+				des échanges avec les utilisateurs servent à identifier les irritants, puis à prioriser les
+				corrections avec l’équipe.
 			</p>
 		</CaseStudySection>
 
@@ -80,31 +73,28 @@
 				disponibles.
 			</p>
 			<p>
-				Le mode multi-trajets ajoute une organisation par date et par ville : l’organisateur peut
-				par exemple distinguer plusieurs départs vers un même camp, puis retrouver les véhicules
-				correspondants sans perdre la vue d’ensemble.
+				Le mode multi-trajets organise les départs par date et par ville : l’organisateur peut
+				distinguer plusieurs départs vers un même camp, puis retrouver les véhicules correspondants
+				sans perdre la vue d’ensemble.
 			</p>
 		</CaseStudySection>
 
 		<CaseStudySection title="Résultats" id="resultats">
 			<p>
-				Vroum est utilisé en production et continue d’évoluer à partir des retours terrain. Le
-				sondage a permis d’identifier puis de corriger une grande partie des irritants remontés par
-				les utilisateurs. Le projet a dépassé les 90 000 visites en 2025, ce qui confirme son usage
-				à une échelle significative pour un outil associatif spécialisé.
+				Le sondage a permis d’identifier puis de corriger une grande partie des irritants remontés
+				par les utilisateurs. Le projet a dépassé les 90 000 visites en 2025, ce qui confirme son
+				usage à une échelle significative pour un outil associatif spécialisé.
 			</p>
 		</CaseStudySection>
 
 		<CaseStudySection title="Apprentissages" id="apprentissages">
 			<p>
 				Ce projet m’a surtout appris à faire évoluer un produit dans la durée plutôt qu’à livrer une
-				interface figée. J’ai dû trouver un équilibre entre besoins utilisateurs, décisions
-				collectives, dette technique et simplicité de maintenance.
+				interface figée.
 			</p>
 			<p>
-				Il m’a aussi permis de renforcer ma capacité à travailler avec des profils complémentaires
-				et à considérer les retours d’usage comme une donnée produit à part entière, même lorsque
-				mon rôle principal reste le développement.
+				J’ai dû trouver un équilibre entre besoins utilisateurs, dette technique et simplicité de
+				maintenance.
 			</p>
 		</CaseStudySection>
 	</CaseStudyLayout>
