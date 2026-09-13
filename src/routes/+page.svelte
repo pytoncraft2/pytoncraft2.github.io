@@ -12,10 +12,10 @@
 </script>
 
 <svelte:head>
-	<title>{name} — Développeur web</title>
+	<title>{name} — Développeur web & UX/UI Designer</title>
 	<meta
 		name="description"
-		content="Portfolio de {name}, développeur web avec une compétence complémentaire en Product Design."
+		content="Portfolio de {name}, développeur web & UX/UI Designer : développement web, conception d’interfaces, prototypage et accessibilité."
 	/>
 </svelte:head>
 
@@ -23,11 +23,11 @@
 	<section class="hero snap-block" aria-labelledby="hero-title">
 		<p class="eyebrow ds-label-m">Portfolio</p>
 		<h1 id="hero-title" class="ds-h1">{name}</h1>
-		<p class="role ds-body-l">Développeur web</p>
+		<p class="role ds-body-l">Développeur web & UX/UI Designer</p>
 		<p class="intro ds-body-m">
-			Je conçois et développe des applications web en gardant un lien direct entre besoins utilisateurs,
-			contraintes produit et faisabilité technique. Ma formation Product Designer complète aujourd’hui
-			mon profil de développeur.
+			Je conçois et développe des applications web en reliant besoins utilisateurs, conception d’interface
+			et faisabilité technique. Mon expérience en développement me permet d’intégrer les contraintes
+			techniques dès la conception et d’assurer une continuité entre les choix UX/UI et leur implémentation.
 		</p>
 		<div class="actions">
 			<Button href="#projets">Voir mes projets</Button>
@@ -38,8 +38,8 @@
 	<section id="projets" class="section snap-block" aria-labelledby="projets-title">
 		<h2 id="projets-title" class="ds-h2">Projets sélectionnés</h2>
 		<p class="section-intro ds-body-m">
-			Une sélection de projets réels et de formation qui montrent mon approche du développement, de la
-			conception produit et de l’amélioration continue.
+			Une sélection de projets réels et de formation qui montrent mon approche du développement web, de
+			l’UX/UI Design et de l’amélioration continue.
 		</p>
 		<ul class="grid">
 			{#each featuredProjects as project (project.slug)}
@@ -61,8 +61,9 @@
 		<h2 id="profil-title" class="ds-h2">Profil</h2>
 		<p class="ds-body-m">
 			Développeur web diplômé d’Epitech, j’ai travaillé plusieurs années sur des produits web en contexte
-			professionnel et associatif. Je poursuis aujourd’hui une formation Product Designer pour renforcer
-			ma capacité à concevoir des interfaces pertinentes avant de les développer.
+			professionnel et associatif. Je poursuis aujourd’hui une formation Product Designer chez OpenClassrooms,
+			préparant à la certification UX/UI Designer (RNCP40917, niveau 6), afin d’élargir mon champ d’intervention
+			de l’analyse des besoins jusqu’à la conception et l’implémentation des interfaces.
 		</p>
 		<h3 class="ds-h3">Compétences</h3>
 		<ul class="skills">
@@ -70,7 +71,7 @@
 			<li>Back-end : FastAPI, Flask, Symfony, Node.js</li>
 			<li>Données et qualité : PostgreSQL, MySQL, Playwright</li>
 			<li>Delivery : Git, GitLab CI, Docker</li>
-			<li>Product Design : Figma, prototypage, design system, accessibilité</li>
+			<li>UX/UI Design : recherche utilisateur, tests utilisateurs, prototypage Figma, design system, accessibilité, audit UX</li>
 		</ul>
 		<p>
 			<a class="about-link" href={resolve('/a-propos')}>En savoir plus sur mon parcours</a>

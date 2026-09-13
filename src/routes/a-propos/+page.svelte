@@ -13,7 +13,7 @@
 	<title>À propos — {name}</title>
 	<meta
 		name="description"
-		content="Parcours de {name}, développeur web avec une compétence complémentaire en Product Design."
+		content="Parcours de {name}, développeur web & UX/UI Designer, avec une approche qui relie conception, usages et contraintes techniques."
 	/>
 </svelte:head>
 
@@ -22,17 +22,17 @@
 		<header class="hero">
 		<h1 class="ds-h1">À propos</h1>
 		<p class="lead ds-body-l">
-			Développeur web de formation, je complète mon profil avec une formation Product Designer afin
-			de mieux relier conception, usages et contraintes techniques.
+			Développeur web & UX/UI Designer, je relie conception d’interface, besoins utilisateurs et contraintes
+			techniques afin de concevoir des produits web cohérents de la réflexion jusqu’à l’implémentation.
 		</p>
 	</header>
 
 	<section class="section" aria-labelledby="presentation-title">
 		<h2 id="presentation-title" class="ds-h2">Présentation</h2>
 		<p class="ds-body-m">
-			Je conçois et développe des interfaces web claires, accessibles et maintenables. Mon parcours
-			technique me permet de relier les contraintes de production aux décisions de conception, tout en
-			gardant le développement web comme cœur de métier.
+			Je conçois et développe des interfaces web claires, accessibles et maintenables. Mon expérience
+			technique me permet d’intégrer la faisabilité et les contraintes de production dès la conception,
+			tout en gardant le développement web comme cœur de métier.
 		</p>
 	</section>
 
@@ -42,7 +42,7 @@
 			<li>2020–2022 — Intégrateur / développeur web, Web@cadémie à Nancy</li>
 			<li>2021–2025 — Développeur web en alternance chez EasySAV à Metz</li>
 			<li>2022–2025 — Master of Science Epitech, spécialité IoT, à Nancy</li>
-			<li>Depuis 2026 — Formation Product Designer chez OpenClassrooms</li>
+			<li>Depuis 2026 — Formation Product Designer chez OpenClassrooms — certification UX/UI Designer (RNCP40917, niveau 6) en cours</li>
 			<li>
 				En parallèle — Bénévole à LaToileScoute, avec notamment le développement de Vroum, un outil
 				de covoiturage scout utilisé en production
@@ -61,13 +61,14 @@
 		</ul>
 	</section>
 
-	<section class="section" aria-labelledby="product-design-title">
-		<h2 id="product-design-title" class="ds-h2">Product Design, compétence complémentaire</h2>
+	<section class="section" aria-labelledby="ux-ui-title">
+		<h2 id="ux-ui-title" class="ds-h2">UX/UI Design</h2>
 		<p class="ds-body-m">
-			Je développe cette compétence afin d’être plus autonome dans la conception de mes produits et
-			de mieux comprendre les usages avant de passer au code. La formation m’a notamment permis de
-			travailler la recherche utilisateur, le prototypage Figma, le design system, l’accessibilité et
-			la structuration de case studies.
+			Ma formation Product Designer chez OpenClassrooms, préparant à la certification UX/UI Designer
+			(RNCP40917, niveau 6), me permet d’approfondir la recherche et les tests utilisateurs, le prototypage
+			Figma, les design systems, l’accessibilité et l’audit UX. Associées à mon expérience de développeur,
+			ces compétences me permettent d’intégrer les contraintes techniques dès la conception et d’assurer
+			une continuité entre les choix UX/UI et leur implémentation.
 		</p>
 	</section>
 
