@@ -16,6 +16,8 @@
 					var dock = localStorage.getItem('dock-placement');
 					if (dock === 'left' || dock === 'right' || dock === 'bottom') {
 						document.documentElement.setAttribute('data-dock', dock);
+					} else if (window.matchMedia('(min-width: 40rem)').matches) {
+						document.documentElement.setAttribute('data-dock', 'left');
 					}
 				} catch (e) {}
 			})();

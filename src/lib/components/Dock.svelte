@@ -9,7 +9,7 @@
 
 	type DockPlacement = 'bottom' | 'left' | 'right';
 
-	let placement = $state<DockPlacement>('bottom');
+	let placement = $state<DockPlacement>('left');
 	let dragging = $state(false);
 	let dragX = $state(0);
 	let dragY = $state(0);
@@ -155,7 +155,8 @@
 		if (isDockPlacement(stored)) {
 			persistPlacement(stored);
 		} else {
-			document.documentElement.dataset.dock = 'bottom';
+			placement = 'left';
+			document.documentElement.dataset.dock = 'left';
 		}
 	});
 
