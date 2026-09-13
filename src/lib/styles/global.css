@@ -124,7 +124,7 @@ summary:focus-visible {
 	position: relative;
 	z-index: 1;
 	overflow: visible;
-	border: 2px solid transparent;
+	border-color: transparent;
 	border-radius: var(--radius-lg);
 	background-color: var(--surface-elevated);
 	background-image:
