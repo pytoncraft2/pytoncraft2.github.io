@@ -20,6 +20,10 @@
 	let startX = 0;
 	let startY = 0;
 	let ignoreClick = false;
+	let visible = $state(true);
+	// Empêche le show/hide pendant le premier scroll déclenché par un hash (comme svelte.dev)
+	let hashChanged = false;
+	let lastScroll = 0;
 
 	function isDockPlacement(value: string | null | undefined): value is DockPlacement {
 		return value === 'bottom' || value === 'left' || value === 'right';
@@ -136,6 +140,20 @@
 		ignoreClick = false;
 	}
 
+	function onHashChange() {
+		hashChanged = true;
+	}
+
+	function onWindowScroll() {
+		const scroll = window.scrollY;
+		if (!hashChanged) {
+			visible = scroll === lastScroll ? visible : scroll < 50 || scroll < lastScroll;
+		}
+
+		lastScroll = scroll;
+		hashChanged = false;
+	}
+
 	function dockDrag(node: HTMLElement) {
 		function onPointerDown(event: PointerEvent) {
 			beginDrag(event, node);
@@ -158,6 +176,8 @@
 			placement = 'left';
 			document.documentElement.dataset.dock = 'left';
 		}
+
+		lastScroll = window.scrollY;
 	});
 
 	const dropEdges = ['bottom', 'left', 'right'] as const;
@@ -206,6 +226,8 @@
 	onpointerup={onPointerUp}
 	onpointercancel={onPointerUp}
 	onkeydown={onKeydown}
+	onscroll={onWindowScroll}
+	onhashchange={onHashChange}
 />
 
 {#if dragging}
@@ -218,8 +240,7 @@
 
 <nav
 	id="menu"
-	class="dock"
-	class:dragging
+	class={['dock', { dragging, visible }]}
 	style:--drag-x="{dragX}px"
 	style:--drag-y="{dragY}px"
 	style:--grab-x="{grabX}px"
@@ -352,6 +373,16 @@
 	.dock:focus {
 		outline: 2px solid var(--action-focus);
 		outline-offset: 4px;
+	}
+
+	@media (max-width: 39.99rem) {
+		.dock {
+			transition: transform 0.2s;
+		}
+
+		.dock:not(.visible):not(:focus-within) {
+			transform: translate(0, 100%);
+		}
 	}
 
 	.items {

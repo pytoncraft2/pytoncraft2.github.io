@@ -6,87 +6,9 @@
 	import Dock from '$lib/components/Dock.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import Header from '$lib/components/Header.svelte';
-	import { afterNavigate, onNavigate } from '$app/navigation';
+	import { onNavigate } from '$app/navigation';
 
 	let { children } = $props();
-
-	const highlightTargets = new Set(['projets', 'contact']);
-	let highlightCleanup: (() => void) | null = null;
-	let lastHighlightAt = 0;
-	let lastHighlightId = '';
-
-	function highlightAnchor(hash: string) {
-		const id = decodeURIComponent(hash.replace(/^#/, ''));
-		if (!highlightTargets.has(id)) {
-			return;
-		}
-
-		const now = performance.now();
-		if (id === lastHighlightId && now - lastHighlightAt < 80) {
-			return;
-		}
-
-		const target = document.getElementById(id);
-		if (!target) {
-			return;
-		}
-
-		lastHighlightAt = now;
-		lastHighlightId = id;
-		highlightCleanup?.();
-		target.classList.remove('is-highlighted');
-		void target.offsetWidth;
-		target.classList.add('is-highlighted');
-
-		const onAnimationEnd = (event: AnimationEvent) => {
-			if (event.animationName !== 'highlight-glow') {
-				return;
-			}
-
-			target.classList.remove('is-highlighted');
-			highlightCleanup = null;
-			target.removeEventListener('animationend', onAnimationEnd);
-		};
-
-		target.addEventListener('animationend', onAnimationEnd);
-		highlightCleanup = () => {
-			target.removeEventListener('animationend', onAnimationEnd);
-		};
-	}
-
-	afterNavigate(({ to }) => {
-		highlightAnchor(to?.url.hash ?? '');
-	});
-
-	function onHashChange() {
-		highlightAnchor(location.hash);
-	}
-
-	function onDocumentClick(event: MouseEvent) {
-		const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
-		if (!(link instanceof HTMLAnchorElement) || link.target === '_blank') {
-			return;
-		}
-
-		let url: URL;
-		try {
-			url = new URL(link.href);
-		} catch {
-			return;
-		}
-
-		if (url.origin !== location.origin || url.pathname !== location.pathname) {
-			return;
-		}
-
-		if (url.hash !== '#projets' && url.hash !== '#contact') {
-			return;
-		}
-
-		requestAnimationFrame(() => {
-			highlightAnchor(url.hash);
-		});
-	}
 
 	onNavigate((navigation) => {
 		if (typeof document.startViewTransition !== 'function') {
@@ -120,9 +42,6 @@
 		rel="stylesheet"
 	/>
 </svelte:head>
-
-<svelte:window onhashchange={onHashChange} />
-<svelte:document onclick={onDocumentClick} />
 
 <a class="skip-link" href="#contenu">Aller au contenu</a>
 <a class="skip-link" href="#menu">Aller au menu</a>

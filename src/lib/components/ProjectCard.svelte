@@ -39,7 +39,7 @@
 		flex-direction: column;
 		gap: var(--spacing-3);
 		width: 100%;
-		max-width: 390px;
+		max-width: var(--project-card-max-width, 390px);
 		padding: var(--spacing-5);
 		background: var(--surface-elevated);
 		border: 1px solid var(--border-default);
@@ -75,6 +75,7 @@
 
 	.link {
 		min-height: 44px;
+		margin-top: auto;
 		display: inline-flex;
 		align-items: center;
 		color: var(--action-primary);

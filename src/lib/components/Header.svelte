@@ -170,4 +170,39 @@
 			padding-right: var(--dock-gutter);
 		}
 	}
+
+	@media (min-width: 64rem) {
+		.header {
+			position: sticky;
+			height: 0;
+			border: none;
+			background: transparent;
+			overflow: visible;
+			pointer-events: none;
+		}
+
+		.inner {
+			display: flex;
+			justify-content: flex-end;
+			width: 100%;
+			min-height: 0;
+			margin: 0;
+			padding: var(--spacing-4) var(--spacing-5);
+		}
+
+		.home,
+		.title {
+			display: none;
+		}
+
+		.theme {
+			pointer-events: auto;
+		}
+
+		:global(html[data-dock='left']) .header,
+		:global(html[data-dock='right']) .header {
+			padding-left: 0;
+			padding-right: 0;
+		}
+	}
 </style>
