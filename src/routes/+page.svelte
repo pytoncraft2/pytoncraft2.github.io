@@ -326,6 +326,7 @@
 		border-radius: var(--radius-md);
 		background: var(--surface-elevated);
 		scroll-snap-align: start;
+		corner-bottom-left-shape: bevel;
 	}
 
 	.proof-note::before {
