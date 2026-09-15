@@ -32,6 +32,11 @@
   --feedback-success: var(--color-success-500);
   --feedback-error: var(--color-error-500);
   --feedback-warning: var(--color-warning-500);
+  --selection-fg: var(--color-neutral-0);
+  --selection-bg: var(--color-brand-500);
+  --scrollbar-track: var(--color-neutral-100);
+  --scrollbar-thumb: var(--color-neutral-300);
+  --scrollbar-thumb-hover: var(--color-brand-500);
 
   /* Layout */
   --spacing-0: 0;
@@ -88,10 +93,20 @@
   --action-primary: var(--color-brand-300);
   --action-primary-hover: var(--color-brand-200);
   --action-focus: var(--color-brand-300);
+  --selection-fg: var(--color-neutral-950);
+  --selection-bg: var(--color-brand-300);
+  --scrollbar-track: var(--color-neutral-900);
+  --scrollbar-thumb: var(--color-neutral-700);
+  --scrollbar-thumb-hover: var(--color-brand-300);
 }
 
 html {
   font-family: var(--font-sans);
   color: var(--text-primary);
   background: var(--surface-default);
+  color-scheme: light;
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
 }

@@ -5,20 +5,38 @@
 
 	const brandName = 'Timothée Hennequin';
 	const themeDuration = 220;
+	const themeColors = {
+		light: '#f8fafc',
+		dark: '#0f172a'
+	} as const;
 
 	let theme = $state<'light' | 'dark'>('light');
 	let themeTimer = 0;
+
+	function syncBrowserChrome(next: 'light' | 'dark') {
+		document.documentElement.style.colorScheme = next;
+
+		let meta = document.querySelector('meta[name="theme-color"]');
+		if (!meta) {
+			meta = document.createElement('meta');
+			meta.setAttribute('name', 'theme-color');
+			document.head.appendChild(meta);
+		}
+		meta.setAttribute('content', themeColors[next]);
+	}
 
 	onMount(() => {
 		const current = document.documentElement.dataset.theme;
 		if (current === 'dark' || current === 'light') {
 			theme = current;
+			syncBrowserChrome(current);
 		}
 	});
 
 	function applyTheme(next: 'light' | 'dark') {
 		theme = next;
 		localStorage.setItem('theme', next);
+		syncBrowserChrome(next);
 
 		const root = document.documentElement;
 		window.clearTimeout(themeTimer);

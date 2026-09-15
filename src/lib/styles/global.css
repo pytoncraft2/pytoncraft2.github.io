@@ -4,13 +4,42 @@
 	box-sizing: border-box;
 }
 
+::-moz-selection {
+	color: var(--selection-fg);
+	background: var(--selection-bg);
+}
+
+::selection {
+	color: var(--selection-fg);
+	background: var(--selection-bg);
+}
+
 html {
 	scroll-behavior: smooth;
 	scroll-padding-top: 4.5rem;
 	scroll-padding-bottom: 6.5rem;
+	scrollbar-width: thin;
+	scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
 
 @media (min-width: 40rem) {
+	html::-webkit-scrollbar {
+		width: 10px;
+	}
+
+	html::-webkit-scrollbar-track {
+		background: var(--scrollbar-track);
+	}
+
+	html::-webkit-scrollbar-thumb {
+		background: var(--scrollbar-thumb);
+		border-radius: var(--radius-full);
+	}
+
+	html::-webkit-scrollbar-thumb:hover {
+		background: var(--scrollbar-thumb-hover);
+	}
+
 	html[data-dock='left'],
 	html[data-dock='right'] {
 		scroll-padding-bottom: 1.5rem;
