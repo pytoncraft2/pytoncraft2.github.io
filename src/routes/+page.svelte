@@ -108,9 +108,7 @@
 			<h1 id="hero-title" class="ds-h1">{name}</h1>
 			<p class="role ds-body-l">Développeur web & UX/UI Designer</p>
 			<p class="intro ds-body-m">
-				Je conçois et développe des applications web en reliant besoins utilisateurs, conception d’interface
-				et faisabilité technique. Mon expérience en développement me permet d’intégrer les contraintes
-				techniques dès la conception et d’assurer une continuité entre les choix UX/UI et leur implémentation.
+				Je conçois et développe des applications web en intégrant les besoins utilisateurs et les contraintes techniques dès la conception.
 			</p>
 			<div class="actions">
 				<Button href="#projets">Voir mes projets</Button>
