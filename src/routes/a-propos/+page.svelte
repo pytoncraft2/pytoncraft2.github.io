@@ -38,14 +38,32 @@
 
 	<section class="section" aria-labelledby="parcours-title">
 		<h2 id="parcours-title" class="ds-h2">Parcours</h2>
-		<ul>
-			<li>2020–2022 — Intégrateur / développeur web, Web@cadémie à Nancy</li>
-			<li>2021–2025 — Développeur web en alternance chez EasySAV à Metz</li>
-			<li>2022–2025 — Master of Science Epitech, spécialité IoT, à Nancy</li>
-			<li>Depuis 2026 — Formation Product Designer chez OpenClassrooms — certification UX/UI Designer (RNCP40917, niveau 6) en cours</li>
+		<ul class="parcours">
 			<li>
-				En parallèle — Bénévole à LaToileScoute, avec notamment le développement de Vroum, un outil
-				de covoiturage scout utilisé en production
+				<span class="parcours-role">2020–2022 — Intégrateur / développeur web</span>
+				<span class="parcours-detail">Web@cadémie, Nancy</span>
+			</li>
+			<li>
+				<span class="parcours-role">2021–2025 — Développeur web en alternance</span>
+				<span class="parcours-detail">EasySAV, Metz</span>
+			</li>
+			<li>
+				<span class="parcours-role">2022–2023 — Pré-MSc Epitech</span>
+				<span class="parcours-detail">
+					Formation intensive en développement et ingénierie logicielle, Nancy
+				</span>
+			</li>
+			<li>
+				<span class="parcours-role">2023–2025 — Master of Science Epitech, spécialité IoT</span>
+				<span class="parcours-detail">
+					Diplômé « Architecte logiciel, développeur d’applications » — niveau 7, Nancy
+				</span>
+			</li>
+			<li>
+				<span class="parcours-role">Depuis 2026 — Formation Product Designer, OpenClassrooms</span>
+				<span class="parcours-detail">
+					Certification UX/UI Designer (RNCP40917, niveau 6) en cours
+				</span>
 			</li>
 		</ul>
 	</section>
@@ -57,7 +75,7 @@
 			<li>Back-end : FastAPI, Flask, Symfony, Node.js</li>
 			<li>Données : PostgreSQL, MySQL</li>
 			<li>Qualité et livraison : Git, GitLab CI, Docker, Playwright</li>
-			<li>Outils et environnements : EasyAdmin, Raspberry Pi, Arduino</li>
+			<li>IoT : Raspberry Pi, Arduino, M5GO, ESP32, LoRa32</li>
 		</ul>
 	</section>
 
@@ -138,6 +156,29 @@
 
 	.section li + li {
 		margin-top: var(--spacing-2);
+	}
+
+	.parcours {
+		list-style: disc;
+	}
+
+	.parcours li {
+		display: flex;
+		flex-direction: column;
+		gap: 0.125rem;
+	}
+
+	.parcours li + li {
+		margin-top: var(--spacing-4);
+	}
+
+	.parcours-role {
+		color: var(--text-primary);
+	}
+
+	.parcours-detail {
+		color: var(--text-secondary);
+		font: 400 var(--text-body-s-size) / var(--text-body-s-line) var(--font-sans);
 	}
 
 	.contact-links {

@@ -82,22 +82,22 @@
 
 :root[data-theme='dark'],
 [data-theme='dark'] {
-  --text-primary: var(--color-neutral-50);
-  --text-secondary: var(--color-neutral-300);
-  --text-inverse: var(--color-neutral-950);
-  --surface-default: var(--color-neutral-950);
-  --surface-subtle: var(--color-neutral-900);
-  --surface-elevated: var(--color-neutral-900);
-  --border-default: var(--color-neutral-700);
-  --border-strong: var(--color-neutral-500);
+  --text-primary: rgb(183, 183, 183);
+  --text-secondary: rgba(183, 183, 183, 0.72);
+  --text-inverse: rgb(23, 23, 23);
+  --surface-default: rgb(23, 23, 23);
+  --surface-subtle: rgb(23, 23, 23);
+  --surface-elevated: rgb(23, 23, 23);
+  --border-default: rgba(183, 183, 183, 0.22);
+  --border-strong: rgba(183, 183, 183, 0.4);
   --action-primary: var(--color-brand-300);
   --action-primary-hover: var(--color-brand-200);
   --action-focus: var(--color-brand-300);
-  --selection-fg: var(--color-neutral-950);
-  --selection-bg: var(--color-brand-300);
-  --scrollbar-track: var(--color-neutral-900);
-  --scrollbar-thumb: var(--color-neutral-700);
-  --scrollbar-thumb-hover: var(--color-brand-300);
+  --selection-fg: rgb(23, 23, 23);
+  --selection-bg: rgb(183, 183, 183);
+  --scrollbar-track: rgb(23, 23, 23);
+  --scrollbar-thumb: rgba(183, 183, 183, 0.35);
+  --scrollbar-thumb-hover: rgb(183, 183, 183);
 }
 
 html {
