@@ -87,7 +87,7 @@
 				design system Figma et un prototype haute fidélité.
 			</p>
 			<p>
-				Ce projet de formation n’a pas produit de métriques d’usage réelles ; je le présente donc
+				Ce projet de formation n’a pas produit de métriques d’usage réelles, je le présente donc
 				comme une démonstration de ma capacité à passer d’une intention graphique à un système
 				d’interface cohérent et prototypé.
 			</p>
