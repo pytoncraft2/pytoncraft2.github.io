@@ -1,4 +1,4 @@
-export type ProjectSlug = 'vroum' | 'easysav' | 'les-bambinets' | 'fox-coffee' | 'sportsee';
+export type ProjectSlug = 'vroum' | 'easysav' | 'les-bambinets' | 'fox-coffee' | 'sportsee' | 'eventorias';
 
 export type Project = {
 	slug: ProjectSlug;
@@ -16,7 +16,7 @@ export type Project = {
 };
 
 export const projects: Project[] = [
-{
+	{
 		slug: 'vroum',
 		title: 'Vroum',
 		subtitle: 'Outil collaboratif de covoiturage pour les scouts',
@@ -58,6 +58,20 @@ export const projects: Project[] = [
 		featured: true,
 		image: '/fox.png',
 		imageAlt: 'Étude de l’expérience client Fox Coffee'
+	},
+	{
+		slug: 'eventorias',
+		title: 'Eventorias',
+		subtitle: 'Concevoir et tester une application de découverte d’événements à Paris',
+		meta: 'Formation Product Design · Prototype no-code · Recherche UX',
+		tags: ['2026', 'Formation', 'Product Design', 'Tests utilisateurs'],
+		description: 'Prototype mobile de découverte et de publication d’événements, amélioré grâce à des micro-tests et documenté pour la passation aux développeurs.',
+		stack: ['Lovable', 'Maze', 'Notion', 'Canva'],
+		role: 'Recherche UX, prototypage, tests et passation',
+		year: '2026',
+		featured: true,
+		image: '/paris.png',
+		imageAlt: 'Prototype mobile Eventorias'
 	},
 	{
 		slug: 'sportsee',
