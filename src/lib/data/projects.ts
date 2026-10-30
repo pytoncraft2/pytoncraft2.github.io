@@ -1,4 +1,4 @@
-export type ProjectSlug = 'vroum' | 'easysav' | 'les-bambinets' | 'fox-coffee';
+export type ProjectSlug = 'vroum' | 'easysav' | 'les-bambinets' | 'fox-coffee' | 'sportsee';
 
 export type Project = {
 	slug: ProjectSlug;
@@ -16,21 +16,7 @@ export type Project = {
 };
 
 export const projects: Project[] = [
-	{
-		slug: 'fox-coffee',
-		title: 'Fox Coffee',
-		subtitle: 'Comprendre et améliorer l’expérience client d’un café',
-		meta: 'Étude terrain · Recherche UX · Atelier Miro',
-		tags: ['2026', 'Étude de cas', 'Recherche UX', 'Service Design'],
-		description: 'Étude qualitative de l’expérience chez Fox Coffee à Metz : 8 observations, 5 entretiens, personas, parcours et atelier d’idéation.',
-		stack: ['Notion', 'Miro', 'Canva'],
-		role: 'Recherche utilisateurs, analyse et animation d’atelier',
-		year: '2026',
-		featured: true,
-		image: '',
-		imageAlt: 'Étude de l’expérience client Fox Coffee'
-	},
-	{
+{
 		slug: 'vroum',
 		title: 'Vroum',
 		subtitle: 'Outil collaboratif de covoiturage pour les scouts',
@@ -58,7 +44,36 @@ export const projects: Project[] = [
 		image: '/easysav.png',
 		imageAlt: 'Interface de l’outil EasySAV'
 	},
+
 	{
+		slug: 'fox-coffee',
+		title: 'Fox Coffee',
+		subtitle: 'Comprendre et améliorer l’expérience client d’un café',
+		meta: 'Étude terrain · Recherche UX · Atelier Miro',
+		tags: ['2026', 'Étude de cas', 'Recherche UX', 'Service Design'],
+		description: 'Étude qualitative de l’expérience chez Fox Coffee à Metz : 8 observations, 5 entretiens, personas, parcours et atelier d’idéation.',
+		stack: ['Notion', 'Miro', 'Canva'],
+		role: 'Recherche utilisateurs, analyse et animation d’atelier',
+		year: '2026',
+		featured: true,
+		image: '/fox.png',
+		imageAlt: 'Étude de l’expérience client Fox Coffee'
+	},
+	{
+		slug: 'sportsee',
+		title: 'SportSee',
+		subtitle: 'Une interface de suivi sportif et son Design System',
+		meta: 'Formation Product Design · Figma · Zeroheight',
+		tags: ['2026', 'Formation', 'UI Design', 'Design System'],
+		description: 'Conception des écrans de connexion, dashboard et profil sur trois formats, avec un Design System réutilisable documenté dans Zeroheight.',
+		stack: ['Figma', 'Zeroheight'],
+		role: 'Conception UI, responsive et documentation du Design System',
+		year: '2026',
+		featured: true,
+		image: '/sportsee.png',
+		imageAlt: 'Projet de conception d’interface SportSee'
+	},
+		{
 		slug: 'les-bambinets',
 		title: 'Les Bambinets',
 		subtitle: 'Application éducative autour de la langue des signes',

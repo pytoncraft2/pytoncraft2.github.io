@@ -1,4 +1,4 @@
-# Portfolio — Figma → SvelteKit design-system bridge
+# Portfolio. Figma → SvelteKit design-system bridge
 
 This starter mirrors the current Figma design system for the portfolio.
 

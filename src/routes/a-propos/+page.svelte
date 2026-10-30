@@ -10,7 +10,7 @@
 </script>
 
 <svelte:head>
-	<title>À propos — {name}</title>
+	<title>À propos • {name}</title>
 	<meta
 		name="description"
 		content="Parcours de {name}, développeur web & UX/UI Designer, avec une approche qui relie conception, usages et contraintes techniques."
@@ -40,27 +40,27 @@
 		<h2 id="parcours-title" class="ds-h2">Parcours</h2>
 		<ul class="parcours">
 			<li>
-				<span class="parcours-role">2020–2022 — Intégrateur / développeur web</span>
+				<span class="parcours-role">2020–2022 : Intégrateur / développeur web</span>
 				<span class="parcours-detail">Web@cadémie, Nancy</span>
 			</li>
 			<li>
-				<span class="parcours-role">2021–2025 — Développeur web en alternance</span>
+				<span class="parcours-role">2021–2025 : Développeur web en alternance</span>
 				<span class="parcours-detail">EasySAV, Metz</span>
 			</li>
 			<li>
-				<span class="parcours-role">2022–2023 — Pré-MSc Epitech</span>
+				<span class="parcours-role">2022–2023 : Pré-MSc Epitech</span>
 				<span class="parcours-detail">
 					Formation intensive en développement et ingénierie logicielle, Nancy
 				</span>
 			</li>
 			<li>
-				<span class="parcours-role">2023–2025 — Master of Science Epitech, spécialité IoT</span>
+				<span class="parcours-role">2023–2025 : Master of Science Epitech, spécialité IoT</span>
 				<span class="parcours-detail">
-					Diplômé « Architecte logiciel, développeur d’applications » — niveau 7, Nancy
+					Diplômé « Architecte logiciel, développeur d’applications » : niveau 7, Nancy
 				</span>
 			</li>
 			<li>
-				<span class="parcours-role">Depuis 2026 — Formation Product Designer, OpenClassrooms</span>
+				<span class="parcours-role">Depuis 2026 : Formation Product Designer, OpenClassrooms</span>
 				<span class="parcours-detail">
 					Certification UX/UI Designer (RNCP40917, niveau 6) en cours
 				</span>

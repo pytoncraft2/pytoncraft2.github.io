@@ -17,7 +17,6 @@
   --color-error-500: #b91c1c;
   --color-warning-500: #a16207;
 
-  /* Semantic — Light */
   --text-primary: var(--color-neutral-900);
   --text-secondary: var(--color-neutral-500);
   --text-inverse: var(--color-neutral-0);

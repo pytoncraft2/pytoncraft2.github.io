@@ -20,7 +20,7 @@
 </script>
 
 <svelte:head>
-	<title>{project.title} — Case study</title>
+	<title>{project.title} • Case study</title>
 	<meta name="description" content={project.description} />
 </svelte:head>
 

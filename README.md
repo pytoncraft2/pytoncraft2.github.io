@@ -1,4 +1,4 @@
-# Portfolio — Timothée Hennequin
+# Portfolio de Timothée Hennequin
 
 Portfolio personnel en SvelteKit.
 

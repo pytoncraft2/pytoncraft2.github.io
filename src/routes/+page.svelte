@@ -94,7 +94,7 @@
 </script>
 
 <svelte:head>
-	<title>{name} — Développeur web & UX/UI Designer</title>
+	<title>{name} • Développeur web & UX/UI Designer</title>
 	<meta
 		name="description"
 		content="Portfolio de {name}, développeur web & UX/UI Designer : développement web, conception d’interfaces, prototypage et accessibilité."
