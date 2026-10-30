@@ -23,13 +23,13 @@
 			<h4>Observer et écouter</h4>
 			<p>Le 27 octobre 2026, j’ai documenté huit situations clients et réalisé cinq entretiens qualitatifs volontaires. Les observations portaient notamment sur l’arrivée, la commande, l’attente, les déplacements et l’utilisation des espaces.</p>
 			<h4>Analyser les parcours</h4>
-			<p>J’ai rapproché les comportements observés et les témoignages pour dégager des besoins, puis représenté deux profils synthétiques et deux parcours « as is ». La différence entre les repères d’un habitué et ceux d’un visiteur occasionnel a contribué au cadrage de la problématique.</p>
+			<p>J’ai rapproché les comportements observés et les témoignages pour dégager des besoins, puis représenté deux profils synthétiques et deux parcours « as is ». Camille, cliente fidèle, recherche le calme et un accueil familier, tandis que Thomas, nouveau visiteur, doit découvrir les repères du service. Ces personas sont des synthèses fictives, et non des portraits individuels.</p>
 			<h4>Faire émerger des solutions</h4>
 			<p>J’ai animé un atelier de 40 minutes sur Miro avec trois participants, dont une personne précédemment interviewée. Après une phase individuelle, les idées ont été discutées, regroupées et priorisées collectivement.</p>
 		</CaseStudySection>
 		<CaseStudySection title="Décisions & arbitrages" id="decisions">
 			<h4>Concentrer la recherche sur les nouveaux visiteurs</h4>
-			<p>Les habitués connaissaient déjà le fonctionnement du lieu. J’ai donc privilégié une question ouverte sur la simplicité de la première visite, sans imposer de solution dès le départ.</p>
+			<p>Les habitués interrogés connaissaient déjà le fonctionnement du lieu. J’ai donc privilégié une question ouverte sur la simplicité de la première visite, sans imposer de solution dès le départ. Cette orientation reste exploratoire : davantage d’entretiens avec de nouveaux visiteurs seraient nécessaires pour la confirmer.</p>
 			<h4>Privilégier des améliorations proportionnées</h4>
 			<p>Des propositions d’ajout de tables ou de nouvelles salles ont été discutées, mais leur coût et leurs implications sur l’organisation semblaient plus importants. Le groupe a retenu trois pistes à approfondir.</p>
 			<h4>Ne pas surinterpréter le vote</h4>
@@ -37,15 +37,15 @@
 		</CaseStudySection>
 		<CaseStudySection title="Recommandations" id="solution">
 			<h4>1. Clarifier la circulation</h4>
-			<p>Étudier des cordons modulables associés à des flèches au sol pour rendre le cheminement plus lisible pendant les périodes d’affluence, sans gêner les accès.</p>
+			<p>Tester des cordons modulables associés à des flèches au sol pour rendre le cheminement plus lisible pendant les périodes d’affluence, sous réserve de préserver les accès, la sécurité et le confort de déplacement.</p>
 			<h4>2. Rendre le menu plus accessible</h4>
-			<p>Proposer un QR code donnant accès à un menu consultable sur téléphone, en complément des supports physiques existants.</p>
+			<p>Étudier un QR code donnant accès à un menu lisible et agrandissable sur téléphone, sans remplacer les supports physiques existants. L’accessibilité du menu numérique resterait à vérifier.</p>
 			<h4>3. Repenser l’espace petit-déjeuner</h4>
 			<p>Explorer un buffet plus confortable, permettant de choisir les produits et de poser son plateau sans perturber la circulation.</p>
 		</CaseStudySection>
 		<CaseStudySection title="Résultats et limites" id="resultats">
-			<p>Le projet a abouti à une synthèse de recherche, deux personas, deux parcours utilisateurs, un atelier d’idéation et un plan de conception UX/UI proposant des étapes de faisabilité, de prototypage et de test.</p>
-			<p>Il s’agit d’une recherche qualitative menée sur une seule matinée, avec cinq entretiens. L’atelier a réuni trois participants au lieu des quatre prévus. Les recommandations n’ont pas encore été testées ou installées : aucun gain mesuré ne peut donc leur être attribué.</p>
+			<p>Le projet a abouti à une synthèse de recherche, deux personas, deux parcours utilisateurs « as-is », un atelier d’idéation et un plan de conception UX/UI sur 12 mois. Ce dernier prévoit l’étude de faisabilité, le prototypage, les tests utilisateurs et une éventuelle mise en œuvre. L’enveloppe de 100 000 € est une hypothèse pédagogique, pas un budget réel de Fox Coffee.</p>
+			<p>Il s’agit d’une recherche qualitative menée sur une seule matinée, avec cinq entretiens. L’atelier a réuni trois participants au lieu des quatre prévus. Les recommandations n’ont pas encore été testées ou installées : les objectifs et indicateurs proposés restent hypothétiques, sans gain mesuré à ce stade.</p>
 		</CaseStudySection>
 		<CaseStudySection title="Apprentissages" id="apprentissages">
 			<p>Ce projet m’a permis de mener une démarche UX complète sur un service du quotidien, en reliant observation, entretiens, analyse et idéation. Il m’a aussi appris à distinguer une difficulté observée, une hypothèse de solution et une amélioration effectivement démontrée.</p>
