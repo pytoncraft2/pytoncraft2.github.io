@@ -1,4 +1,4 @@
-export type ProjectSlug = 'vroum' | 'easysav' | 'les-bambinets';
+export type ProjectSlug = 'vroum' | 'easysav' | 'les-bambinets' | 'fox-coffee';
 
 export type Project = {
 	slug: ProjectSlug;
@@ -16,6 +16,20 @@ export type Project = {
 };
 
 export const projects: Project[] = [
+	{
+		slug: 'fox-coffee',
+		title: 'Fox Coffee',
+		subtitle: 'Comprendre et améliorer l’expérience client d’un café',
+		meta: 'Étude terrain · Recherche UX · Atelier Miro',
+		tags: ['2026', 'Étude de cas', 'Recherche UX', 'Service Design'],
+		description: 'Étude qualitative de l’expérience chez Fox Coffee à Metz : observations, entretiens, personas, parcours et atelier d’idéation.',
+		stack: ['Notion', 'Miro', 'Canva'],
+		role: 'Recherche utilisateurs, analyse et animation d’atelier',
+		year: '2026',
+		featured: true,
+		image: '',
+		imageAlt: 'Étude de l’expérience client Fox Coffee'
+	},
 	{
 		slug: 'vroum',
 		title: 'Vroum',
