@@ -4,15 +4,22 @@
 	let {
 		title,
 		parent,
+		transitionName,
 		children
 	}: {
 		title: string;
 		parent: { href: string; label: string };
+		transitionName?: string;
 		children: Snippet;
 	} = $props();
 </script>
 
-<section class="window" aria-label={title}>
+<section
+	class="window"
+	aria-label={title}
+	style:view-transition-name={transitionName}
+	style:view-transition-class={transitionName ? 'project-frame' : undefined}
+>
 	<div class="titlebar">
 		<a class="back" href={parent.href}>
 			<svg class="chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true">

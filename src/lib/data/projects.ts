@@ -1,9 +1,10 @@
+import type { AssetPath } from '$app/types';
+
 export type ProjectSlug = 'vroum' | 'easysav' | 'les-bambinets' | 'fox-coffee' | 'sportsee' | 'eventorias';
 
 export type Project = {
 	slug: ProjectSlug;
 	title: string;
-	subtitle: string;
 	meta: string;
 	tags: string[];
 	description: string;
@@ -11,7 +12,7 @@ export type Project = {
 	role: string;
 	year: string;
 	featured: boolean;
-	image: string;
+	image: AssetPath;
 	imageAlt: string;
 };
 
@@ -19,7 +20,6 @@ export const projects: Project[] = [
 	{
 		slug: 'vroum',
 		title: 'Vroum',
-		subtitle: 'Outil collaboratif de covoiturage pour les scouts',
 		meta: 'Production · SvelteKit, FastAPI, PostgreSQL',
 		tags: ['2023–Aujourd’hui', 'Production', 'Développement web', 'Produit'],
 		description: 'Outil de covoiturage collaboratif utilisé par des groupes scouts.',
@@ -27,13 +27,12 @@ export const projects: Project[] = [
 		role: 'Développement web et participation aux décisions produit',
 		year: '2023-present',
 		featured: true,
-		image: '/vroum.png',
+		image: 'vroum.png',
 		imageAlt: 'Interface de l’outil de covoiturage Vroum'
 	},
 	{
 		slug: 'easysav',
 		title: 'EasySAV',
-		subtitle: 'Amélioration de formulaires métiers et de l’expérience utilisateur',
 		meta: 'Startup · Symfony, Twig, EasyAdmin',
 		tags: ['2021–2025', 'Expérience pro', 'Développement web'],
 		description: 'Formulaires métiers et interface d’administration.',
@@ -41,14 +40,13 @@ export const projects: Project[] = [
 		role: 'Développement web',
 		year: '2020-2025',
 		featured: true,
-		image: '/easysav.png',
+		image: 'easysav.png',
 		imageAlt: 'Interface de l’outil EasySAV'
 	},
 
 	{
 		slug: 'fox-coffee',
 		title: 'Fox Coffee',
-		subtitle: 'Comprendre et améliorer l’expérience client d’un café',
 		meta: 'Étude terrain · Recherche UX · Atelier Miro',
 		tags: ['2026', 'Étude de cas', 'Recherche UX', 'Service Design'],
 		description: 'Étude qualitative de l’expérience chez Fox Coffee à Metz : 8 observations, 5 entretiens, personas, parcours et atelier d’idéation.',
@@ -56,13 +54,12 @@ export const projects: Project[] = [
 		role: 'Recherche utilisateurs, analyse et animation d’atelier',
 		year: '2026',
 		featured: true,
-		image: '/fox.png',
+		image: 'fox.png',
 		imageAlt: 'Étude de l’expérience client Fox Coffee'
 	},
 	{
 		slug: 'eventorias',
 		title: 'Eventorias',
-		subtitle: 'Concevoir et tester une application de découverte d’événements à Paris',
 		meta: 'Formation Product Design · Prototype no-code · Recherche UX',
 		tags: ['2026', 'Formation', 'Product Design', 'Tests utilisateurs'],
 		description: 'Prototype mobile de découverte et de publication d’événements, amélioré grâce à des micro-tests et documenté pour la passation aux développeurs.',
@@ -70,13 +67,12 @@ export const projects: Project[] = [
 		role: 'Recherche UX, prototypage, tests et passation',
 		year: '2026',
 		featured: true,
-		image: '/paris.png',
+		image: 'paris.png',
 		imageAlt: 'Prototype mobile Eventorias'
 	},
 	{
 		slug: 'sportsee',
 		title: 'SportSee',
-		subtitle: 'Une interface de suivi sportif et son Design System',
 		meta: 'Formation Product Design · Figma · Zeroheight',
 		tags: ['2026', 'Formation', 'UI Design', 'Design System'],
 		description: 'Conception des écrans de connexion, dashboard et profil sur trois formats, avec un Design System réutilisable documenté dans Zeroheight.',
@@ -84,13 +80,12 @@ export const projects: Project[] = [
 		role: 'Conception UI, responsive et documentation du Design System',
 		year: '2026',
 		featured: true,
-		image: '/sportsee.png',
+		image: 'sportsee.png',
 		imageAlt: 'Projet de conception d’interface SportSee'
 	},
 		{
 		slug: 'les-bambinets',
 		title: 'Les Bambinets',
-		subtitle: 'Application éducative autour de la langue des signes',
 		meta: 'Formation UX/UI · Figma',
 		tags: ['2026', 'Formation', 'UX/UI Design'],
 		description: 'Application éducative autour de la langue des signes.',
@@ -98,7 +93,7 @@ export const projects: Project[] = [
 		role: 'UX/UI Design',
 		year: '2026-2027',
 		featured: true,
-		image: '/bambinet.png',
+		image: 'bambinet.png',
 		imageAlt: 'Prototype de l’application Les Bambinets'
 	}
 ];

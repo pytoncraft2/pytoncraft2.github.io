@@ -35,6 +35,9 @@ export default defineConfig({
 			}),
 			paths: {
 				base: resolveBasePath()
+			},
+			alias: {
+				$lib: 'src/lib'
 			}
 		})
 	]

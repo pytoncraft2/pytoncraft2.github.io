@@ -1,14 +1,15 @@
 <script lang="ts">
-	import { asset, resolve } from '$app/paths';
+	import { asset } from '$app/paths';
 	import Button from '$lib/components/Button.svelte';
 	import ProjectCard from '$lib/components/ProjectCard.svelte';
 	import TechIcon from '$lib/components/TechIcon.svelte';
-	import { getFeaturedProjects, projectPath } from '$lib/data/projects';
+	import { getFeaturedProjects } from '$lib/data/projects';
 	import { homeTechs } from '$lib/data/skills';
 	import { prefersReducedMotion } from 'svelte/motion';
 	import { on } from 'svelte/events';
 	import type { Attachment } from 'svelte/attachments';
 	import { snapBlocks } from '$lib/snap-blocks';
+	import type { Snapshot } from './$types';
 
 	const name = 'Timothée Hennequin';
 	const email = 'timothennequin@gmail.com';
@@ -49,6 +50,22 @@
 	let visibleCount = $state(1);
 	let projectScrollLock = false;
 	let projectScrollTimer = 0;
+	let initialProjectIndex = 0;
+
+	export const snapshot: Snapshot<number> = {
+		capture: () => projectIndex,
+		restore: (index) => {
+			initialProjectIndex = Math.max(0, Math.min(index, projectCount - 1));
+			projectIndex = initialProjectIndex;
+			if (projectScroller) {
+				projectScroller.scrollLeft = projectOffset(projectScroller, initialProjectIndex);
+			}
+		}
+	};
+
+	function projectOffset(root: HTMLElement, index: number) {
+		return (root.children[index] as HTMLElement | undefined)?.offsetLeft ?? 0;
+	}
 
 	const pageCount = $derived(Math.max(1, Math.ceil(projectCount / visibleCount)));
 	const pageIndex = $derived(Math.min(pageCount - 1, Math.floor(projectIndex / visibleCount)));
@@ -155,20 +172,21 @@
 		const started = performance.now();
 		let corrections = 0;
 
-		function keepFirstPage() {
-			if (performance.now() - started > 500 || corrections >= 3 || node.scrollLeft === 0) {
+		function keepInitialPage() {
+			const left = projectOffset(node, initialProjectIndex);
+			if (performance.now() - started > 500 || corrections >= 3 || node.scrollLeft === left) {
 				return false;
 			}
 
 			corrections += 1;
-			node.scrollLeft = 0;
-			projectIndex = 0;
+			node.scrollLeft = left;
+			projectIndex = initialProjectIndex;
 			return true;
 		}
 
-		keepFirstPage();
+		keepInitialPage();
 		const offScroll = on(node, 'scroll', () => {
-			if (keepFirstPage()) {
+			if (keepInitialPage()) {
 				return;
 			}
 
@@ -241,10 +259,10 @@
 				{#each featuredProjects as project (project.slug)}
 					<li>
 						<ProjectCard
+							slug={project.slug}
 							title={project.title}
 							tags={project.tags}
 							description={project.description}
-							href={resolve(projectPath(project.slug))}
 							imageSrc={project.image ? asset(project.image) : undefined}
 							imageAlt={project.imageAlt}
 						/>
@@ -433,7 +451,7 @@
 		left: 0.5rem;
 		width: 0.7rem;
 		height: 0.7rem;
-		border: 1px solid var(--border-default);
+		border: 1px solid var(--scrollbar-thumb);
 		border-radius: var(--radius-full);
 		background: var(--surface-subtle);
 		box-shadow: 0 0 0 2px var(--surface-elevated);

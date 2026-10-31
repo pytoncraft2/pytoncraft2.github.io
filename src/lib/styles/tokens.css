@@ -1,41 +1,33 @@
 :root {
-  /* Primitives */
-  --color-neutral-0: #ffffff;
-  --color-neutral-50: #f8fafc;
-  --color-neutral-100: #f1f5f9;
-  --color-neutral-200: #e2e8f0;
-  --color-neutral-300: #cbd5e1;
-  --color-neutral-500: #64748b;
-  --color-neutral-700: #334155;
-  --color-neutral-900: #0f172a;
-  --color-neutral-950: #020617;
-  --color-brand-200: #bfdbfe;
-  --color-brand-300: #93c5fd;
-  --color-brand-500: #2563eb;
-  --color-brand-600: #1d4ed8;
+  /* Palette */
+  --color-shadow: #202030;
+  --color-grape: #39304a;
+  --color-snow: #fcf7f8;
+  --color-mint: #3ab795;
+  --color-cyan: #1b9aaa;
   --color-success-500: #15803d;
   --color-error-500: #b91c1c;
   --color-warning-500: #a16207;
 
-  --text-primary: var(--color-neutral-900);
-  --text-secondary: var(--color-neutral-500);
-  --text-inverse: var(--color-neutral-0);
-  --surface-default: var(--color-neutral-0);
-  --surface-subtle: var(--color-neutral-50);
-  --surface-elevated: var(--color-neutral-0);
-  --border-default: var(--color-neutral-200);
-  --border-strong: var(--color-neutral-300);
-  --action-primary: var(--color-brand-600);
-  --action-primary-hover: var(--color-brand-500);
-  --action-focus: var(--color-brand-500);
+  --text-primary: var(--color-shadow);
+  --text-secondary: var(--color-grape);
+  --text-inverse: var(--color-snow);
+  --surface-default: var(--color-snow);
+  --surface-subtle: #eee9ec;
+  --surface-elevated: var(--color-snow);
+  --border-default: #ddd7dc;
+  --border-strong: #c5bfc7;
+  --action-primary: #1d7383;
+  --action-primary-hover: #1d6979;
+  --action-focus: var(--color-grape);
   --feedback-success: var(--color-success-500);
   --feedback-error: var(--color-error-500);
   --feedback-warning: var(--color-warning-500);
-  --selection-fg: var(--color-neutral-0);
-  --selection-bg: var(--color-brand-500);
-  --scrollbar-track: var(--color-neutral-100);
-  --scrollbar-thumb: var(--color-neutral-300);
-  --scrollbar-thumb-hover: var(--color-brand-500);
+  --selection-fg: var(--color-shadow);
+  --selection-bg: var(--color-mint);
+  --scrollbar-track: var(--surface-subtle);
+  --scrollbar-thumb: var(--border-strong);
+  --scrollbar-thumb-hover: var(--action-primary);
 
   /* Layout */
   --spacing-0: 0;
@@ -81,22 +73,22 @@
 
 :root[data-theme='dark'],
 [data-theme='dark'] {
-  --text-primary: rgb(183, 183, 183);
-  --text-secondary: rgba(183, 183, 183, 0.72);
-  --text-inverse: rgb(23, 23, 23);
-  --surface-default: rgb(23, 23, 23);
-  --surface-subtle: rgb(23, 23, 23);
-  --surface-elevated: rgb(23, 23, 23);
-  --border-default: rgba(183, 183, 183, 0.22);
-  --border-strong: rgba(183, 183, 183, 0.4);
-  --action-primary: var(--color-brand-300);
-  --action-primary-hover: var(--color-brand-200);
-  --action-focus: var(--color-brand-300);
-  --selection-fg: rgb(23, 23, 23);
-  --selection-bg: rgb(183, 183, 183);
-  --scrollbar-track: rgb(23, 23, 23);
-  --scrollbar-thumb: rgba(183, 183, 183, 0.35);
-  --scrollbar-thumb-hover: rgb(183, 183, 183);
+  --text-primary: var(--color-snow);
+  --text-secondary: var(--color-mint);
+  --text-inverse: var(--color-shadow);
+  --surface-default: var(--color-shadow);
+  --surface-subtle: var(--color-shadow);
+  --surface-elevated: #322c43;
+  --border-default: #70687b;
+  --border-strong: #837c8c;
+  --action-primary: #36a5b3;
+  --action-primary-hover: #51b0bd;
+  --action-focus: var(--color-snow);
+  --selection-fg: var(--color-shadow);
+  --selection-bg: var(--color-mint);
+  --scrollbar-track: var(--color-shadow);
+  --scrollbar-thumb: #70687b;
+  --scrollbar-thumb-hover: var(--color-mint);
 }
 
 html {

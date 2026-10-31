@@ -1,35 +1,66 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
+	import { projectPath, type ProjectSlug } from '$lib/data/projects';
 	import ProjectTags from './ProjectTags.svelte';
 
 	let {
+		slug,
 		title,
 		tags,
 		description,
-		href,
 		linkLabel = 'Voir le projet →',
 		imageSrc,
 		imageAlt = ''
 	}: {
+		slug: ProjectSlug;
 		title: string;
 		tags: string[];
 		description: string;
-		href: string;
 		linkLabel?: string;
 		imageSrc?: string;
 		imageAlt?: string;
 	} = $props();
+
+	const restored = $derived(
+		typeof document !== 'undefined' && document.documentElement.dataset.projectTransition === slug
+	);
+
+	function arm(event: MouseEvent) {
+		if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+			return;
+		}
+
+		const card = event.currentTarget;
+		if (!(card instanceof HTMLElement)) {
+			return;
+		}
+
+		document.querySelectorAll('[data-project-card][data-transition]').forEach((node) => {
+			node.removeAttribute('data-transition');
+		});
+		card.closest('[data-project-card]')?.setAttribute('data-transition', '');
+	}
 </script>
 
-<article class="card">
+<article
+	class="card"
+	data-project-card
+	data-transition={restored ? '' : undefined}
+	style:--vt-title={`project-${slug}-title`}
+	style:--vt-media={`project-${slug}-media`}
+	style:--vt-tags={`project-${slug}-tags`}
+	style:--vt-summary={`project-${slug}-summary`}
+	style:--vt-card={`project-${slug}-card`}
+>
 	<div class="media">
 		{#if imageSrc}
 			<img src={imageSrc} alt={imageAlt} />
 		{/if}
 	</div>
-	<h3>{title}</h3>
+	<h3 class="title">{title}</h3>
 	<ProjectTags {tags} />
 	<p class="description">{description}</p>
-	<a class="link" {href}>{linkLabel}</a>
+	<a class="link" href={resolve(projectPath(slug))} onclick={arm}>{linkLabel}</a>
 </article>
 
 <style>
@@ -67,10 +98,40 @@
 		font: 600 var(--text-h3-size) / var(--text-h3-line) var(--font-sans);
 	}
 
+	.title,
+	.card :global(.tags) {
+		width: fit-content;
+	}
+
 	.description {
 		margin: 0;
 		color: var(--text-secondary);
 		font: 400 var(--text-body-s-size) / var(--text-body-s-line) var(--font-sans);
+	}
+
+	.card[data-transition] {
+		view-transition-name: var(--vt-card);
+		view-transition-class: project-frame;
+	}
+
+	.card[data-transition] .title {
+		view-transition-name: var(--vt-title);
+		view-transition-class: project-text;
+	}
+
+	.card[data-transition] .media {
+		view-transition-name: var(--vt-media);
+		view-transition-class: project-media;
+	}
+
+	.card[data-transition] :global(.tags) {
+		view-transition-name: var(--vt-tags);
+		view-transition-class: project-text;
+	}
+
+	.card[data-transition] .description {
+		view-transition-name: var(--vt-summary);
+		view-transition-class: project-text;
 	}
 
 	.link {

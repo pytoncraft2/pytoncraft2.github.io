@@ -24,25 +24,43 @@
 	<meta name="description" content={project.description} />
 </svelte:head>
 
-<WindowFrame title={project.title} parent={{ href: `${resolve('/')}#projets`, label: 'Projets' }}>
+<WindowFrame
+	title={project.title}
+	parent={{ href: `${resolve('/')}#projets`, label: 'Projets' }}
+	transitionName={`project-${project.slug}-card`}
+>
 	<article>
 		<header class="hero">
-			<h1 class="ds-h1">{project.title}</h1>
-			<p class="subtitle ds-body-l">{project.subtitle}</p>
-			<ProjectTags tags={project.tags} />
 			{#if project.image}
-				<ProjectImage src={asset(project.image)} alt={project.imageAlt} />
+				<ProjectImage
+					src={asset(project.image)}
+					alt={project.imageAlt}
+					transitionName={`project-${project.slug}-media`}
+				/>
 			{/if}
+			<h1 class="ds-h1" style:view-transition-name={`project-${project.slug}-title`} style:view-transition-class="project-text">
+				{project.title}
+			</h1>
+			<ProjectTags tags={project.tags} transitionName={`project-${project.slug}-tags`} />
+			<p
+				class="subtitle ds-body-l"
+				style:view-transition-name={`project-${project.slug}-summary`}
+				style:view-transition-class="project-text"
+			>
+				{project.description}
+			</p>
 		</header>
 
 	{@render children()}
 
 	{#if nextProject}
 		<nav class="next" aria-label="Projet suivant">
-			<p class="next-label ds-label-m">Projet suivant</p>
-			<p class="next-title ds-h3">{nextProject.title}</p>
+			<div class="next-text">
+				<p class="next-label ds-label-m">Projet suivant</p>
+				<p class="next-title ds-h3">{nextProject.title}</p>
+			</div>
 			<Button href={resolve(projectPath(nextProject.slug))} variant="secondary">
-				Voir {nextProject.title}
+				Voir le projet →
 			</Button>
 		</nav>
 	{/if}
@@ -59,6 +77,7 @@
 	}
 
 	.subtitle {
+		max-width: 60ch;
 		margin: 0;
 		color: var(--text-secondary);
 	}
@@ -69,12 +88,19 @@
 
 	.next {
 		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		gap: var(--spacing-3);
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--spacing-4);
 		margin-top: var(--spacing-8);
 		padding-top: var(--spacing-10);
 		border-top: 1px solid var(--border-default);
+	}
+
+	.next-text {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-1);
 	}
 
 	.next-label,

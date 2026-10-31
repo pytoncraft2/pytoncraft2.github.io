@@ -1,9 +1,13 @@
 <script lang="ts">
-	let { tags }: { tags: string[] } = $props();
+	let { tags, transitionName }: { tags: string[]; transitionName?: string } = $props();
 </script>
 
 {#if tags.length}
-	<ul class="tags">
+	<ul
+		class="tags"
+		style:view-transition-name={transitionName}
+		style:view-transition-class={transitionName ? 'project-text' : undefined}
+	>
 		{#each tags as tag (tag)}
 			<li>{tag}</li>
 		{/each}

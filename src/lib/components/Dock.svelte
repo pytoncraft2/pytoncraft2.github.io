@@ -3,7 +3,7 @@
 	import { asset, resolve } from '$app/paths';
 	import { page } from '$app/state';
 
-	const cvHref = asset('/cv-timothee-hennequin.pdf');
+	const cvHref = asset('cv-timothee-hennequin.pdf');
 	const storageKey = 'dock-placement';
 	const dragThreshold = 8;
 
@@ -444,6 +444,7 @@
 
 	@media (min-width: 40rem) {
 		.dock {
+			--dock-bevel: 3.5rem;
 			right: auto;
 			bottom: var(--spacing-5);
 			left: 50%;
@@ -514,16 +515,95 @@
 			top: 50%;
 			right: auto;
 			bottom: auto;
-			left: var(--spacing-5);
+			left: 0;
+			--dock-shape: polygon(
+				0 0,
+				100% var(--dock-bevel),
+				100% calc(100% - var(--dock-bevel)),
+				0 100%
+			);
+			padding: var(--dock-bevel) var(--spacing-3) var(--dock-bevel) var(--spacing-2);
 			transform: translateY(-50%);
 		}
 
 		:global(html[data-dock='right']) .dock:not(.dragging) {
 			top: 50%;
-			right: var(--spacing-5);
+			right: 0;
 			bottom: auto;
 			left: auto;
+			--dock-shape: polygon(
+				100% 0,
+				0 var(--dock-bevel),
+				0 calc(100% - var(--dock-bevel)),
+				100% 100%
+			);
+			padding: var(--dock-bevel) var(--spacing-2) var(--dock-bevel) var(--spacing-3);
 			transform: translateY(-50%);
+		}
+
+		@supports (clip-path: shape(from 0 0, line to 0 0)) {
+			:global(html[data-dock='left']) .dock:not(.dragging) {
+				--dock-shape: shape(
+					from 0 0,
+					line to calc(100% - var(--dock-round)) calc(var(--dock-bevel) - var(--dock-round) / 2),
+					curve to 100% calc(var(--dock-bevel) + var(--dock-round)) with 100% var(--dock-bevel),
+					line to 100% calc(100% - var(--dock-bevel) - var(--dock-round)),
+					curve to calc(100% - var(--dock-round)) calc(100% - var(--dock-bevel) + var(--dock-round) / 2)
+						with 100% calc(100% - var(--dock-bevel)),
+					line to 0 100%,
+					close
+				);
+			}
+
+			:global(html[data-dock='right']) .dock:not(.dragging) {
+				--dock-shape: shape(
+					from 100% 0,
+					line to var(--dock-round) calc(var(--dock-bevel) - var(--dock-round) / 2),
+					curve to 0 calc(var(--dock-bevel) + var(--dock-round)) with 0 var(--dock-bevel),
+					line to 0 calc(100% - var(--dock-bevel) - var(--dock-round)),
+					curve to var(--dock-round) calc(100% - var(--dock-bevel) + var(--dock-round) / 2)
+						with 0 calc(100% - var(--dock-bevel)),
+					line to 100% 100%,
+					close
+				);
+			}
+		}
+
+		:global(html[data-dock='left']) .dock:not(.dragging),
+		:global(html[data-dock='right']) .dock:not(.dragging) {
+			--dock-round: 1rem;
+			border: none;
+			border-radius: 0;
+			background: transparent;
+		}
+
+		:global(html[data-dock='left']) .dock:not(.dragging)::before,
+		:global(html[data-dock='left']) .dock:not(.dragging)::after,
+		:global(html[data-dock='right']) .dock:not(.dragging)::before,
+		:global(html[data-dock='right']) .dock:not(.dragging)::after {
+			content: '';
+			position: absolute;
+			z-index: -1;
+			inset: 0;
+			clip-path: var(--dock-shape);
+		}
+
+		:global(html[data-dock='left']) .dock:not(.dragging)::before,
+		:global(html[data-dock='right']) .dock:not(.dragging)::before {
+			background: var(--border-default);
+		}
+
+		:global(html[data-dock='left']) .dock:not(.dragging)::after,
+		:global(html[data-dock='right']) .dock:not(.dragging)::after {
+			background: var(--surface-elevated);
+		}
+
+		:global(html[data-dock='left']) .dock:not(.dragging)::after {
+			inset: 1px 1px 1px 0;
+		}
+
+		:global(html[data-dock='right']) .dock:not(.dragging)::after {
+			inset: 1px 0 1px 1px;
 		}
 
 		:global(html[data-dock='left']) .dock,
@@ -567,7 +647,7 @@
 
 		.slot[data-edge='left'] {
 			top: 50%;
-			left: var(--spacing-5);
+			left: 0;
 			width: 5.75rem;
 			height: min(28rem, 70vh);
 			transform: translateY(-50%);
@@ -575,7 +655,7 @@
 
 		.slot[data-edge='right'] {
 			top: 50%;
-			right: var(--spacing-5);
+			right: 0;
 			width: 5.75rem;
 			height: min(28rem, 70vh);
 			transform: translateY(-50%);

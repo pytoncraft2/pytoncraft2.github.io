@@ -10,6 +10,11 @@
 
 	let { children } = $props();
 
+	function projectSlug(url: URL | undefined) {
+		const match = url?.pathname.match(/^\/projets\/([^/]+)\/?$/);
+		return match?.[1] ?? null;
+	}
+
 	onNavigate((navigation) => {
 		if (typeof document.startViewTransition !== 'function') {
 			return;
@@ -23,10 +28,27 @@
 			return;
 		}
 
+		const fromSlug = projectSlug(navigation.from?.url);
+		const toSlug = projectSlug(navigation.to?.url);
+		const root = document.documentElement;
+		if (fromSlug !== toSlug && (fromSlug || toSlug)) {
+			root.dataset.projectTransition = toSlug ?? fromSlug ?? '';
+		}
+
+		const previousScrollBehavior = root.style.scrollBehavior;
+		root.style.scrollBehavior = 'auto';
+
 		return new Promise<void>((resolve) => {
-			document.startViewTransition(async () => {
+			const transition = document.startViewTransition(async () => {
 				resolve();
 				await navigation.complete;
+			});
+			transition.finished.finally(() => {
+				root.style.scrollBehavior = previousScrollBehavior;
+				delete root.dataset.projectTransition;
+				document.querySelectorAll('[data-project-card][data-transition]').forEach((node) => {
+					node.removeAttribute('data-transition');
+				});
 			});
 		});
 	});

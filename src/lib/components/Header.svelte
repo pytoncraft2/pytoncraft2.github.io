@@ -1,17 +1,28 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { prefersReducedMotion } from 'svelte/motion';
-	import { resolve } from '$app/paths';
 
-	const brandName = 'Timothée Hennequin';
 	const themeDuration = 220;
 	const themeColors = {
-		light: '#f8fafc',
-		dark: '#171717'
+		light: '#eee9ec',
+		dark: '#202030'
 	} as const;
 
 	let theme = $state<'light' | 'dark'>('light');
 	let themeTimer = 0;
+	let visible = $state(true);
+	let hashChanged = false;
+	let lastScroll = 0;
+
+	function onWindowScroll() {
+		const scroll = window.scrollY;
+		if (!hashChanged) {
+			visible = scroll === lastScroll ? visible : scroll < 50 || scroll < lastScroll;
+		}
+
+		lastScroll = scroll;
+		hashChanged = false;
+	}
 
 	function syncBrowserChrome(next: 'light' | 'dark') {
 		document.documentElement.style.colorScheme = next;
@@ -31,6 +42,8 @@
 			theme = current;
 			syncBrowserChrome(current);
 		}
+
+		lastScroll = window.scrollY;
 	});
 
 	function applyTheme(next: 'light' | 'dark') {
@@ -61,10 +74,10 @@
 	}
 </script>
 
-<header class="header">
+<svelte:window onscroll={onWindowScroll} onhashchange={() => (hashChanged = true)} />
+
+<header class={['header', { visible }]}>
 	<div class="inner">
-		<a class="home" href={resolve('/')}>Accueil</a>
-		<p class="title">{brandName}</p>
 		<button
 			class="theme"
 			type="button"
@@ -100,51 +113,20 @@
 		position: sticky;
 		top: 0;
 		z-index: 15;
-		border-bottom: 1px solid var(--border-default);
-		background: var(--surface-elevated);
+		height: 0;
+		overflow: visible;
+		pointer-events: none;
 		view-transition-name: app-header;
 	}
 
 	.inner {
-		display: grid;
-		grid-template-columns: 1fr auto 1fr;
-		align-items: center;
-		gap: var(--spacing-3);
-		width: min(100% - var(--spacing-6), 72rem);
-		min-height: 44px;
-		margin-inline: auto;
-		padding-block: var(--spacing-1);
-	}
-
-	.home {
-		justify-self: start;
-		min-height: 44px;
-		display: inline-flex;
-		align-items: center;
-		color: var(--text-primary);
-		font: 600 var(--text-label-m-size) / var(--text-label-m-line) var(--font-sans);
-		text-decoration: none;
-	}
-
-	.home:focus-visible {
-		outline: 2px solid var(--action-focus);
-		outline-offset: 2px;
-		border-radius: var(--radius-sm);
-	}
-
-	.title {
-		margin: 0;
-		max-width: 42vw;
-		overflow: hidden;
-		color: var(--text-primary);
-		font: 600 var(--text-body-s-size) / var(--text-body-s-line) var(--font-sans);
-		text-align: center;
-		text-overflow: ellipsis;
-		white-space: nowrap;
+		display: flex;
+		justify-content: flex-end;
+		padding: var(--spacing-3);
 	}
 
 	.theme {
-		justify-self: end;
+		pointer-events: auto;
 		min-width: 44px;
 		min-height: 44px;
 		display: inline-flex;
@@ -174,53 +156,19 @@
 		outline-offset: 2px;
 	}
 
-	@media (min-width: 40rem) {
-		.title {
-			max-width: none;
-			font: 600 var(--text-body-m-size) / var(--text-body-m-line) var(--font-sans);
+	@media (max-width: 39.99rem) {
+		.theme {
+			transition: transform 0.2s;
 		}
 
-		:global(html[data-dock='left']) .header {
-			padding-left: var(--dock-gutter);
-		}
-
-		:global(html[data-dock='right']) .header {
-			padding-right: var(--dock-gutter);
+		.header:not(.visible) .theme:not(:focus-visible) {
+			transform: translateY(calc(-100% - var(--spacing-4)));
 		}
 	}
 
 	@media (min-width: 64rem) {
-		.header {
-			position: sticky;
-			height: 0;
-			border: none;
-			background: transparent;
-			overflow: visible;
-			pointer-events: none;
-		}
-
 		.inner {
-			display: flex;
-			justify-content: flex-end;
-			width: 100%;
-			min-height: 0;
-			margin: 0;
 			padding: var(--spacing-4) var(--spacing-5);
-		}
-
-		.home,
-		.title {
-			display: none;
-		}
-
-		.theme {
-			pointer-events: auto;
-		}
-
-		:global(html[data-dock='left']) .header,
-		:global(html[data-dock='right']) .header {
-			padding-left: 0;
-			padding-right: 0;
 		}
 	}
 </style>
