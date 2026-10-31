@@ -5,7 +5,7 @@
 	const themeDuration = 220;
 	const themeColors = {
 		light: '#eee9ec',
-		dark: '#202030'
+		dark: '#0f0f0f'
 	} as const;
 
 	let theme = $state<'light' | 'dark'>('light');

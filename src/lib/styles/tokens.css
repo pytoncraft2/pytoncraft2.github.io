@@ -11,6 +11,7 @@
 
   --text-primary: var(--color-shadow);
   --text-secondary: var(--color-grape);
+  --text-heading: var(--text-primary);
   --text-inverse: var(--color-snow);
   --surface-default: var(--color-snow);
   --surface-subtle: #eee9ec;
@@ -73,22 +74,30 @@
 
 :root[data-theme='dark'],
 [data-theme='dark'] {
-  --text-primary: var(--color-snow);
-  --text-secondary: var(--color-mint);
-  --text-inverse: var(--color-shadow);
-  --surface-default: var(--color-shadow);
-  --surface-subtle: var(--color-shadow);
-  --surface-elevated: #322c43;
-  --border-default: #70687b;
-  --border-strong: #837c8c;
-  --action-primary: #36a5b3;
-  --action-primary-hover: #51b0bd;
-  --action-focus: var(--color-snow);
-  --selection-fg: var(--color-shadow);
-  --selection-bg: var(--color-mint);
-  --scrollbar-track: var(--color-shadow);
-  --scrollbar-thumb: #70687b;
-  --scrollbar-thumb-hover: var(--color-mint);
+  --color-night: #0f0f0f;
+  --color-night-raised: #242424;
+  --color-ash: #eeeeee;
+  --color-smoke: #b7b7b7;
+  --color-frost: #aacccc;
+  --color-frost-light: #cfe3e3;
+
+  --text-primary: var(--color-ash);
+  --text-secondary: var(--color-smoke);
+  --text-heading: var(--color-frost);
+  --text-inverse: var(--color-night);
+  --surface-default: var(--color-night);
+  --surface-subtle: var(--color-night);
+  --surface-elevated: var(--color-night-raised);
+  --border-default: rgb(255 255 255 / 0.1);
+  --border-strong: rgb(211 211 211 / 0.2);
+  --action-primary: var(--color-frost);
+  --action-primary-hover: var(--color-frost-light);
+  --action-focus: var(--color-ash);
+  --selection-fg: var(--color-night);
+  --selection-bg: var(--color-frost);
+  --scrollbar-track: var(--color-night);
+  --scrollbar-thumb: var(--border-strong);
+  --scrollbar-thumb-hover: var(--color-frost);
 }
 
 html {

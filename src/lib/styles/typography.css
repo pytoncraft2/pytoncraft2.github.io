@@ -14,6 +14,13 @@
   font: 600 var(--text-h3-size) / var(--text-h3-line) var(--font-sans);
 }
 
+.ds-display-l,
+.ds-h1,
+.ds-h2,
+.ds-h3 {
+  color: var(--text-heading);
+}
+
 .ds-body-l {
   font: 400 var(--text-body-l-size) / var(--text-body-l-line) var(--font-sans);
 }
