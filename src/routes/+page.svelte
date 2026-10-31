@@ -4,7 +4,7 @@
 	import ProjectCard from '$lib/components/ProjectCard.svelte';
 	import TechIcon from '$lib/components/TechIcon.svelte';
 	import { getFeaturedProjects, projectPath } from '$lib/data/projects';
-	import { homeTechs, uxSkills } from '$lib/data/skills';
+	import { homeTechs } from '$lib/data/skills';
 	import { prefersReducedMotion } from 'svelte/motion';
 	import { on } from 'svelte/events';
 	import type { Attachment } from 'svelte/attachments';
@@ -16,10 +16,56 @@
 	const featuredProjects = getFeaturedProjects();
 	const projectCount = featuredProjects.length;
 
+	const careerSteps = [
+		{
+			id: 'webacademie',
+			period: '2020–2022',
+			name: 'Web@cadémie',
+			detail: 'Formation en développement web, Nancy.'
+		},
+		{
+			id: 'easysav',
+			period: '2021–2025',
+			name: 'EasySAV',
+			detail: 'Développeur web en alternance, Metz.'
+		},
+		{
+			id: 'epitech',
+			period: '2022–2025',
+			name: 'Epitech',
+			detail:
+				'Pré-MSc puis MSc IoT, Nancy. Titre obtenu : « Architecte logiciel, développeur d’applications », niveau\u00A07.'
+		},
+		{
+			id: 'openclassrooms',
+			period: 'Depuis 2026',
+			name: 'OpenClassrooms',
+			detail: 'Formation Product Designer, certification UX/UI Designer niveau\u00A06 en cours.'
+		}
+	];
+
 	let projectScroller: HTMLUListElement | undefined;
 	let projectIndex = $state(0);
+	let visibleCount = $state(1);
 	let projectScrollLock = false;
 	let projectScrollTimer = 0;
+
+	const pageCount = $derived(Math.max(1, Math.ceil(projectCount / visibleCount)));
+	const pageIndex = $derived(Math.min(pageCount - 1, Math.floor(projectIndex / visibleCount)));
+	const previousLabel = $derived(visibleCount > 1 ? 'Projets précédents' : 'Projet précédent');
+	const nextLabel = $derived(visibleCount > 1 ? 'Projets suivants' : 'Projet suivant');
+
+	function pageLabel(page: number) {
+		const start = page * visibleCount;
+		const end = Math.min(projectCount, start + visibleCount);
+		const titles = featuredProjects.slice(start, end).map((project) => project.title);
+		if (titles.length <= 1) {
+			return `Aller au projet ${titles[0] ?? ''}`;
+		}
+
+		const last = titles[titles.length - 1];
+		return `Afficher ${titles.slice(0, -1).join(', ')} et ${last}`;
+	}
 
 	function syncProjectIndex() {
 		if (projectScrollLock) {
@@ -50,6 +96,28 @@
 		projectIndex = closest;
 	}
 
+	function measureVisibleCount() {
+		const root = projectScroller;
+		const first = root?.children[0] as HTMLElement | undefined;
+		if (!root || !first || first.offsetWidth === 0) {
+			return;
+		}
+
+		const styles = getComputedStyle(root);
+		const gap = Number.parseFloat(styles.columnGap) || Number.parseFloat(styles.gap) || 0;
+		const count = Math.round((root.clientWidth + gap) / (first.offsetWidth + gap));
+		const next = Math.max(1, Math.min(count, projectCount));
+		if (next === visibleCount) {
+			return;
+		}
+
+		visibleCount = next;
+		const aligned = Math.floor(projectIndex / next) * next;
+		if (aligned !== projectIndex) {
+			scrollToProject(aligned);
+		}
+	}
+
 	function unlockProjectScroll() {
 		projectScrollLock = false;
 		syncProjectIndex();
@@ -77,12 +145,44 @@
 		projectScrollTimer = window.setTimeout(unlockProjectScroll, 450);
 	}
 
+	function scrollToPage(page: number) {
+		const bounded = Math.max(0, Math.min(page, pageCount - 1));
+		scrollToProject(bounded * visibleCount);
+	}
+
 	const projectCarousel: Attachment<HTMLUListElement> = (node) => {
 		projectScroller = node;
-		const offScroll = on(node, 'scroll', syncProjectIndex);
+		const started = performance.now();
+		let corrections = 0;
+
+		function keepFirstPage() {
+			if (performance.now() - started > 500 || corrections >= 3 || node.scrollLeft === 0) {
+				return false;
+			}
+
+			corrections += 1;
+			node.scrollLeft = 0;
+			projectIndex = 0;
+			return true;
+		}
+
+		keepFirstPage();
+		const offScroll = on(node, 'scroll', () => {
+			if (keepFirstPage()) {
+				return;
+			}
+
+			syncProjectIndex();
+		});
 		const offScrollEnd = on(node, 'scrollend', unlockProjectScroll);
+		const observer = new ResizeObserver(() => {
+			measureVisibleCount();
+		});
+		observer.observe(node);
+		measureVisibleCount();
 
 		return () => {
+			observer.disconnect();
 			window.clearTimeout(projectScrollTimer);
 			offScroll();
 			offScrollEnd();
@@ -134,8 +234,8 @@
 		</aside>
 	</section>
 
-	<section id="projets" class="section section-flush snap-block" aria-labelledby="projets-title">
-		<h2 id="projets-title" class="ds-h2">Projets sélectionnés</h2>
+	<section class="section section-flush snap-block" aria-labelledby="projets">
+		<h2 id="projets" class="ds-h2">Projets sélectionnés</h2>
 		<div class="projects-carousel">
 			<ul id="projets-carousel" class="grid" {@attach projectCarousel}>
 				{#each featuredProjects as project (project.slug)}
@@ -155,10 +255,10 @@
 				<button
 					class="carousel-btn"
 					type="button"
-					onclick={() => scrollToProject(projectIndex - 1)}
-					disabled={projectIndex === 0}
+					onclick={() => scrollToPage(pageIndex - 1)}
+					disabled={pageIndex === 0}
 					aria-controls="projets-carousel"
-					aria-label="Projet précédent"
+					aria-label={previousLabel}
 				>
 					<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
 						<path
@@ -172,16 +272,16 @@
 				</button>
 				<div class="carousel-indicator">
 					<p class="carousel-status" aria-live="polite">
-						{projectIndex + 1} / {projectCount}
+						{pageIndex + 1} / {pageCount}
 					</p>
 					<div class="carousel-dots">
-						{#each featuredProjects as project, i (project.slug)}
+						{#each { length: pageCount }, i (i)}
 							<button
-								class={['carousel-dot', i === projectIndex && 'active']}
+								class={['carousel-dot', i === pageIndex && 'active']}
 								type="button"
-								onclick={() => scrollToProject(i)}
-								aria-label="Aller au projet {project.title}"
-								aria-current={i === projectIndex ? 'true' : undefined}
+								onclick={() => scrollToPage(i)}
+								aria-label={pageLabel(i)}
+								aria-current={i === pageIndex ? 'true' : undefined}
 								aria-controls="projets-carousel"
 							>
 								<span></span>
@@ -192,10 +292,10 @@
 				<button
 					class="carousel-btn"
 					type="button"
-					onclick={() => scrollToProject(projectIndex + 1)}
-					disabled={projectIndex === projectCount - 1}
+					onclick={() => scrollToPage(pageIndex + 1)}
+					disabled={pageIndex === pageCount - 1}
 					aria-controls="projets-carousel"
-					aria-label="Projet suivant"
+					aria-label={nextLabel}
 				>
 					<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
 						<path
@@ -211,37 +311,36 @@
 		</div>
 	</section>
 
-	<section id="profil" class="section snap-block" aria-labelledby="profil-title">
+	<section id="profil" class="section profil snap-block" aria-labelledby="profil-title">
 		<h2 id="profil-title" class="ds-h2">Profil</h2>
 		<p class="ds-body-m">
-			Développeur web diplômé d’Epitech, j’ai travaillé plusieurs années sur des produits web en contexte
-			professionnel et associatif. Je poursuis aujourd’hui une formation Product Designer chez OpenClassrooms,
-			préparant à la certification UX/UI Designer (RNCP40917, niveau 6), afin d’élargir mon champ d’intervention
-			de l’analyse des besoins jusqu’à la conception et l’implémentation des interfaces.
+			Développeur web, j’interviens aujourd’hui sur la réalisation d’applications et sur la conception UX/UI, de
+			l’analyse des besoins jusqu’à l’interface.
 		</p>
-		<h3 class="ds-h3">Compétences</h3>
-		<div class="skills">
-			<section class="skill-block" aria-labelledby="tech-title">
-				<h4 id="tech-title" class="skill-heading">Technologies & outils</h4>
-				<ul class="tech-grid">
-					{#each homeTechs as item (item.id)}
-						<li>
-							<span class="tech-item">
-								<TechIcon name={item.id} />
-								<span>{item.label}</span>
-							</span>
-						</li>
-					{/each}
-				</ul>
-			</section>
-			<section class="skill-block" aria-labelledby="ux-title">
-				<h4 id="ux-title" class="skill-heading">UX/UI Design</h4>
-				<p class="ux-skills">{uxSkills.join(' · ')}</p>
-			</section>
-		</div>
-		<p>
-			<a class="about-link" href={resolve('/a-propos')}>En savoir plus sur mon parcours</a>
-		</p>
+		<h3 id="parcours-title" class="subhead">Parcours</h3>
+		<ul class="timeline" aria-labelledby="parcours-title">
+			{#each careerSteps as step (step.id)}
+				<li class="step">
+					<span class="step-mark" aria-hidden="true"></span>
+					<div class="step-body">
+						<p class="step-date">{step.period}</p>
+						<p class="step-name">{step.name}</p>
+						<p class="step-detail">{step.detail}</p>
+					</div>
+				</li>
+			{/each}
+		</ul>
+		<h3 id="tech-title" class="subhead">Technologies</h3>
+		<ul class="tech-grid" aria-labelledby="tech-title">
+			{#each homeTechs as item (item.id)}
+				<li>
+					<span class="tech-item">
+						<TechIcon name={item.id} />
+						<span>{item.label}</span>
+					</span>
+				</li>
+			{/each}
+		</ul>
 	</section>
 
 	<section id="contact" class="section snap-block" aria-labelledby="contact-title">
@@ -395,6 +494,7 @@
 	}
 
 	.grid {
+		position: relative;
 		display: flex;
 		gap: var(--spacing-4);
 		margin: 0;
@@ -531,17 +631,93 @@
 		border-radius: var(--radius-sm);
 	}
 
-	.skills {
-		display: flex;
-		flex-direction: column;
-		gap: var(--spacing-4);
-		margin: 0 0 var(--spacing-4);
-	}
-
-	.skill-heading {
-		margin: 0 0 var(--spacing-2);
+	.profil .subhead {
+		margin: var(--spacing-6) 0 var(--spacing-3);
 		color: var(--text-primary);
 		font: 600 var(--text-body-m-size) / var(--text-body-m-line) var(--font-sans);
+	}
+
+	.profil .subhead:first-of-type {
+		margin-top: var(--spacing-2);
+	}
+
+	.timeline {
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+		margin: 0 0 var(--spacing-4);
+		padding: 0;
+		list-style: none;
+	}
+
+	.step {
+		display: grid;
+		grid-template-columns: 0.75rem minmax(0, 1fr);
+		column-gap: var(--spacing-3);
+	}
+
+	.step-mark {
+		position: relative;
+	}
+
+	.step-mark::before {
+		content: '';
+		position: absolute;
+		z-index: 1;
+		top: 0.4rem;
+		left: 0;
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: var(--radius-full);
+		background: var(--action-primary);
+		box-shadow: 0 0 0 3px var(--surface-elevated);
+	}
+
+	.step-mark::after {
+		content: '';
+		position: absolute;
+		z-index: 0;
+		top: 0.7rem;
+		bottom: -0.45rem;
+		left: calc(0.25rem - 0.5px);
+		width: 1px;
+		background: var(--border-strong);
+	}
+
+	.step:last-child .step-mark::after {
+		display: none;
+	}
+
+	.step-body {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-1);
+		min-width: 0;
+		padding-bottom: var(--spacing-5);
+	}
+
+	.step:last-child .step-body {
+		padding-bottom: 0;
+	}
+
+	.timeline p {
+		margin: 0;
+		max-width: none;
+	}
+
+	.step-date {
+		color: var(--text-secondary);
+		font: 600 var(--text-label-m-size) / var(--text-label-m-line) var(--font-sans);
+	}
+
+	.step-name {
+		color: var(--text-primary);
+		font: 600 var(--text-body-m-size) / var(--text-body-m-line) var(--font-sans);
+	}
+
+	.step-detail {
+		color: var(--text-secondary);
+		font: 400 var(--text-body-s-size) / var(--text-body-s-line) var(--font-sans);
 	}
 
 	.tech-grid {
@@ -569,14 +745,6 @@
 		color: var(--text-primary);
 	}
 
-	.ux-skills {
-		margin: 0;
-		max-width: 40rem;
-		color: var(--text-secondary);
-		font: 400 var(--text-body-s-size) / var(--text-body-s-line) var(--font-sans);
-	}
-
-	.about-link,
 	.contact-links a {
 		min-height: 44px;
 		display: inline-flex;
@@ -586,12 +754,10 @@
 		text-decoration: none;
 	}
 
-	.about-link:hover,
 	.contact-links a:hover {
 		text-decoration: underline;
 	}
 
-	.about-link:focus-visible,
 	.contact-links a:focus-visible {
 		outline: 2px solid var(--action-focus);
 		outline-offset: 2px;
@@ -609,29 +775,57 @@
 			gap: var(--spacing-4);
 		}
 
-		.projects-carousel {
-			--project-card-max-width: 390px;
-		}
-
-		.carousel-nav {
-			display: none;
-		}
-
 		.grid {
-			display: grid;
-			grid-template-columns: repeat(2, minmax(0, 1fr));
 			gap: var(--spacing-6);
-			overflow: visible;
-			scroll-snap-type: none;
 		}
 
 		.grid li {
-			flex: unset;
-			scroll-snap-align: none;
+			flex-basis: calc((100% - var(--spacing-6)) / 2);
 		}
 
 		.tech-grid {
 			grid-template-columns: repeat(5, minmax(0, 1fr));
+		}
+	}
+
+	@media (min-width: 64rem) {
+		.timeline {
+			display: grid;
+			grid-template-columns: repeat(4, minmax(0, 1fr));
+			column-gap: var(--spacing-5);
+		}
+
+		.step {
+			display: flex;
+			flex-direction: column;
+			gap: var(--spacing-2);
+			position: relative;
+			padding-top: calc(0.5rem + var(--spacing-3));
+		}
+
+		.step-mark {
+			position: absolute;
+			top: 0;
+			right: 0;
+			left: 0;
+			height: 0.5rem;
+		}
+
+		.step-mark::before {
+			top: 0;
+		}
+
+		.step-mark::after {
+			top: calc(0.25rem - 0.5px);
+			right: calc(-1 * var(--spacing-5) - 0.15rem);
+			bottom: auto;
+			left: 0.5rem;
+			width: auto;
+			height: 1px;
+		}
+
+		.step-body {
+			padding-bottom: 0;
 		}
 	}
 
@@ -673,8 +867,8 @@
 			transform: rotate(5deg);
 		}
 
-		.grid {
-			grid-template-columns: repeat(3, minmax(0, 1fr));
+		.grid li {
+			flex-basis: calc((100% - 2 * var(--spacing-6)) / 3);
 		}
 
 		.tech-grid {

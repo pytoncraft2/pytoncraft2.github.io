@@ -194,12 +194,6 @@
 			active: routeId === '/' && hash !== '#projets' && hash !== '#contact'
 		},
 		{
-			id: 'parcours',
-			label: 'Parcours',
-			href: resolve('/a-propos'),
-			active: routeId === '/a-propos'
-		},
-		{
 			id: 'projets',
 			label: 'Projets',
 			href: `${resolve('/')}#projets`,

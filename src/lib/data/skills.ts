@@ -30,12 +30,3 @@ export const homeTechs: TechItem[] = [
 	{ id: 'git', label: 'Git' },
 	{ id: 'figma', label: 'Figma' }
 ];
-
-export const uxSkills = [
-	'Recherche utilisateur',
-	'Tests utilisateurs',
-	'Prototypage',
-	'Design system',
-	'Accessibilité',
-	'Audit UX'
-] as const;
