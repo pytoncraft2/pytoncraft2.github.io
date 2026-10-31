@@ -303,7 +303,7 @@
 					<p class="carousel-status" aria-live="polite">
 						{pageIndex + 1} / {pageCount}
 					</p>
-					<div class="carousel-dots">
+					<div class="carousel-dots" style:--dot-count={pageCount}>
 						{#each { length: pageCount }, i (i)}
 							<button
 								class={['carousel-dot', i === pageIndex && 'active']}
@@ -550,7 +550,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		gap: var(--spacing-2);
+		gap: var(--spacing-3);
 	}
 
 	.carousel-btn {
@@ -612,8 +612,8 @@
 	}
 
 	.carousel-dot {
-		flex: 0 0 44px;
-		min-width: 44px;
+		flex: 0 0 clamp(24px, (100vw - 10rem) / var(--dot-count), 44px);
+		min-width: 0;
 		min-height: 32px;
 		display: inline-flex;
 		align-items: center;

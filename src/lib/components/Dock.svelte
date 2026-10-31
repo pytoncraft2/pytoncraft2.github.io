@@ -390,16 +390,22 @@
 		list-style: none;
 	}
 
+	.items > li {
+		display: flex;
+		flex: 1 1 0;
+		min-width: 0;
+	}
+
 	.item {
 		min-width: 44px;
 		min-height: 44px;
 		display: flex;
-		flex: 1 1 0;
+		flex: 1 1 auto;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
 		gap: var(--spacing-1);
-		padding: var(--spacing-1);
+		padding: var(--spacing-2) var(--spacing-3);
 		border-radius: var(--radius-md);
 		color: var(--text-primary);
 		text-decoration: none;
@@ -461,6 +467,10 @@
 		.items {
 			width: auto;
 			gap: var(--spacing-2);
+		}
+
+		.items > li {
+			flex: 0 0 auto;
 		}
 
 		.item {
