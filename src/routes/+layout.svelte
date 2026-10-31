@@ -1,11 +1,11 @@
 <script lang="ts">
-	import '$lib/styles/tokens.css';
-	import '$lib/styles/typography.css';
-	import '$lib/styles/global.css';
-	import favicon from '$lib/assets/favicon.svg';
-	import Dock from '$lib/components/Dock.svelte';
-	import Footer from '$lib/components/Footer.svelte';
-	import Header from '$lib/components/Header.svelte';
+	import '#lib/styles/tokens.css';
+	import '#lib/styles/typography.css';
+	import '#lib/styles/global.css';
+	import favicon from '#lib/assets/favicon.svg';
+	import Dock from '#lib/components/Dock.svelte';
+	import Footer from '#lib/components/Footer.svelte';
+	import Header from '#lib/components/Header.svelte';
 	import { onNavigate } from '$app/navigation';
 
 	let { children } = $props();
@@ -16,6 +16,8 @@
 	}
 
 	onNavigate((navigation) => {
+		if (navigation.shallow && navigation.type === 'goto') return;
+
 		if (typeof document.startViewTransition !== 'function') {
 			return;
 		}
@@ -57,8 +59,18 @@
 <svelte:head>
 	<link rel="icon" href={favicon} />
 	<meta name="color-scheme" content="light dark" />
-	<link rel="preconnect" href="https://fonts.googleapis.com" />
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+
+	<link
+		rel="preconnect"
+		href="https://fonts.googleapis.com"
+	/>
+
+	<link
+		rel="preconnect"
+		href="https://fonts.gstatic.com"
+		crossorigin="anonymous"
+	/>
+
 	<link
 		href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
 		rel="stylesheet"
@@ -103,11 +115,11 @@
 	}
 
 	@media (min-width: 40rem) {
-		:global(html[data-dock='left']) .stage {
+		:global(html[data-dock="left"]) .stage {
 			padding-left: var(--dock-gutter);
 		}
 
-		:global(html[data-dock='right']) .stage {
+		:global(html[data-dock="right"]) .stage {
 			padding-right: var(--dock-gutter);
 		}
 	}

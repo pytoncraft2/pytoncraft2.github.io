@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { projectPath, type ProjectSlug } from '$lib/data/projects';
+	import { projectPath, type ProjectSlug } from '#lib/data/projects.js';
 	import ProjectTags from './ProjectTags.svelte';
 
 	let {

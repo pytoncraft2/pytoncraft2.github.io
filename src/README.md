@@ -16,8 +16,8 @@ Import the styles once in `src/routes/+layout.svelte`:
 
 ```svelte
 <script lang="ts">
-  import '$lib/styles/tokens.css';
-  import '$lib/styles/typography.css';
+  import '#lib/styles/tokens.css';
+  import '#lib/styles/typography.css';
 </script>
 
 <slot />

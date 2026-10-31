@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { TechId } from '$lib/data/skills';
-	import { techIcons } from '$lib/data/tech-icons';
+	import type { TechId } from '#lib/data/skills.js';
+	import { techIcons } from '#lib/data/tech-icons.js';
 
 	let { name }: { name: TechId } = $props();
 

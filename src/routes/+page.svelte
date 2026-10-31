@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { asset } from '$app/paths';
-	import Button from '$lib/components/Button.svelte';
-	import ProjectCard from '$lib/components/ProjectCard.svelte';
-	import TechIcon from '$lib/components/TechIcon.svelte';
-	import { getFeaturedProjects } from '$lib/data/projects';
-	import { homeTechs } from '$lib/data/skills';
+	import Button from '#lib/components/Button.svelte';
+	import ProjectCard from '#lib/components/ProjectCard.svelte';
+	import TechIcon from '#lib/components/TechIcon.svelte';
+	import { getFeaturedProjects } from '#lib/data/projects.js';
+	import { homeTechs } from '#lib/data/skills.js';
 	import { prefersReducedMotion } from 'svelte/motion';
 	import { on } from 'svelte/events';
 	import type { Attachment } from 'svelte/attachments';
-	import { snapBlocks } from '$lib/snap-blocks';
+	import { snapBlocks } from '#lib/snap-blocks.js';
 	import type { Snapshot } from './$types';
 
 	const name = 'Timothée Hennequin';

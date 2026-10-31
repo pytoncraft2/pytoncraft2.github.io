@@ -1,7 +1,7 @@
 <script lang="ts">
- import CaseStudyLayout from '$lib/components/CaseStudyLayout.svelte';
- import CaseStudySection from '$lib/components/CaseStudySection.svelte';
- import { getProject } from '$lib/data/projects';
+ import CaseStudyLayout from '#lib/components/CaseStudyLayout.svelte';
+ import CaseStudySection from '#lib/components/CaseStudySection.svelte';
+ import { getProject } from '#lib/data/projects.js';
  const project = getProject('eventorias');
 </script>
 

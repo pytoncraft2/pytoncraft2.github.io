@@ -1,18 +1,18 @@
-import type { TechId } from '$lib/data/skills';
-import dockerLogo from '$lib/assets/tech/docker.svg';
-import fastapiLogo from '$lib/assets/tech/fastapi.svg';
-import figmaLogo from '$lib/assets/tech/figma.svg';
-import flaskLogo from '$lib/assets/tech/flask.svg';
-import gitLogo from '$lib/assets/tech/git.svg';
-import gitlabLogo from '$lib/assets/tech/gitlab.svg';
-import mysqlLogo from '$lib/assets/tech/mysql.svg';
-import nodejsLogo from '$lib/assets/tech/nodejs.svg';
-import playwrightLogo from '$lib/assets/tech/playwright.svg';
-import postgresqlLogo from '$lib/assets/tech/postgresql.svg';
-import reactLogo from '$lib/assets/tech/react.svg';
-import svelteLogo from '$lib/assets/tech/svelte.svg';
-import symfonyLogo from '$lib/assets/tech/symfony.svg';
-import twigLogo from '$lib/assets/tech/twig.svg';
+import type { TechId } from '#lib/data/skills.js';
+import dockerLogo from '#lib/assets/tech/docker.svg';
+import fastapiLogo from '#lib/assets/tech/fastapi.svg';
+import figmaLogo from '#lib/assets/tech/figma.svg';
+import flaskLogo from '#lib/assets/tech/flask.svg';
+import gitLogo from '#lib/assets/tech/git.svg';
+import gitlabLogo from '#lib/assets/tech/gitlab.svg';
+import mysqlLogo from '#lib/assets/tech/mysql.svg';
+import nodejsLogo from '#lib/assets/tech/nodejs.svg';
+import playwrightLogo from '#lib/assets/tech/playwright.svg';
+import postgresqlLogo from '#lib/assets/tech/postgresql.svg';
+import reactLogo from '#lib/assets/tech/react.svg';
+import svelteLogo from '#lib/assets/tech/svelte.svg';
+import symfonyLogo from '#lib/assets/tech/symfony.svg';
+import twigLogo from '#lib/assets/tech/twig.svg';
 
 export type TechIconSource = {
 	title: string;

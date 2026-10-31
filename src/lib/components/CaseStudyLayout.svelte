@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { asset, resolve } from '$app/paths';
-	import type { Project } from '$lib/data/projects';
-	import { getNextProject, projectPath } from '$lib/data/projects';
+	import type { Project } from '#lib/data/projects.js';
+	import { getNextProject, projectPath } from '#lib/data/projects.js';
 	import Button from './Button.svelte';
 	import ProjectImage from './ProjectImage.svelte';
 	import ProjectTags from './ProjectTags.svelte';
