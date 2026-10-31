@@ -9,7 +9,7 @@
 	import { on } from 'svelte/events';
 	import type { Attachment } from 'svelte/attachments';
 	import { snapBlocks } from '#lib/snap-blocks.js';
-	import type { Snapshot } from './$types';
+	import { snapshot } from '$app/navigation';
 
 	const name = 'Timothée Hennequin';
 	const email = 'timothennequin@gmail.com';
@@ -50,9 +50,19 @@
 	let visibleCount = $state(1);
 	let projectScrollLock = false;
 	let projectScrollTimer = 0;
-	let initialProjectIndex = 0;
+	let initialProjectIndex = originProjectIndex();
 
-	export const snapshot: Snapshot<number> = {
+	function originProjectIndex() {
+		if (typeof document === 'undefined') {
+			return 0;
+		}
+
+		const slug = document.documentElement.dataset.projectTransition;
+		return Math.max(0, featuredProjects.findIndex((project) => project.slug === slug));
+	}
+
+	snapshot<number>({
+		id: 'home-projects',
 		capture: () => projectIndex,
 		restore: (index) => {
 			initialProjectIndex = Math.max(0, Math.min(index, projectCount - 1));
@@ -61,7 +71,7 @@
 				projectScroller.scrollLeft = projectOffset(projectScroller, initialProjectIndex);
 			}
 		}
-	};
+	});
 
 	function projectOffset(root: HTMLElement, index: number) {
 		return (root.children[index] as HTMLElement | undefined)?.offsetLeft ?? 0;
@@ -184,6 +194,8 @@
 			return true;
 		}
 
+		measureVisibleCount();
+		initialProjectIndex = Math.floor(initialProjectIndex / visibleCount) * visibleCount;
 		keepInitialPage();
 		const offScroll = on(node, 'scroll', () => {
 			if (keepInitialPage()) {
@@ -197,7 +209,6 @@
 			measureVisibleCount();
 		});
 		observer.observe(node);
-		measureVisibleCount();
 
 		return () => {
 			observer.disconnect();
