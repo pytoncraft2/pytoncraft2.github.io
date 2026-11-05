@@ -31,6 +31,19 @@ export const projects: Project[] = [
 		imageAlt: 'Interface de l’outil de covoiturage Vroum'
 	},
 	{
+		slug: 'easysav',
+		title: 'EasySAV',
+		meta: 'Startup · Symfony, Twig, EasyAdmin',
+		tags: ['2021–2025', 'Expérience pro', 'Développement web'],
+		description: 'Formulaires métiers et interface d’administration.',
+		stack: ['Symfony', 'Twig', 'EasyAdmin'],
+		role: 'Développement web',
+		year: '2020-2025',
+		featured: true,
+		image: 'easysav.png',
+		imageAlt: 'Interface de l’outil EasySAV'
+	},
+	{
 		slug: 'resident-streamer',
 		title: 'Resident Streamer',
 		meta: 'Projet Epitech · Phaser 3, TypeScript, Colyseus',
@@ -56,20 +69,6 @@ export const projects: Project[] = [
 		image: 'codeonwheels.webp',
 		imageAlt: 'Maquettes CodeOnWheels : défis Arduino et interface avec photographie du robot'
 	},
-	{
-		slug: 'easysav',
-		title: 'EasySAV',
-		meta: 'Startup · Symfony, Twig, EasyAdmin',
-		tags: ['2021–2025', 'Expérience pro', 'Développement web'],
-		description: 'Formulaires métiers et interface d’administration.',
-		stack: ['Symfony', 'Twig', 'EasyAdmin'],
-		role: 'Développement web',
-		year: '2020-2025',
-		featured: true,
-		image: 'easysav.png',
-		imageAlt: 'Interface de l’outil EasySAV'
-	},
-
 	{
 		slug: 'fox-coffee',
 		title: 'Fox Coffee',
