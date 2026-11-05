@@ -1,6 +1,6 @@
 import type { AssetPath } from '$app/types';
 
-export type ProjectSlug = 'vroum' | 'easysav' | 'les-bambinets' | 'fox-coffee' | 'sportsee' | 'eventorias' | 'resident-streamer';
+export type ProjectSlug = 'vroum' | 'easysav' | 'les-bambinets' | 'fox-coffee' | 'sportsee' | 'eventorias' | 'resident-streamer' | 'codeonwheels';
 
 export type Project = {
 	slug: ProjectSlug;
@@ -42,6 +42,19 @@ export const projects: Project[] = [
 		featured: true,
 		image: 'resident-streamer.jpg',
 		imageAlt: 'Capture du jeu Resident Streamer : salle futuriste avec personnages et interface de jeu'
+	},
+	{
+		slug: 'codeonwheels',
+		title: 'CodeOnWheels',
+		meta: 'Projet Epitech · Svelte, ESP32-CAM, Arduino',
+		tags: ['Projet académique', 'Développement web', 'IoT', 'UX/UI'],
+		description: 'Une application pédagogique qui apprend à programmer en débloquant les fonctions d’un véhicule robotisé réel.',
+		stack: ['Svelte', 'ESP32-CAM', 'Arduino', 'Figma'],
+		role: 'Conception UX/UI, développement de l’application et programmation du robot',
+		year: 'Formation Epitech',
+		featured: true,
+		image: 'codeonwheels.webp',
+		imageAlt: 'Maquettes CodeOnWheels : défis Arduino et interface avec photographie du robot'
 	},
 	{
 		slug: 'easysav',
