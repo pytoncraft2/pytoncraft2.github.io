@@ -1,6 +1,6 @@
 import type { AssetPath } from '$app/types';
 
-export type ProjectSlug = 'vroum' | 'easysav' | 'les-bambinets' | 'fox-coffee' | 'sportsee' | 'eventorias';
+export type ProjectSlug = 'vroum' | 'easysav' | 'les-bambinets' | 'fox-coffee' | 'sportsee' | 'eventorias' | 'resident-streamer';
 
 export type Project = {
 	slug: ProjectSlug;
@@ -29,6 +29,19 @@ export const projects: Project[] = [
 		featured: true,
 		image: 'vroum.png',
 		imageAlt: 'Interface de l’outil de covoiturage Vroum'
+	},
+	{
+		slug: 'resident-streamer',
+		title: 'Resident Streamer',
+		meta: 'Projet Epitech · Phaser 3, TypeScript, Colyseus',
+		tags: ['2022', 'Projet académique', 'Développement web', 'Temps réel'],
+		description: 'Jeu de speedrun coopératif en 2D pour 2 à 4 joueurs, développé en binôme avec une architecture multijoueur.',
+		stack: ['Phaser 3', 'TypeScript', 'Colyseus', 'Node.js'],
+		role: 'Chef de projet et développeur, en binôme avec un designer de personnages',
+		year: '2022',
+		featured: true,
+		image: 'resident-streamer.jpg',
+		imageAlt: 'Capture du jeu Resident Streamer : salle futuriste avec personnages et interface de jeu'
 	},
 	{
 		slug: 'easysav',
