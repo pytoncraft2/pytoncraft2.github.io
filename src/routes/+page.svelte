@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { asset } from '$app/paths';
 	import Button from '#lib/components/Button.svelte';
+	import HeroScene from '#lib/components/HeroScene.svelte';
 	import ProjectCard from '#lib/components/ProjectCard.svelte';
 	import TechIcon from '#lib/components/TechIcon.svelte';
 	import { getFeaturedProjects } from '#lib/data/projects.js';
@@ -261,6 +262,8 @@
 				</div>
 			</dl>
 		</aside>
+
+		<HeroScene />
 	</section>
 
 	<section class="section section-flush snap-block" aria-labelledby="projets">
@@ -390,8 +393,13 @@
 	}
 
 	.hero {
+		/* Hauteur de la bande de paysage de HeroScene, sous le texte. */
+		--hero-scene-band: clamp(9rem, 22.2vw, 26rem);
+		position: relative;
+		isolation: isolate;
 		display: grid;
 		gap: var(--spacing-8);
+		padding-bottom: calc(var(--hero-scene-band) * 0.8);
 		margin-bottom: clamp(var(--spacing-10), 6vw, var(--spacing-16));
 	}
 

@@ -95,6 +95,8 @@
 		display: flex;
 		flex-direction: column;
 		min-height: 100vh;
+		/* Le décor pleine largeur de l'accueil (100vw) ne doit pas créer de défilement horizontal. */
+		overflow-x: clip;
 	}
 
 	.stage {

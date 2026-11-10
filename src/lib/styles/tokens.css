@@ -30,6 +30,27 @@
   --scrollbar-thumb: var(--border-strong);
   --scrollbar-thumb-hover: var(--action-primary);
 
+  /* Scène d’accueil (jour) : décor uniquement, jamais pour du texte ou une action */
+  --scene-sky-top: var(--surface-subtle);
+  --scene-sky-horizon: #d4e9ea;
+  --scene-sun: #f2b45a;
+  --scene-sun-glow: rgb(242 180 90 / 0.22);
+  --scene-moon: #e8eef0;
+  --scene-moon-glow: rgb(170 204 204 / 0.14);
+  --scene-star: #ffffff;
+  --scene-cloud: rgb(255 255 255 / 0.85);
+  --scene-far: #bcdada;
+  --scene-snow: #f7fafa;
+  --scene-mid: #93c9bd;
+  --scene-near: #62ab97;
+  --scene-tree: #3f8f78;
+  --scene-tree-shade: #2f7562;
+  --scene-trunk: #6b5250;
+  --scene-ground: var(--surface-subtle);
+  --scene-rider: var(--color-grape);
+  --scene-bike: var(--color-shadow);
+  --scene-lamp: #ffe7a8;
+
   /* Layout */
   --spacing-0: 0;
   --spacing-1: 0.25rem;
@@ -98,6 +119,31 @@
   --scrollbar-track: var(--color-night);
   --scrollbar-thumb: var(--border-strong);
   --scrollbar-thumb-hover: var(--color-frost);
+
+  /* Scène d’accueil (nuit) */
+  --scene-sky-horizon: #0d2036;
+  --scene-far: #163a5c;
+  --scene-snow: #2c5378;
+  --scene-mid: #10304e;
+  --scene-near: #0b2540;
+  --scene-tree: #0d3838;
+  --scene-tree-shade: #0a2d2d;
+  --scene-trunk: #1d1b24;
+  --scene-rider: var(--color-smoke);
+  --scene-bike: var(--color-frost);
+}
+
+/* Permet au ciel de la scène d’accueil de passer en douceur du jour à la nuit */
+@property --scene-sky-top {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --scene-sky-horizon {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
 }
 
 html {
