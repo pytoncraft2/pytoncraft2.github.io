@@ -53,7 +53,7 @@ Le contraste entre un élément et son fond doit être vérifié dans son contex
 
 ## Typographie et composition
 
-- Utiliser Inter et les classes `ds-*` existantes ; réserver les plus grandes tailles à l’introduction et aux titres structurants.
+- Utiliser Sora pour les titres (`--font-heading`, graisses 600 et 700), Onest pour le texte (`--font-sans`) et les classes `ds-*` existantes ; réserver les plus grandes tailles à l’introduction et aux titres structurants.
 - Conserver une hiérarchie de titres sémantique, indépendamment de la taille visuelle choisie.
 - Garder les paragraphes des études de cas dans une colonne de lecture confortable. Les captures peuvent occuper une largeur plus importante si leur compréhension le nécessite.
 - Utiliser les espacements partagés pour établir un rythme : éléments d’un même groupe proches, sections distinctes davantage séparées.

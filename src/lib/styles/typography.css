@@ -1,17 +1,17 @@
 .ds-display-l {
-  font: 700 var(--text-display-l-size) / var(--text-display-l-line) var(--font-sans);
+  font: 700 var(--text-display-l-size) / var(--text-display-l-line) var(--font-heading);
 }
 
 .ds-h1 {
-  font: 700 var(--text-h1-size) / var(--text-h1-line) var(--font-sans);
+  font: 700 var(--text-h1-size) / var(--text-h1-line) var(--font-heading);
 }
 
 .ds-h2 {
-  font: 600 var(--text-h2-size) / var(--text-h2-line) var(--font-sans);
+  font: 600 var(--text-h2-size) / var(--text-h2-line) var(--font-heading);
 }
 
 .ds-h3 {
-  font: 600 var(--text-h3-size) / var(--text-h3-line) var(--font-sans);
+  font: 600 var(--text-h3-size) / var(--text-h3-line) var(--font-heading);
 }
 
 .ds-display-l,

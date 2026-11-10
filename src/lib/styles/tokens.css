@@ -74,7 +74,8 @@
   --radius-full: 999px;
 
   /* Typography */
-  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-sans: 'Onest', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-heading: 'Sora', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --text-display-l-size: 4rem;
   --text-display-l-line: 4.5rem;
   --text-h1-size: 3rem;

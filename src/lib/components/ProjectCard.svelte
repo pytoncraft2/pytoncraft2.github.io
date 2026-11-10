@@ -95,7 +95,7 @@
 	h3 {
 		margin: 0;
 		color: var(--text-heading);
-		font: 600 var(--text-h3-size) / var(--text-h3-line) var(--font-sans);
+		font: 600 var(--text-h3-size) / var(--text-h3-line) var(--font-heading);
 	}
 
 	.title,
