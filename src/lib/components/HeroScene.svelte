@@ -174,9 +174,14 @@
 
 		<g class="day">
 			<g class="flock">
-				<path class="bird" d="M0 0 q6 -6 12 0 q6 -6 12 0" />
-				<path class="bird bird-b" d="M30 -14 q5 -5 10 0 q5 -5 10 0" />
-				<path class="bird bird-c" d="M44 8 q4 -4 8 0 q4 -4 8 0" />
+				<!-- Chaque oiseau est dessiné autour de son corps (0, 0) : seules les ailes bougent. -->
+				<path class="bird" transform="translate(12 0)" d="M-12 -5 Q-6 -7 0 0 Q6 -7 12 -5" />
+				<g transform="translate(40 -14) scale(0.83)">
+					<path class="bird bird-b" d="M-12 -5 Q-6 -7 0 0 Q6 -7 12 -5" />
+				</g>
+				<g transform="translate(52 8) scale(0.67)">
+					<path class="bird bird-c" d="M-12 -5 Q-6 -7 0 0 Q6 -7 12 -5" />
+				</g>
 			</g>
 		</g>
 
@@ -389,8 +394,7 @@
 	}
 
 	.spokes,
-	.foliage,
-	.bird {
+	.foliage {
 		transform-box: fill-box;
 		transform-origin: center;
 	}
@@ -434,8 +438,9 @@
 			animation: fly 34s linear 5s infinite both;
 		}
 
+		/* Battement d’ailes par morphose du tracé ; sans support de `d` en CSS, l’oiseau reste en vol plané. */
 		.bird {
-			animation: flap 520ms ease-in-out infinite alternate;
+			animation: flap 440ms ease-in-out infinite alternate;
 		}
 
 		.bird-b {
@@ -531,8 +536,12 @@
 	}
 
 	@keyframes flap {
+		from {
+			d: path('M-12 -5 Q-6 -7 0 0 Q6 -7 12 -5');
+		}
+
 		to {
-			transform: scaleY(0.35);
+			d: path('M-10 5 Q-5 -2 0 1 Q5 -2 10 5');
 		}
 	}
 
