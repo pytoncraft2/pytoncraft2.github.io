@@ -1,9 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { asset, resolve } from '$app/paths';
-	import { page } from '$app/state';
+	import { withBase } from '#lib/paths.js';
 
-	const cvHref = asset('cv-timothee-hennequin.pdf');
+	/** Chemin de la page courante, fourni par Astro (Astro.url.pathname). */
+	let { pathname }: { pathname: string } = $props();
+
+	const cvHref = withBase('cv-timothee-hennequin.pdf');
+	const homeHref = withBase('/');
 	const storageKey = 'dock-placement';
 	const dragThreshold = 8;
 
@@ -142,6 +145,7 @@
 
 	function onHashChange() {
 		hashChanged = true;
+		hash = window.location.hash;
 	}
 
 	function onWindowScroll() {
@@ -178,31 +182,33 @@
 		}
 
 		lastScroll = window.scrollY;
+		hash = window.location.hash;
 	});
 
 	const dropEdges = ['bottom', 'left', 'right'] as const;
 	const preview = $derived(dragging ? nearestPlacement(dragX, dragY) : null);
 
-	const routeId = $derived(page.route.id ?? '');
-	const hash = $derived(page.url.hash);
+	let hash = $state('');
+	const isHome = $derived(pathname === homeHref || pathname === homeHref.replace(/\/$/, '') || pathname.endsWith('/index.html'));
+	const isProject = $derived(pathname.includes('/projets/'));
 
 	const items = $derived([
 		{
 			id: 'accueil',
 			label: 'Accueil',
-			href: resolve('/'),
-			active: routeId === '/' && hash !== '#projets' && hash !== '#contact'
+			href: homeHref,
+			active: isHome && hash !== '#projets' && hash !== '#contact'
 		},
 		{
 			id: 'projets',
 			label: 'Projets',
-			href: `${resolve('/')}#projets`,
-			active: routeId.startsWith('/projets') || (routeId === '/' && hash === '#projets')
+			href: `${homeHref}#projets`,
+			active: isProject || (isHome && hash === '#projets')
 		},
 		{
 			id: 'contact',
 			label: 'Contact',
-			href: `${resolve('/')}#contact`,
+			href: `${homeHref}#contact`,
 			active: hash === '#contact'
 		},
 		{

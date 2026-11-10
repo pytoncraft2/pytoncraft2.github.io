@@ -1,0 +1,28 @@
+---
+import Button from '#lib/components/Button.svelte';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase } from '#lib/paths.js';
+---
+
+<BaseLayout title="Page introuvable • Timothée Hennequin" description="Cette page n’existe pas ou a été déplacée.">
+	<section class="not-found">
+		<h1 class="ds-h1">Page introuvable</h1>
+		<p class="ds-body-m">Cette page n’existe pas ou a été déplacée.</p>
+		<Button href={withBase('/')}>Retour à l’accueil</Button>
+	</section>
+</BaseLayout>
+
+<style>
+	.not-found {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: var(--spacing-4);
+		padding-block: var(--spacing-10);
+	}
+
+	h1,
+	p {
+		margin: 0;
+	}
+</style>

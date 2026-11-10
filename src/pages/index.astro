@@ -1,0 +1,533 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '#lib/components/Button.svelte';
+import HeroScene from '#lib/components/HeroScene.svelte';
+import ProjectCarousel, { type CarouselProject } from '#lib/components/ProjectCarousel.svelte';
+import TechIcon from '#lib/components/TechIcon.svelte';
+import { homeTechs } from '#lib/data/skills.js';
+import { projectPath, withBase } from '#lib/paths.js';
+import { getFeaturedProjects } from '#lib/projects.js';
+
+const name = 'Timothée Hennequin';
+const email = 'timothennequin@gmail.com';
+const linkedInHref = 'https://www.linkedin.com/in/timothee-hennequin/';
+
+const cards: CarouselProject[] = (await getFeaturedProjects()).map(({ id, data }) => ({
+	slug: id,
+	href: projectPath(id),
+	title: data.title,
+	tags: data.tags,
+	description: data.description,
+	imageSrc: withBase(data.image),
+	imageAlt: data.imageAlt
+}));
+
+const careerSteps = [
+	{
+		id: 'webacademie',
+		period: '2020–2022',
+		name: 'Web@cadémie',
+		detail: 'Formation en développement web, Nancy.'
+	},
+	{
+		id: 'easysav',
+		period: '2021–2025',
+		name: 'EasySAV',
+		detail: 'Développeur web en alternance, Metz.'
+	},
+	{
+		id: 'epitech',
+		period: '2022–2025',
+		name: 'Epitech',
+		detail:
+			'Pré-MSc puis MSc IoT, Nancy. Titre obtenu : « Architecte logiciel, développeur d’applications », niveau\u00A07.'
+	},
+	{
+		id: 'openclassrooms',
+		period: 'Depuis 2026',
+		name: 'OpenClassrooms',
+		detail: 'Formation Product Designer, certification UX/UI Designer niveau\u00A06 en cours.'
+	}
+];
+---
+
+<BaseLayout
+	title={`${name} • Développeur web & UX/UI Designer`}
+	description={`Portfolio de ${name}, développeur web & UX/UI Designer : développement web, conception d’interfaces, prototypage et accessibilité.`}
+>
+	<!-- Le script de retour (BaseLayout) a besoin du carrousel dès le premier rendu. -->
+	<link slot="head" rel="expect" href="#projets-carousel" blocking="render" />
+	<div class="page" data-snap-blocks>
+		<section class="hero snap-block" aria-labelledby="hero-title">
+			<div class="hero-copy">
+				<p class="eyebrow ds-label-m">Portfolio</p>
+				<h1 id="hero-title" class="ds-h1">{name}</h1>
+				<p class="role ds-body-l">Développeur web & UX/UI Designer</p>
+				<p class="intro ds-body-m">
+					Je conçois et développe des applications web en intégrant les besoins utilisateurs et les contraintes techniques dès la conception.
+				</p>
+				<div class="actions">
+					<Button href="#projets">Voir mes projets</Button>
+					<Button href="#contact" variant="secondary">Me contacter</Button>
+				</div>
+			</div>
+
+			<aside class="proofs" aria-label="Points clés">
+				<dl class="proofs-list">
+					<div class="proof-note">
+						<dt>Développement web</dt>
+						<dd>Expérience professionnelle</dd>
+					</div>
+					<div class="proof-note">
+						<dt>UX/UI Design</dt>
+						<dd>Certification niveau 6 en cours</dd>
+					</div>
+					<div class="proof-note">
+						<dt>Produit en production</dt>
+						<dd>Vroum · +90 000 visites en 2025</dd>
+					</div>
+				</dl>
+			</aside>
+
+			<HeroScene client:idle />
+		</section>
+
+		<section class="section section-flush snap-block" aria-labelledby="projets">
+			<h2 id="projets" class="ds-h2">Projets sélectionnés</h2>
+			<ProjectCarousel client:load projects={cards} />
+		</section>
+
+		<section id="profil" class="section profil snap-block" aria-labelledby="profil-title">
+			<h2 id="profil-title" class="ds-h2">Profil</h2>
+			<p class="ds-body-m">
+				Développeur web, j’interviens aujourd’hui sur la réalisation d’applications et sur la conception UX/UI, de
+				l’analyse des besoins jusqu’à l’interface.
+			</p>
+			<h3 id="parcours-title" class="subhead">Parcours</h3>
+			<ul class="timeline" aria-labelledby="parcours-title">
+				{
+					careerSteps.map((step) => (
+						<li class="step">
+							<span class="step-mark" aria-hidden="true" />
+							<div class="step-body">
+								<p class="step-date">{step.period}</p>
+								<p class="step-name">{step.name}</p>
+								<p class="step-detail">{step.detail}</p>
+							</div>
+						</li>
+					))
+				}
+			</ul>
+			<h3 id="tech-title" class="subhead">Technologies</h3>
+			<ul class="tech-grid" aria-labelledby="tech-title">
+				{
+					homeTechs.map((item) => (
+						<li>
+							<span class="tech-item">
+								<TechIcon name={item.id} />
+								<span>{item.label}</span>
+							</span>
+						</li>
+					))
+				}
+			</ul>
+		</section>
+
+		<section id="contact" class="section snap-block" aria-labelledby="contact-title">
+			<h2 id="contact-title" class="ds-h2">Contact</h2>
+			<p class="ds-body-m">
+				Pour un échange autour d’un poste, d’un projet ou d’une collaboration, vous pouvez me contacter directement.
+			</p>
+			<div class="contact-links">
+				<a href={`mailto:${email}`}>{email}</a>
+				<a href={linkedInHref} target="_blank" rel="noreferrer">LinkedIn</a>
+			</div>
+		</section>
+	</div>
+</BaseLayout>
+
+<script>
+	import { snapBlocks } from '#lib/snap-blocks.js';
+
+	// Défilement par blocs de l’accueil (attachment Svelte réutilisé tel quel).
+	const page = document.querySelector<HTMLElement>('[data-snap-blocks]');
+	if (page) {
+		snapBlocks(page);
+	}
+</script>
+
+<style>
+	.page {
+		display: contents;
+	}
+
+	.hero {
+		/* Hauteur de la bande de paysage de HeroScene, sous le texte. */
+		--hero-scene-band: clamp(9rem, 22.2vw, 26rem);
+		position: relative;
+		isolation: isolate;
+		display: grid;
+		gap: var(--spacing-8);
+		padding-bottom: calc(var(--hero-scene-band) * 0.8);
+		margin-bottom: clamp(var(--spacing-10), 6vw, var(--spacing-16));
+	}
+
+	.hero-copy {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: var(--spacing-4);
+		min-width: 0;
+	}
+
+	.eyebrow {
+		margin: 0;
+		color: var(--text-secondary);
+	}
+
+	.hero h1,
+	.role,
+	.intro {
+		margin: 0;
+	}
+
+	.role {
+		color: var(--text-primary);
+	}
+
+	.intro {
+		max-width: 40rem;
+		color: var(--text-secondary);
+	}
+
+	.proofs {
+		min-width: 0;
+	}
+
+	.proofs-list {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: nowrap;
+		align-items: stretch;
+		gap: var(--spacing-3);
+		margin: 0;
+		padding-block: var(--spacing-1);
+		overflow-x: auto;
+		overscroll-behavior-x: contain;
+		scrollbar-width: thin;
+		scroll-snap-type: x proximity;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.proof-note {
+		position: relative;
+		flex: 0 0 auto;
+		width: max-content;
+		max-width: none;
+		padding: var(--spacing-3) var(--spacing-5) var(--spacing-3) var(--spacing-8);
+		border: 1px solid var(--border-default);
+		border-radius: var(--radius-md);
+		background: var(--surface-elevated);
+		scroll-snap-align: start;
+		corner-bottom-left-shape: bevel;
+	}
+
+	.proof-note::before {
+		content: '';
+		position: absolute;
+		top: 0.5rem;
+		left: 0.5rem;
+		width: 0.7rem;
+		height: 0.7rem;
+		border: 1px solid var(--scrollbar-thumb);
+		border-radius: var(--radius-full);
+		background: var(--surface-subtle);
+		box-shadow: 0 0 0 2px var(--surface-elevated);
+		pointer-events: none;
+	}
+
+	.proofs-list dt {
+		margin: 0 0 var(--spacing-1);
+		color: var(--text-primary);
+		font: 600 var(--text-body-m-size) / var(--text-body-m-line) var(--font-sans);
+	}
+
+	.proofs-list dd {
+		margin: 0;
+		color: var(--text-secondary);
+		font: 400 var(--text-body-s-size) / var(--text-body-s-line) var(--font-sans);
+	}
+
+	.actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--spacing-4);
+		margin-top: var(--spacing-2);
+	}
+
+	.section {
+		margin-bottom: var(--spacing-8);
+		padding: var(--spacing-8);
+		border: 1px solid var(--border-default);
+		border-radius: var(--radius-lg);
+		background: var(--surface-elevated);
+	}
+
+	.section-flush {
+		padding: 0;
+		border: none;
+		background: transparent;
+	}
+
+	.section h2 {
+		margin: 0 0 var(--spacing-4);
+	}
+
+	.section h3 {
+		margin: var(--spacing-8) 0 var(--spacing-4);
+	}
+
+	.section p {
+		margin: 0 0 var(--spacing-4);
+		max-width: 40rem;
+	}
+
+	.profil .subhead {
+		margin: var(--spacing-6) 0 var(--spacing-3);
+		color: var(--text-primary);
+		font: 600 var(--text-body-m-size) / var(--text-body-m-line) var(--font-sans);
+	}
+
+	.profil .subhead:first-of-type {
+		margin-top: var(--spacing-2);
+	}
+
+	.timeline {
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+		margin: 0 0 var(--spacing-4);
+		padding: 0;
+		list-style: none;
+	}
+
+	.step {
+		display: grid;
+		grid-template-columns: 0.75rem minmax(0, 1fr);
+		column-gap: var(--spacing-3);
+	}
+
+	.step-mark {
+		position: relative;
+	}
+
+	.step-mark::before {
+		content: '';
+		position: absolute;
+		z-index: 1;
+		top: 0.4rem;
+		left: 0;
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: var(--radius-full);
+		background: var(--action-primary);
+		box-shadow: 0 0 0 3px var(--surface-elevated);
+	}
+
+	.step-mark::after {
+		content: '';
+		position: absolute;
+		z-index: 0;
+		top: 0.7rem;
+		bottom: -0.45rem;
+		left: calc(0.25rem - 0.5px);
+		width: 1px;
+		background: var(--border-strong);
+	}
+
+	.step:last-child .step-mark::after {
+		display: none;
+	}
+
+	.step-body {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-1);
+		min-width: 0;
+		padding-bottom: var(--spacing-5);
+	}
+
+	.step:last-child .step-body {
+		padding-bottom: 0;
+	}
+
+	.timeline p {
+		margin: 0;
+		max-width: none;
+	}
+
+	.step-date {
+		color: var(--text-secondary);
+		font: 600 var(--text-label-m-size) / var(--text-label-m-line) var(--font-sans);
+	}
+
+	.step-name {
+		color: var(--text-primary);
+		font: 600 var(--text-body-m-size) / var(--text-body-m-line) var(--font-sans);
+	}
+
+	.step-detail {
+		color: var(--text-secondary);
+		font: 400 var(--text-body-s-size) / var(--text-body-s-line) var(--font-sans);
+	}
+
+	.tech-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: var(--spacing-3) var(--spacing-2);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.tech-item {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--spacing-1);
+		min-width: 0;
+		--tech-icon-size: 1.5rem;
+		color: var(--text-secondary);
+		text-align: center;
+		font: 500 0.75rem / 1rem var(--font-sans);
+	}
+
+	.tech-item span {
+		color: var(--text-primary);
+	}
+
+	.contact-links a {
+		min-height: 44px;
+		display: inline-flex;
+		align-items: center;
+		color: var(--action-primary);
+		font: 500 var(--text-label-m-size) / var(--text-label-m-line) var(--font-sans);
+		text-decoration: none;
+	}
+
+	.contact-links a:hover {
+		text-decoration: underline;
+	}
+
+	.contact-links a:focus-visible {
+		outline: 2px solid var(--action-focus);
+		outline-offset: 2px;
+		border-radius: var(--radius-sm);
+	}
+
+	.contact-links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--spacing-4);
+	}
+
+	@media (min-width: 40rem) {
+		.proofs-list {
+			gap: var(--spacing-4);
+		}
+
+		.tech-grid {
+			grid-template-columns: repeat(5, minmax(0, 1fr));
+		}
+	}
+
+	@media (min-width: 64rem) {
+		.timeline {
+			display: grid;
+			grid-template-columns: repeat(4, minmax(0, 1fr));
+			column-gap: var(--spacing-5);
+		}
+
+		.step {
+			display: flex;
+			flex-direction: column;
+			gap: var(--spacing-2);
+			position: relative;
+			padding-top: calc(0.5rem + var(--spacing-3));
+		}
+
+		.step-mark {
+			position: absolute;
+			top: 0;
+			right: 0;
+			left: 0;
+			height: 0.5rem;
+		}
+
+		.step-mark::before {
+			top: 0;
+		}
+
+		.step-mark::after {
+			top: calc(0.25rem - 0.5px);
+			right: calc(-1 * var(--spacing-5) - 0.15rem);
+			bottom: auto;
+			left: 0.5rem;
+			width: auto;
+			height: 1px;
+		}
+
+		.step-body {
+			padding-bottom: 0;
+		}
+	}
+
+	@media (min-width: 64rem) {
+		.hero {
+			grid-template-columns: minmax(0, 2fr) minmax(14rem, 1fr);
+			align-items: center;
+			column-gap: clamp(var(--spacing-6), 4vw, var(--spacing-12));
+		}
+
+		.proofs {
+			padding-block: var(--spacing-4);
+			padding-inline: var(--spacing-4) var(--spacing-2);
+		}
+
+		.proofs-list {
+			flex-direction: column;
+			flex-wrap: nowrap;
+			align-items: flex-end;
+			gap: clamp(var(--spacing-5), 2.4vw, var(--spacing-8));
+			overflow: visible;
+			padding-block: 0;
+			scroll-snap-type: none;
+		}
+
+		.proof-note {
+			scroll-snap-align: none;
+		}
+
+		.proof-note:nth-child(1) {
+			transform: rotate(4deg);
+		}
+
+		.proof-note:nth-child(2) {
+			transform: rotate(3deg) translateX(calc(-1 * var(--spacing-12)));
+		}
+
+		.proof-note:nth-child(3) {
+			transform: rotate(5deg);
+		}
+
+		.tech-grid {
+			grid-template-columns: repeat(9, minmax(0, 1fr));
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.proof-note {
+			transform: none !important;
+		}
+	}
+</style>

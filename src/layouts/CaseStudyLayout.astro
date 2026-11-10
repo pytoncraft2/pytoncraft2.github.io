@@ -1,0 +1,180 @@
+---
+import Button from '#lib/components/Button.svelte';
+import ProjectImage from '#lib/components/ProjectImage.svelte';
+import ProjectTags from '#lib/components/ProjectTags.svelte';
+import WindowFrame from '#lib/components/WindowFrame.svelte';
+import { projectPath, withBase } from '#lib/paths.js';
+import type { ProjectEntry } from '#lib/projects.js';
+import BaseLayout from './BaseLayout.astro';
+
+type Props = {
+	project: ProjectEntry;
+	next?: ProjectEntry;
+};
+
+const { project, next } = Astro.props;
+const { id: slug, data } = project;
+---
+
+<BaseLayout title={`${data.title} • Case study`} description={data.description}>
+	<WindowFrame
+		title={data.title}
+		parent={{ href: `${withBase('/')}#projets`, label: 'Projets' }}
+		transitionName={`project-${slug}-card`}
+	>
+		<article>
+			<header class="hero">
+				<ProjectImage
+					src={withBase(data.image)}
+					alt={data.imageAlt}
+					transitionName={`project-${slug}-media`}
+				/>
+				<h1
+					class="ds-h1"
+					style={`view-transition-name: project-${slug}-title; view-transition-class: project-text;`}
+				>
+					{data.title}
+				</h1>
+				<ProjectTags tags={data.tags} transitionName={`project-${slug}-tags`} />
+				<p
+					class="subtitle ds-body-l"
+					style={`view-transition-name: project-${slug}-summary; view-transition-class: project-text;`}
+				>
+					{data.description}
+				</p>
+			</header>
+
+			<!-- Contenu Markdown (src/content/projects/<slug>.md), structuré par rehype-case-study. -->
+			<div class="case-body">
+				<slot />
+			</div>
+
+			{
+				next && (
+					<nav class="next" aria-label="Projet suivant">
+						<div class="next-text">
+							<p class="next-label ds-label-m">Projet suivant</p>
+							<p class="next-title ds-h3">{next.data.title}</p>
+						</div>
+						<Button href={projectPath(next.id)} variant="secondary">
+							Voir le projet →
+						</Button>
+					</nav>
+				)
+			}
+		</article>
+	</WindowFrame>
+</BaseLayout>
+
+<style>
+	.hero {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: var(--spacing-4);
+		padding-bottom: var(--spacing-8);
+	}
+
+	.subtitle {
+		max-width: 60ch;
+		margin: 0;
+		color: var(--text-secondary);
+	}
+
+	h1 {
+		margin: 0;
+	}
+
+	/* Anciennement CaseStudySection : le HTML vient du Markdown, d’où :global(). */
+	.case-body :global(.case-section) {
+		padding-block: var(--spacing-10);
+	}
+
+	.case-body :global(.case-section > h2) {
+		margin: 0 0 var(--spacing-5);
+	}
+
+	.case-body :global(.case-content) {
+		max-width: 40rem;
+		color: var(--text-primary);
+		font: 400 var(--text-body-m-size) / var(--text-body-m-line) var(--font-sans);
+	}
+
+	.case-body :global(.case-content p) {
+		margin: 0 0 var(--spacing-4);
+	}
+
+	.case-body :global(.case-content p:last-child) {
+		margin-bottom: 0;
+	}
+
+	/* Intertitres `###` (anciens <h4>) : même rendu, hiérarchie de titres corrigée. */
+	.case-body :global(.case-content h3) {
+		margin: var(--spacing-6) 0 var(--spacing-2);
+		font: 700 var(--text-body-m-size) / var(--text-body-m-line) var(--font-sans);
+	}
+
+	.case-body :global(.case-content h3:first-child) {
+		margin-top: 0;
+	}
+
+	.case-body :global(.case-content ul) {
+		margin: 0 0 var(--spacing-4);
+		padding-left: 1.25rem;
+	}
+
+	.case-body :global(.case-content li + li) {
+		margin-top: var(--spacing-2);
+	}
+
+	/* Anciennement ProjectImage, pour les images du Markdown. */
+	.case-body :global(.case-figure) {
+		width: 100%;
+		max-width: 45rem;
+		margin: 0 0 var(--spacing-4);
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-3);
+	}
+
+	.case-body :global(.case-figure img) {
+		width: 100%;
+		height: auto;
+		aspect-ratio: 35 / 18;
+		object-fit: cover;
+		border-radius: var(--radius-md);
+		background: var(--surface-subtle);
+		border: 1px solid var(--border-default);
+	}
+
+	.case-body :global(.case-figure figcaption) {
+		margin: 0;
+		color: var(--text-secondary);
+	}
+
+	.next {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--spacing-4);
+		margin-top: var(--spacing-8);
+		padding-top: var(--spacing-10);
+		border-top: 1px solid var(--border-default);
+	}
+
+	.next-text {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-1);
+	}
+
+	.next-label,
+	.next-title {
+		margin: 0;
+	}
+
+	.next-label {
+		color: var(--text-secondary);
+	}
+</style>

@@ -54,6 +54,13 @@ html {
 	}
 }
 
+/* Site multipage (Astro) : transitions de vue natives entre documents, sans routeur JS. */
+@media (prefers-reduced-motion: no-preference) {
+	@view-transition {
+		navigation: auto;
+	}
+}
+
 ::view-transition-old(root),
 ::view-transition-new(root) {
 	animation-duration: 140ms;

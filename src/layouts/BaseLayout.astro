@@ -1,0 +1,157 @@
+---
+import '#lib/styles/tokens.css';
+import '#lib/styles/typography.css';
+import '#lib/styles/global.css';
+import favicon from '#lib/assets/favicon.svg';
+import Dock from '#lib/components/Dock.svelte';
+import Footer from '#lib/components/Footer.svelte';
+import Header from '#lib/components/Header.svelte';
+
+type Props = {
+	title: string;
+	description: string;
+};
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="text-scale" content="scale" />
+		<!-- Avant tout rendu : thème et position du dock mémorisés, pour éviter un flash. -->
+		<script is:inline>
+			(function () {
+				try {
+					var stored = localStorage.getItem('theme');
+					var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+					var theme =
+						stored === 'light' || stored === 'dark' ? stored : prefersDark ? 'dark' : 'light';
+					document.documentElement.setAttribute('data-theme', theme);
+					document.documentElement.style.colorScheme = theme;
+
+					var themeColor = theme === 'dark' ? '#0f0f0f' : '#eee9ec';
+					var meta = document.querySelector('meta[name="theme-color"]');
+					if (!meta) {
+						meta = document.createElement('meta');
+						meta.setAttribute('name', 'theme-color');
+						document.head.appendChild(meta);
+					}
+					meta.setAttribute('content', themeColor);
+
+					var dock = localStorage.getItem('dock-placement');
+					if (dock === 'left' || dock === 'right' || dock === 'bottom') {
+						document.documentElement.setAttribute('data-dock', dock);
+					} else if (window.matchMedia('(min-width: 40rem)').matches) {
+						document.documentElement.setAttribute('data-dock', 'left');
+					}
+				} catch (e) {}
+			})();
+		</script>
+		<!--
+			Transitions de vue entre pages (natives, sans routeur JS : voir @view-transition dans global.css).
+			Au retour d'une étude de cas vers l'accueil, la carte du projet quitté reçoit les noms de
+			transition avant le premier rendu, et le carrousel est placé sur sa page.
+		-->
+		<script is:inline>
+			window.addEventListener('pagereveal', function (event) {
+				if (!event.viewTransition || !window.navigation || !navigation.activation) {
+					return;
+				}
+
+				var from = navigation.activation.from && navigation.activation.from.url;
+				var match = from && new URL(from).pathname.match(/\/projets\/([^/.]+)(?:\.html)?\/?$/);
+				if (!match) {
+					return;
+				}
+
+				var root = document.documentElement;
+				var card = document.querySelector('[data-project-card="' + match[1] + '"]');
+				if (!card) {
+					return;
+				}
+
+				root.dataset.projectTransition = match[1];
+				card.setAttribute('data-transition', '');
+
+				var item = card.closest('li');
+				var list = item && item.parentElement;
+				if (item && list) {
+					var gap = parseFloat(getComputedStyle(list).columnGap) || 0;
+					var perPage = Math.max(1, Math.round((list.clientWidth + gap) / (item.offsetWidth + gap)));
+					var index = Array.prototype.indexOf.call(list.children, item);
+					var first = list.children[Math.floor(index / perPage) * perPage];
+					list.scrollLeft = first ? first.offsetLeft : 0;
+				}
+
+				event.viewTransition.finished.finally(function () {
+					delete root.dataset.projectTransition;
+				});
+			});
+		</script>
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="icon" href={favicon.src} />
+		<meta name="color-scheme" content="light dark" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Sora:wght@600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<slot name="head" />
+	</head>
+	<body>
+		<a class="skip-link" href="#contenu">Aller au contenu</a>
+		<a class="skip-link" href="#menu">Aller au menu</a>
+		<div class="app">
+			<Header client:load />
+			<div class="stage">
+				<main id="contenu" tabindex="-1">
+					<slot />
+				</main>
+			</div>
+			<Footer />
+			<Dock client:load pathname={Astro.url.pathname} />
+		</div>
+	</body>
+</html>
+
+<style>
+	.app {
+		display: flex;
+		flex-direction: column;
+		min-height: 100vh;
+		/* Le décor pleine largeur de l'accueil (100vw) ne doit pas créer de défilement horizontal. */
+		overflow-x: clip;
+	}
+
+	.stage {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+	}
+
+	main {
+		flex: 1;
+		width: min(100% - var(--spacing-8), 72rem);
+		margin-inline: auto;
+		padding-block: var(--spacing-8);
+	}
+
+	main:focus {
+		outline: none;
+	}
+
+	@media (min-width: 40rem) {
+		:global(html[data-dock='left']) .stage {
+			padding-left: var(--dock-gutter);
+		}
+
+		:global(html[data-dock='right']) .stage {
+			padding-right: var(--dock-gutter);
+		}
+	}
+</style>

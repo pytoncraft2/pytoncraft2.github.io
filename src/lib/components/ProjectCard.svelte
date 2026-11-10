@@ -1,10 +1,9 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
-	import { projectPath, type ProjectSlug } from '#lib/data/projects.js';
 	import ProjectTags from './ProjectTags.svelte';
 
 	let {
 		slug,
+		href,
 		title,
 		tags,
 		description,
@@ -12,7 +11,9 @@
 		imageSrc,
 		imageAlt = ''
 	}: {
-		slug: ProjectSlug;
+		slug: string;
+		/** Lien vers l’étude de cas, chemin de base inclus. */
+		href: string;
 		title: string;
 		tags: string[];
 		description: string;
@@ -44,7 +45,7 @@
 
 <article
 	class="card"
-	data-project-card
+	data-project-card={slug}
 	data-transition={restored ? '' : undefined}
 	style:--vt-title={`project-${slug}-title`}
 	style:--vt-media={`project-${slug}-media`}
@@ -60,7 +61,7 @@
 	<h3 class="title">{title}</h3>
 	<ProjectTags {tags} />
 	<p class="description">{description}</p>
-	<a class="link" href={resolve(projectPath(slug))} onclick={arm}>{linkLabel}</a>
+	<a class="link" {href} onclick={arm}>{linkLabel}</a>
 </article>
 
 <style>
