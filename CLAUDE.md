@@ -24,49 +24,56 @@ Mettre en valeur la complémentarité entre développement et conception avec de
 
 ```sh
 npm install
-npm run dev       # serveur de dev Vite
-npm run build     # build statique dans build/
+npm run dev       # serveur de dev Astro
+npm run build     # build statique dans build/ (pages en .html : /projets/vroum.html)
 npm run preview   # sert le build
-npm run check     # svelte-kit sync + svelte-check (typecheck TS et Svelte)
+npm run check     # astro check (fichiers .astro et TS) + svelte-check (composants Svelte)
 ```
 
 Il n’y a ni tests, ni linter, ni formatter configurés : `npm run check` puis `npm run build` sont les seules vérifications automatiques. Le rendu visuel se contrôle dans le navigateur (`npm run dev` ou `npm run preview`).
 
+Astro met en cache le rendu du Markdown : après une modification de `src/lib/markdown/rehype-case-study.ts`, supprimer `node_modules/.astro` et `.astro/data-store.json` avant de reconstruire, sinon l’ancien HTML est réutilisé.
+
 ## Architecture
 
-SvelteKit, TypeScript, Svelte 5 (runes), CSS avec propriétés personnalisées. Aucune bibliothèque UI ou d’animation.
+Astro (site statique multipage), îles Svelte 5 (runes), TypeScript, CSS avec propriétés personnalisées. Le contenu des études de cas est en Markdown, séparé du code. Aucune bibliothèque UI ou d’animation.
 
 | Emplacement | Responsabilité |
 | --- | --- |
-| `src/app.html` | Script inline appliqué avant hydratation : thème et position du dock |
-| `src/routes/+layout.svelte` | Structure commune, styles, en-tête, pied de page, dock, transitions de vue |
-| `src/routes/+layout.ts` | `prerender = true` pour tout le site |
-| `src/routes/+page.svelte` | Accueil : hero, carrousel des projets, profil (`#profil`), contact (`#contact`) |
-| `src/routes/projets/<slug>/+page.svelte` | Étude de cas d’un projet |
-| `src/lib/data/projects.ts` | Type `Project`, union `ProjectSlug`, ordre et helpers (`getProject`, `getNextProject`, `getFeaturedProjects`, `projectPath`) |
+| `src/content/projects/<slug>.md` | Une étude de cas : métadonnées en en-tête (titre, tags, ordre, image…) et texte en Markdown |
+| `src/content.config.ts` | Schéma de la collection `projects` (validé au build) |
+| `src/lib/markdown/rehype-case-study.ts` | Transforme le HTML du Markdown : sections `## Titre {#id}`, figures légendées, liens externes, chemin de base |
+| `src/lib/projects.ts` | Lecture de la collection : `getFeaturedProjects` (triés par `order`), `getNextProject` |
+| `src/layouts/BaseLayout.astro` | Document HTML commun : script thème/dock avant rendu, script de transition de retour, en-tête, dock, pied de page |
+| `src/layouts/CaseStudyLayout.astro` | Mise en page d’une étude de cas et styles du contenu Markdown |
+| `src/pages/index.astro` | Accueil statique : hero, profil (`#profil`), contact (`#contact`) |
+| `src/pages/projets/[slug].astro` | Génère une page par fichier de la collection |
+| `src/lib/components/` | Composants Svelte : rendus en HTML statique, ou îles hydratées avec `client:*` |
+| `src/lib/components/ProjectCarousel.svelte` | Île du carrousel des projets |
+| `src/lib/components/HeroScene.svelte` | Île du paysage jour/nuit derrière le hero (règles dans `DESIGN.md`, « Scène d’accueil ») ; couleurs `--scene-*` dans `tokens.css` |
 | `src/lib/data/skills.ts`, `tech-icons.ts` | Compétences (`TechId`) et logos de `src/lib/assets/tech/` |
-| `src/lib/components/` | Composants partagés |
-| `src/lib/components/HeroScene.svelte` | Paysage jour/nuit décoratif derrière le hero (règles dans `DESIGN.md`, « Scène d’accueil ») ; couleurs `--scene-*` dans `tokens.css` |
 | `src/lib/styles/` | `tokens.css` (couleurs, thèmes, espacements, rayons, tailles), `typography.css` (classes `ds-*`), `global.css` |
-| `src/lib/snap-blocks.ts` | Attachment `{@attach snapBlocks}` : défilement par blocs `.snap-block` de l’accueil |
+| `src/lib/snap-blocks.ts` | Défilement par blocs `.snap-block` de l’accueil, appelé par un `<script>` de `index.astro` |
+| `public/` | Fichiers servis tels quels (captures, CV, `.nojekyll`) |
 
 Il n’existe pas de page « À propos » séparée : le parcours est la section Profil de l’accueil.
 
 Points qui demandent de lire plusieurs fichiers :
 
-- **Rendu statique et chemins** : `adapter-static` avec `fallback: '404.html'`, déployé sur GitHub Pages par `.github/workflows/deploy.yml` (push sur `main`). Le chemin de base vient de `BASE_PATH` (vide en dev). Les liens internes passent par `resolve()` et les fichiers de `static/` par `asset()` (`$app/paths`) ; ne jamais écrire de chemin absolu en dur.
-- **Alias `#lib`** : les imports utilisent `#lib/...` (champ `imports` de `package.json`), pas `$lib`, et les modules TS sont importés avec l’extension `.js` (ex. `#lib/data/projects.js`). L’entrée nue `#lib` pointe vers `src/lib/index.js`, qui n’existe pas : toujours importer un sous-chemin.
-- **Runes forcées** : `vite.config.ts` active le mode runes hors `node_modules`. Pas de syntaxe Svelte 4 (`export let`, `<slot>`, `on:click`).
-- **Thème et dock** : `src/app.html` lit `localStorage` (`theme`, `dock-placement`) et pose `data-theme` / `data-dock` sur `<html>` avant l’hydratation ; `Header.svelte` et `Dock.svelte` écrivent les mêmes clés et attributs. Garder les trois synchronisés. Les styles ciblent `:global(html[data-theme='dark'])` et `:global(html[data-dock=...])` ; les tokens sombres sont dans `tokens.css` sous `[data-theme='dark']`.
-- **Transitions de vue** : `+layout.svelte` enveloppe les navigations dans `document.startViewTransition` (sauf mouvement réduit) et pose `data-project-transition` lors d’un passage accueil ↔ projet. `ProjectCard` et `ProjectTags` partagent des `view-transition-name` avec la page projet ; l’en-tête utilise `app-header`. Un nouvel élément animé de l’accueil ne doit pas réutiliser ces noms.
+- **Îles** : seuls `Header`, `Dock` (`client:load`), `ProjectCarousel` (`client:load`) et `HeroScene` (`client:idle`) envoient du JavaScript. Les autres composants Svelte (`Button`, `TechIcon`, `WindowFrame`, `ProjectTags`, `ProjectImage`, `Footer`) sont rendus en HTML au build. Une île ne reçoit que des props sérialisables (pas d’objet de collection, pas de fonction) ; c’est la raison du type `CarouselProject`.
+- **Chemins** : le chemin de base vient de `BASE_PATH` (workflow `.github/workflows/deploy.yml`, vide pour `<user>.github.io`). Liens internes et fichiers de `public/` passent par `withBase()` / `projectPath()` (`src/lib/paths.ts`) ; dans le Markdown, écrire des chemins absolus (`/image.webp`), le plugin ajoute la base. Ne jamais écrire de chemin préfixé en dur.
+- **Alias `#lib`** : les imports utilisent `#lib/...` (champ `imports` de `package.json`), et les modules TS sont importés avec l’extension `.js` (ex. `#lib/projects.js`).
+- **Thème et dock** : le script inline de `BaseLayout.astro` lit `localStorage` (`theme`, `dock-placement`) et pose `data-theme` / `data-dock` sur `<html>` avant le rendu ; `Header.svelte` et `Dock.svelte` écrivent les mêmes clés et attributs. Garder les trois synchronisés. Le dock reçoit le chemin courant en prop (`pathname`) pour son état actif.
+- **Transitions de vue** : natives entre documents (`@view-transition` dans `global.css`, Chrome et Safari récents ; navigation simple ailleurs). `ProjectCard` pose `data-transition` sur la carte cliquée ; la page projet porte les mêmes `view-transition-name`. Au retour, le script `pagereveal` de `BaseLayout.astro` reconnaît le projet quitté, nomme sa carte et place le carrousel sur sa page avant le premier rendu (l’accueil bloque ce rendu avec `<link rel="expect" href="#projets-carousel">`). La position du carrousel est aussi mémorisée en `sessionStorage` pour les retours arrière.
+- **Markdown** : moteur `unified()` de `@astrojs/markdown-remark` (le moteur par défaut d’Astro 7, Sätteri, n’accepte pas les plugins rehype). Astro ajoute ses propres attributs aux images ; les apostrophes et guillemets droits sont convertis en typographiques (« smartypants »).
 
 ## Conventions de code
 
 - Suivre le style du fichier modifié (tabulations dans les fichiers Svelte et TS).
-- Utiliser runes, snippets et attachments lorsque le contexte s’y prête. Ne pas convertir les composants sans nécessité.
+- Composants interactifs en Svelte 5 (runes, snippets, attachments) ; pages et mises en page en `.astro`. Pas de syntaxe Svelte 4 (`export let`, `<slot>`, `on:click`) dans les composants Svelte. Ne pas convertir les composants sans nécessité.
 - Réutiliser les composants et fonctions existants avant de créer une abstraction.
 - Conserver un typage utile ; éviter `any`, les contournements TypeScript et les suppressions d’avertissements sans justification.
-- Garder les accès à `window`, `document`, `localStorage` et autres API du navigateur compatibles avec le pré-rendu (dans un attachment, un `$effect` ou un gestionnaire d’événement). Nettoyer les abonnements, écouteurs, `requestAnimationFrame` et temporisations.
+- Garder les accès à `window`, `document`, `localStorage` et autres API du navigateur compatibles avec le rendu au build (dans un attachment, un `$effect`, un gestionnaire d’événement ou un `<script>` Astro). Nettoyer les abonnements, écouteurs, `requestAnimationFrame` et temporisations.
 - Ne pas ajouter de dépendance, de service externe ou de nouvelle couche technique lorsqu’une solution simple existe (en particulier pas de bibliothèque de particules ou d’animation pour la scène d’accueil : SVG et CSS suffisent).
 
 ## Interface
@@ -75,7 +82,7 @@ Les règles détaillées sont dans `DESIGN.md`. En résumé :
 
 - Utiliser les tokens sémantiques de `tokens.css` ; ajouter un token seulement si son rôle et sa réutilisation le justifient, et le définir pour les deux thèmes.
 - Vérifier les thèmes clair et sombre, mobile et ordinateur, clavier et mouvement réduit.
-- Réutiliser `Button`, `ProjectCard`, `ProjectTags`, `ProjectImage`, `WindowFrame`, `CaseStudyLayout` et `CaseStudySection` selon leur usage réel.
+- Réutiliser `Button`, `ProjectCard`, `ProjectTags`, `ProjectImage`, `WindowFrame` et `CaseStudyLayout` selon leur usage réel.
 - Conserver la navigation, le dock, les liens d’évitement et les préférences existantes.
 - Pour une correction locale, limiter les changements aux styles concernés ; éviter les sélecteurs globaux qui touchent d’autres pages.
 
@@ -105,15 +112,15 @@ Contenu public en français, à la première personne pour les études de cas, t
 ## Ajouter ou modifier un projet
 
 1. Examiner un projet comparable et vérifier les informations disponibles.
-2. Ajouter le slug à l’union `ProjectSlug` et l’entrée dans `projects` (`src/lib/data/projects.ts`), en respectant le type `Project`. Le champ `image` est un chemin relatif à `static/`.
-3. Placer les captures optimisées (WebP de préférence) dans `static/`.
-4. Créer `src/routes/projets/<slug>/+page.svelte` : `getProject('<slug>')` puis `CaseStudyLayout` + `CaseStudySection`. Les images de `static/` passent par `asset()`.
+2. Créer `src/content/projects/<slug>.md` en copiant l’en-tête d’un projet existant : le nom du fichier donne l’URL, `order` la place dans le carrousel, `image` un fichier de `public/` (sans `/`). Le schéma de `src/content.config.ts` refuse un en-tête incomplet au build.
+3. Placer les captures optimisées (WebP de préférence) dans `public/`.
+4. Écrire le contenu en Markdown : `## Titre {#id}` pour chaque section (l’identifiant garde l’ancre stable), `###` pour un intertitre, `![Texte alternatif](/image.webp "Légende")` pour une figure. Pas de HTML dans le contenu.
 5. Sélectionner les sections utiles : contexte, problème, rôle, démarche, décisions, solution, résultats, limites, apprentissages. Adapter leur longueur au projet.
 6. Si un visuel manque, le signaler dans le compte rendu plutôt que publier un faux visuel ou un libellé « à insérer ».
 7. Vérifier la carte de l’accueil, l’ordre des projets, le compteur et les contrôles du carrousel, la route, la transition de vue et le lien vers le projet suivant.
 8. Contrôler la cohérence entre la carte, l’étude de cas, la section Profil et les compétences si la modification les concerne.
 
-Ne pas dupliquer les métadonnées centralisées ni réordonner les autres projets sans raison liée à la demande.
+Ne pas dupliquer les métadonnées de l’en-tête Markdown ni réordonner les autres projets sans raison liée à la demande.
 
 ## Méthode de travail
 
@@ -129,8 +136,8 @@ Ne pas dupliquer les métadonnées centralisées ni réordonner les autres proje
 Adapter la vérification au changement :
 
 - Contenu : exactitude, liens, titres, cohérence entre les sections concernées.
-- TypeScript ou Svelte : `npm run check`, `svelte-autofixer` ; traiter les erreurs introduites.
-- Routes, ressources, pré-rendu : `npm run build` et contrôle des chemins dans `build/`.
+- TypeScript, Astro ou Svelte : `npm run check`, `svelte-autofixer` pour les composants Svelte ; traiter les erreurs introduites.
+- Routes, ressources, rendu statique : `npm run build` et contrôle des chemins dans `build/` (tester aussi avec `BASE_PATH=/demo npm run build`).
 - Interface : mobile et ordinateur, thèmes clair et sombre ; tablette si la disposition change à cette largeur ; dock à gauche, à droite et en bas.
 - Interaction : clavier, focus, tactile, mouvement réduit.
 - Ajouter un test seulement s’il couvre un comportement ou une régression utile (le dépôt n’a pas d’infrastructure de test ; en proposer une avant de l’ajouter).

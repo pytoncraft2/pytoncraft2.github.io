@@ -1,4 +1,4 @@
-# Portfolio. Figma → SvelteKit design-system bridge
+# Portfolio. Figma → Astro/Svelte design-system bridge
 
 This starter mirrors the current Figma design system for the portfolio.
 
@@ -10,17 +10,16 @@ This starter mirrors the current Figma design system for the portfolio.
 - `src/lib/components/NavLink.svelte`: header navigation link with active state.
 - `src/lib/components/ProjectCard.svelte`: project card used on the portfolio homepage.
 
-## SvelteKit integration
+## Astro integration
 
-Import the styles once in `src/routes/+layout.svelte`:
+The styles are imported once in the frontmatter of `src/layouts/BaseLayout.astro`:
 
-```svelte
-<script lang="ts">
-  import '#lib/styles/tokens.css';
-  import '#lib/styles/typography.css';
-</script>
-
-<slot />
+```astro
+---
+import '#lib/styles/tokens.css';
+import '#lib/styles/typography.css';
+import '#lib/styles/global.css';
+---
 ```
 
 ## Dark mode
