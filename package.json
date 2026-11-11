@@ -11,8 +11,8 @@
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.12",
-		"@astrojs/svelte": "^9.1.2",
-		"astro": "^7.4.8",
+		"@astrojs/svelte": "^9.1.4",
+		"astro": "^7.4.10",
 		"svelte": "^5.57.3",
 		"svelte-check": "^4.7.7",
 		"typescript": "^6.0.3"
