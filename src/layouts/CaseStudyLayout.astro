@@ -44,7 +44,7 @@ const { id: slug, data } = project;
 				</p>
 			</header>
 
-			<!-- Contenu Markdown (src/content/projects/<slug>.md), structuré par rehype-case-study. -->
+			<!-- Contenu Markdown (src/content/projects/<slug>.md). -->
 			<div class="case-body">
 				<slot />
 			</div>
@@ -85,59 +85,62 @@ const { id: slug, data } = project;
 		margin: 0;
 	}
 
-	/* Anciennement CaseStudySection : le HTML vient du Markdown, d’où :global(). */
-	.case-body :global(.case-section) {
-		padding-block: var(--spacing-10);
-	}
-
-	.case-body :global(.case-section > h2) {
-		margin: 0 0 var(--spacing-5);
-	}
-
-	.case-body :global(.case-content) {
+	/*
+	 * Contenu Markdown (src/content/projects/<slug>.md), rendu tel quel par Astro :
+	 * les styles visent directement ses éléments, d’où :global().
+	 */
+	.case-body {
 		max-width: 40rem;
+		padding-bottom: var(--spacing-10);
 		color: var(--text-primary);
 		font: 400 var(--text-body-m-size) / var(--text-body-m-line) var(--font-sans);
 	}
 
-	.case-body :global(.case-content p) {
-		margin: 0 0 var(--spacing-4);
+	/* Chaque `##` ouvre une section : même rythme que l’ancien CaseStudySection. */
+	.case-body :global(h2) {
+		margin: calc(2 * var(--spacing-10)) 0 var(--spacing-5);
+		color: var(--text-heading);
+		font: 600 var(--text-h2-size) / var(--text-h2-line) var(--font-heading);
 	}
 
-	.case-body :global(.case-content p:last-child) {
-		margin-bottom: 0;
+	.case-body :global(h2:first-child) {
+		margin-top: var(--spacing-10);
 	}
 
 	/* Intertitres `###` (anciens <h4>) : même rendu, hiérarchie de titres corrigée. */
-	.case-body :global(.case-content h3) {
+	.case-body :global(h3) {
 		margin: var(--spacing-6) 0 var(--spacing-2);
 		font: 700 var(--text-body-m-size) / var(--text-body-m-line) var(--font-sans);
 	}
 
-	.case-body :global(.case-content h3:first-child) {
+	.case-body :global(h2 + h3) {
 		margin-top: 0;
 	}
 
-	.case-body :global(.case-content ul) {
+	.case-body :global(p) {
+		margin: 0 0 var(--spacing-4);
+	}
+
+	.case-body :global(ul) {
 		margin: 0 0 var(--spacing-4);
 		padding-left: 1.25rem;
 	}
 
-	.case-body :global(.case-content li + li) {
+	.case-body :global(li + li) {
 		margin-top: var(--spacing-2);
 	}
 
-	/* Anciennement ProjectImage, pour les images du Markdown. */
-	.case-body :global(.case-figure) {
-		width: 100%;
-		max-width: 45rem;
-		margin: 0 0 var(--spacing-4);
+	/*
+	 * Image légendée : `![Texte alternatif](./image.webp)` suivi, à la ligne,
+	 * de `*Légende*`. Markdown les place dans le même paragraphe.
+	 */
+	.case-body :global(p:has(> img)) {
 		display: flex;
 		flex-direction: column;
 		gap: var(--spacing-3);
 	}
 
-	.case-body :global(.case-figure img) {
+	.case-body :global(p > img) {
 		width: 100%;
 		height: auto;
 		aspect-ratio: 35 / 18;
@@ -147,9 +150,10 @@ const { id: slug, data } = project;
 		border: 1px solid var(--border-default);
 	}
 
-	.case-body :global(.case-figure figcaption) {
-		margin: 0;
+	.case-body :global(p:has(> img) > em) {
 		color: var(--text-secondary);
+		font: 400 var(--text-body-s-size) / var(--text-body-s-line) var(--font-sans);
+		font-style: normal;
 	}
 
 	.next {

@@ -12,31 +12,31 @@ image: "vroum.png"
 imageAlt: "Interface de l’outil de covoiturage Vroum"
 ---
 
-## Contexte {#contexte}
+## Contexte
 
 Vroum est un outil collaboratif de covoiturage développé au sein de l'association LaToileScoute. Il aide les organisateurs scouts à répartir participants, véhicules et matériel pour les trajets aller et retour d'un événement.
 
 Le produit est utilisé en conditions réelles et évolue depuis 2023 en fonction des usages et des besoins rencontrés sur différents événements.
 
-## Problème {#probleme}
+## Problème
 
 La complexité d'un covoiturage varie fortement selon la taille et l'organisation d'un événement. Lors du rassemblement Clameurs, le grand nombre de véhicules a montré les limites d'une simple liste : l'information devenait difficile à parcourir et à organiser.
 
 D'autres événements ont ensuite fait apparaître des besoins plus complexes, avec des véhicules venant de différentes villes et circulant sur plusieurs jours. Il fallait prendre en charge ces usages sans complexifier inutilement les covoiturages plus simples.
 
-## Mon rôle {#role}
+## Mon rôle
 
 Je suis le principal contributeur technique de Vroum. Je conçois et développe la majorité des évolutions du produit, du front-end SvelteKit au backend FastAPI, tout en participant aux choix produit et UX avec l'équipe de LaToileScoute.
 
 Je peux proposer une évolution, en concevoir et tester une première solution, puis la présenter à l'équipe. Les choix importants sont discutés collectivement avant validation et déploiement en production.
 
-## Démarche {#demarche}
+## Démarche
 
 Vroum évolue de manière itérative à partir de sondages, de retours directs des utilisateurs, de bugs constatés et de propositions de l'équipe.
 
 Les besoins sont discutés collectivement et les solutions peuvent être pré-testées avant d'être retenues. L'objectif n'est pas d'ajouter systématiquement chaque fonctionnalité demandée, mais de trouver une réponse adaptée au besoin, à l'usage et à la maintenabilité du projet.
 
-## Décisions & arbitrages {#decisions}
+## Décisions & arbitrages
 
 ### Faire évoluer Vroum vers le multi-trajets
 
@@ -60,19 +60,19 @@ J'ai proposé de remplacer le backend Flask par FastAPI afin d'améliorer les pe
 
 FastAPI permettait notamment d'utiliser les WebSockets nativement et de supprimer Socket.IO côté client et serveur. La migration a également permis de réduire les dépendances backend de 26 à 8, un point important pour la pérennité d'un projet associatif maintenu sur la durée.
 
-## Solution {#solution}
+## Solution
 
 Vroum repose aujourd'hui sur SvelteKit, FastAPI et PostgreSQL. L'application permet d'organiser participants, véhicules et matériel pour des covoiturages simples comme pour des événements impliquant plusieurs villes ou dates.
 
 Au fil des évolutions, l'interface a également été adaptée aux usages mobiles et à l'accessibilité, avec notamment une navigation au clavier et au lecteur d'écran, une meilleure gestion du focus et des interactions adaptées aux petits écrans.
 
-## Résultats {#resultats}
+## Résultats
 
 Vroum est utilisé en production pour organiser des covoiturages scouts et a dépassé 90 000 visites en 2025.
 
 Les retours d'utilisation ont directement alimenté plusieurs évolutions du produit, notamment le multi-trajets et les notifications par e-mail. Le produit continue d'évoluer à partir de situations rencontrées sur des événements réels.
 
-## Apprentissages {#apprentissages}
+## Apprentissages
 
 Vroum m'a appris à faire évoluer un produit dans la durée plutôt qu'à chercher une solution définitive dès la première version. Les usages réels font régulièrement apparaître des besoins difficiles à anticiper.
 

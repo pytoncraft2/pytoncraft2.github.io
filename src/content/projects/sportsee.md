@@ -12,21 +12,21 @@ image: "sportsee.png"
 imageAlt: "Projet de conception d’interface SportSee"
 ---
 
-## Contexte {#contexte}
+## Contexte
 
 Dans le cadre de ma formation Product Designer chez OpenClassrooms, j’ai conçu l’interface de SportSee, une application de suivi d’activité sportive. La mission consistait à passer d’une structure fonctionnelle à des maquettes haute fidélité, puis à documenter un Design System réutilisable.
 
 Le périmètre couvre trois écrans : connexion, dashboard et profil, déclinés sur ordinateur, tablette et mobile. Il s’agit d’un projet de conception, sans application développée ou mise en production à ce stade.
 
-## Problème {#probleme}
+## Problème
 
 Comment rendre les performances sportives faciles à comprendre, tout en conservant une interface motivante et cohérente sur plusieurs formats ? L’enjeu était de hiérarchiser les données essentielles et de permettre une lecture plus détaillée sans surcharger le dashboard.
 
-## Mon rôle {#role}
+## Mon rôle
 
 J’ai analysé le brief, les parcours utilisateurs et les wireframes annotés, réalisé le mini-benchmark et le moodboard, défini les fondations visuelles, construit les composants Figma et adapté les maquettes aux trois formats. J’ai également effectué les contrôles de conception et documenté le système dans Zeroheight.
 
-## Démarche {#demarche}
+## Démarche
 
 ### Comparer pour choisir
 
@@ -40,7 +40,7 @@ Le moodboard associe une identité sportive à des surfaces claires et aérées.
 
 J’ai traduit cette direction en couleurs, typographies, espacements et composants réutilisables. Les wireframes ont servi de base à la structure ; Figma Make m’a aidé à explorer une direction visuelle, ensuite adaptée manuellement au Design System et aux contraintes responsive. Les maquettes finales constituent le livrable de référence.
 
-## Décisions & arbitrages {#decisions}
+## Décisions & arbitrages
 
 ### Hiérarchiser avant de détailler
 
@@ -54,7 +54,7 @@ Les grilles passent de 12 colonnes sur ordinateur à 8 sur tablette et 4 sur mob
 
 Les variables Figma portent les valeurs partagées. Modifier la couleur principale commence par la variable concernée : les composants et les instances liés héritent de sa nouvelle valeur. Les boutons, champs, éléments de navigation et cartes peuvent ensuite être réutilisés pour composer de nouveaux écrans.
 
-## Accessibilité et contrôle qualité {#accessibilite}
+## Accessibilité et contrôle qualité
 
 J’ai contrôlé les principales associations de couleurs pour préserver la lisibilité. Les composants prévoient des focus visibles, des labels de formulaire et des erreurs qui ne reposent pas uniquement sur la couleur. Sur tablette et mobile, les principales cibles tactiles mesurent au moins 44 pixels.
 
@@ -62,7 +62,7 @@ Les graphiques associent couleurs, titres, unités et informations textuelles. J
 
 Ces contrôles portent sur la conception. La navigation au clavier, les technologies d’assistance et le comportement réel devront être vérifiés lors du développement ; ils ne constituent pas une validation de l’accessibilité d’une application en production.
 
-## Résultats et livrables {#resultats}
+## Résultats et livrables
 
 Le projet aboutit à un mini-benchmark, un moodboard, des fondations visuelles, des composants Figma et neuf maquettes haute fidélité. Un prototype relie les écrans et permet d’explorer la navigation.
 
@@ -70,13 +70,13 @@ La documentation Zeroheight rassemble le démarrage, les fondations (couleurs, t
 
 Aucun gain d’usage n’a été mesuré auprès d’utilisateurs à ce stade. Une prochaine étape serait de tester les parcours et la compréhension des données avant l’implémentation.
 
-## Apprentissages {#apprentissages}
+## Apprentissages
 
 Ce projet m’a permis de relier une direction graphique à des règles concrètes et réutilisables. En tant que développeur web, cette démarche renforce mon autonomie pour concevoir mes propres interfaces et préparer leur implémentation avec des composants et des valeurs partagés.
 
 J’ai aussi appris à distinguer une exploration visuelle d’un livrable final : une proposition issue de Figma Make doit être adaptée, structurée et contrôlée pour s’intégrer au produit.
 
-## Explorer le projet {#ressources}
+## Explorer le projet
 
 - [Consulter les maquettes et le prototype dans Figma](https://www.figma.com/design/7oIV2vJHunlZkKaxUFk9iv/Sportsee-wireframes-annot%C3%A9s--Copy-?node-id=0-1)
 - [Explorer le Design System dans Zeroheight](https://zeroheight.com/09f44adcf)

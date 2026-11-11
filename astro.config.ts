@@ -1,7 +1,5 @@
-import { unified } from '@astrojs/markdown-remark';
 import svelte from '@astrojs/svelte';
 import { defineConfig } from 'astro/config';
-import { rehypeCaseStudy } from './src/lib/markdown/rehype-case-study.ts';
 
 declare const process: {
 	env: Record<string, string | undefined>;
@@ -31,12 +29,6 @@ export default defineConfig({
 	prefetch: {
 		prefetchAll: true,
 		defaultStrategy: 'hover'
-	},
-	markdown: {
-		// Pipeline remark/rehype (unified) : le plugin rehype-case-study est un plugin rehype standard.
-		processor: unified({
-			rehypePlugins: [[rehypeCaseStudy, { base }]]
-		})
 	},
 	devToolbar: {
 		enabled: false

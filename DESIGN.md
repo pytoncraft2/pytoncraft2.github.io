@@ -126,7 +126,7 @@ Les éléments listés sont une direction, pas un inventaire obligatoire. Mieux 
 
 ## Études de cas et visuels
 
-Utiliser `CaseStudyLayout`, `ProjectTags` et `ProjectImage` pour conserver une présentation commune. Le contenu est écrit en Markdown (`src/content/projects/`) : sections, intertitres et figures légendées suivent tous la même mise en forme, sans HTML ni style propre à une page.
+Utiliser `CaseStudyLayout`, `ProjectTags` et `ProjectImage` pour conserver une présentation commune. Le contenu est écrit en Markdown (`src/content/projects/`) : sections, intertitres et images légendées suivent tous la même mise en forme, sans HTML ni style propre à une page.
 
 - Introduire le projet par son objectif, son contexte et ma contribution.
 - Développer les décisions importantes avec leur justification et une preuve lorsque disponible.

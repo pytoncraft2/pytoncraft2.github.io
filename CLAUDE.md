@@ -32,17 +32,14 @@ npm run check     # astro check (fichiers .astro et TS) + svelte-check (composan
 
 Il n’y a ni tests, ni linter, ni formatter configurés : `npm run check` puis `npm run build` sont les seules vérifications automatiques. Le rendu visuel se contrôle dans le navigateur (`npm run dev` ou `npm run preview`).
 
-Astro met en cache le rendu du Markdown : après une modification de `src/lib/markdown/rehype-case-study.ts`, supprimer `node_modules/.astro` et `.astro/data-store.json` avant de reconstruire, sinon l’ancien HTML est réutilisé.
-
 ## Architecture
 
 Astro (site statique multipage), îles Svelte 5 (runes), TypeScript, CSS avec propriétés personnalisées. Le contenu des études de cas est en Markdown, séparé du code. Aucune bibliothèque UI ou d’animation.
 
 | Emplacement | Responsabilité |
 | --- | --- |
-| `src/content/projects/<slug>.md` | Une étude de cas : métadonnées en en-tête (titre, tags, ordre, image…) et texte en Markdown |
+| `src/content/projects/<slug>.md` | Une étude de cas : métadonnées en en-tête (titre, tags, ordre, image…) et texte en Markdown ; ses captures dans `src/content/projects/<slug>/` |
 | `src/content.config.ts` | Schéma de la collection `projects` (validé au build) |
-| `src/lib/markdown/rehype-case-study.ts` | Transforme le HTML du Markdown : sections `## Titre {#id}`, figures légendées, liens externes, chemin de base |
 | `src/lib/projects.ts` | Lecture de la collection : `getFeaturedProjects` (triés par `order`), `getNextProject` |
 | `src/layouts/BaseLayout.astro` | Document HTML commun : script thème/dock avant rendu, script de transition de retour, en-tête, dock, pied de page |
 | `src/layouts/CaseStudyLayout.astro` | Mise en page d’une étude de cas et styles du contenu Markdown |
@@ -54,18 +51,18 @@ Astro (site statique multipage), îles Svelte 5 (runes), TypeScript, CSS avec pr
 | `src/lib/data/skills.ts`, `tech-icons.ts` | Compétences (`TechId`) et logos de `src/lib/assets/tech/` |
 | `src/lib/styles/` | `tokens.css` (couleurs, thèmes, espacements, rayons, tailles), `typography.css` (classes `ds-*`), `global.css` |
 | `src/lib/snap-blocks.ts` | Défilement par blocs `.snap-block` de l’accueil, appelé par un `<script>` de `index.astro` |
-| `public/` | Fichiers servis tels quels (captures, CV, `.nojekyll`) |
+| `public/` | Fichiers servis tels quels : images de couverture des projets, CV, `.nojekyll` |
 
 Il n’existe pas de page « À propos » séparée : le parcours est la section Profil de l’accueil.
 
 Points qui demandent de lire plusieurs fichiers :
 
 - **Îles** : seuls `Header`, `Dock` (`client:load`), `ProjectCarousel` (`client:load`) et `HeroScene` (`client:idle`) envoient du JavaScript. Les autres composants Svelte (`Button`, `TechIcon`, `WindowFrame`, `ProjectTags`, `ProjectImage`, `Footer`) sont rendus en HTML au build. Une île ne reçoit que des props sérialisables (pas d’objet de collection, pas de fonction) ; c’est la raison du type `CarouselProject`.
-- **Chemins** : le chemin de base vient de `BASE_PATH` (workflow `.github/workflows/deploy.yml`, vide pour `<user>.github.io`). Liens internes et fichiers de `public/` passent par `withBase()` / `projectPath()` (`src/lib/paths.ts`) ; dans le Markdown, écrire des chemins absolus (`/image.webp`), le plugin ajoute la base. Ne jamais écrire de chemin préfixé en dur.
+- **Chemins** : le chemin de base vient de `BASE_PATH` (workflow `.github/workflows/deploy.yml`, vide pour `<user>.github.io`). Liens internes et fichiers de `public/` passent par `withBase()` / `projectPath()` (`src/lib/paths.ts`) ; dans le Markdown, les images sont référencées en relatif (`./<slug>/image.webp`) : Astro les optimise et ajoute la base lui-même. Ne jamais écrire de chemin préfixé en dur.
 - **Alias `#lib`** : les imports utilisent `#lib/...` (champ `imports` de `package.json`), et les modules TS sont importés avec l’extension `.js` (ex. `#lib/projects.js`).
 - **Thème et dock** : le script inline de `BaseLayout.astro` lit `localStorage` (`theme`, `dock-placement`) et pose `data-theme` / `data-dock` sur `<html>` avant le rendu ; `Header.svelte` et `Dock.svelte` écrivent les mêmes clés et attributs. Garder les trois synchronisés. Le dock reçoit le chemin courant en prop (`pathname`) pour son état actif.
 - **Transitions de vue** : natives entre documents (`@view-transition` dans `global.css`, Chrome et Safari récents ; navigation simple ailleurs). `ProjectCard` pose `data-transition` sur la carte cliquée ; la page projet porte les mêmes `view-transition-name`. Au retour, le script `pagereveal` de `BaseLayout.astro` reconnaît le projet quitté, nomme sa carte et place le carrousel sur sa page avant le premier rendu (l’accueil bloque ce rendu avec `<link rel="expect" href="#projets-carousel">`). La position du carrousel est aussi mémorisée en `sessionStorage` pour les retours arrière.
-- **Markdown** : moteur `unified()` de `@astrojs/markdown-remark` (le moteur par défaut d’Astro 7, Sätteri, n’accepte pas les plugins rehype). Astro ajoute ses propres attributs aux images ; les apostrophes et guillemets droits sont convertis en typographiques (« smartypants »).
+- **Markdown** : moteur par défaut d’Astro, sans plugin. Le HTML produit est brut (titres avec identifiants automatiques, paragraphes, listes, images) ; toute la mise en forme est dans les styles `:global()` de `CaseStudyLayout.astro`. Une image légendée s’écrit `![Texte alternatif](./slug/image.webp)` puis `*Légende*` à la ligne suivante (même paragraphe) : le CSS cible `p:has(> img)`. Les liens externes s’ouvrent dans le même onglet. Les apostrophes et guillemets droits sont convertis en typographiques.
 
 ## Conventions de code
 
@@ -112,9 +109,9 @@ Contenu public en français, à la première personne pour les études de cas, t
 ## Ajouter ou modifier un projet
 
 1. Examiner un projet comparable et vérifier les informations disponibles.
-2. Créer `src/content/projects/<slug>.md` en copiant l’en-tête d’un projet existant : le nom du fichier donne l’URL, `order` la place dans le carrousel, `image` un fichier de `public/` (sans `/`). Le schéma de `src/content.config.ts` refuse un en-tête incomplet au build.
-3. Placer les captures optimisées (WebP de préférence) dans `public/`.
-4. Écrire le contenu en Markdown : `## Titre {#id}` pour chaque section (l’identifiant garde l’ancre stable), `###` pour un intertitre, `![Texte alternatif](/image.webp "Légende")` pour une figure. Pas de HTML dans le contenu.
+2. Créer `src/content/projects/<slug>.md` en copiant l’en-tête d’un projet existant : le nom du fichier donne l’URL, `order` la place dans le carrousel, `image` (couverture) un fichier de `public/` (sans `/`). Le schéma de `src/content.config.ts` refuse un en-tête incomplet au build.
+3. Placer la couverture dans `public/` et les captures de l’étude dans `src/content/projects/<slug>/` (Astro les optimise au build).
+4. Écrire le contenu en Markdown : `##` pour chaque section, `###` pour un intertitre, `![Texte alternatif](./<slug>/image.webp)` suivi de `*Légende*` à la ligne pour une image légendée. Pas de HTML dans le contenu.
 5. Sélectionner les sections utiles : contexte, problème, rôle, démarche, décisions, solution, résultats, limites, apprentissages. Adapter leur longueur au projet.
 6. Si un visuel manque, le signaler dans le compte rendu plutôt que publier un faux visuel ou un libellé « à insérer ».
 7. Vérifier la carte de l’accueil, l’ordre des projets, le compteur et les contrôles du carrousel, la route, la transition de vue et le lien vers le projet suivant.

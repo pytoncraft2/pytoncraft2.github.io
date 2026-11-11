@@ -12,23 +12,23 @@ image: "fox.png"
 imageAlt: "Étude de l’expérience client Fox Coffee"
 ---
 
-## Contexte {#contexte}
+## Contexte
 
 Dans le cadre d’un projet de formation en Product Design chez OpenClassrooms, j’ai étudié l’expérience des clients de Fox Coffee, un café situé à Metz. Avec l’accord de l’établissement, j’ai mené une recherche sur place pour identifier des points forts, des difficultés et des possibilités d’amélioration.
 
 La mission portait sur un service physique, et non sur la refonte d’une application. Les recommandations constituent des pistes à évaluer, pas des changements déjà déployés.
 
-## Problème {#probleme}
+## Problème
 
 L’accueil et l’ambiance du café sont appréciés, mais certaines étapes peuvent demander des repères supplémentaires : comprendre les offres, circuler autour du comptoir ou choisir les éléments du petit-déjeuner lorsque l’espace est occupé.
 
 La question retenue pour guider l’idéation était : « Comment pourrait-on rendre l’expérience chez Fox Coffee plus simple et agréable pour les personnes qui viennent pour la première fois ? »
 
-## Mon rôle {#role}
+## Mon rôle
 
 J’ai préparé le protocole de recherche et le guide d’entretien, réalisé les observations et les entretiens, synthétisé les enseignements, construit deux personas et leurs parcours actuels, puis préparé et animé un atelier d’idéation à distance.
 
-## Démarche {#demarche}
+## Démarche
 
 ### Observer et écouter
 
@@ -42,7 +42,7 @@ J’ai rapproché les comportements observés et les témoignages pour dégager 
 
 J’ai animé un atelier de 40 minutes sur Miro avec trois participants, dont une personne précédemment interviewée. Après une phase individuelle, les idées ont été discutées, regroupées et priorisées collectivement.
 
-## Décisions & arbitrages {#decisions}
+## Décisions & arbitrages
 
 ### Concentrer la recherche sur les nouveaux visiteurs
 
@@ -56,7 +56,7 @@ Des propositions d’ajout de tables ou de nouvelles salles ont été discutées
 
 La priorisation a été en partie réalisée manuellement. J’ai conservé l’ordre des trois idées retenues, sans présenter les nombres de votes comme des mesures précises.
 
-## Recommandations {#solution}
+## Recommandations
 
 ### 1. Clarifier la circulation
 
@@ -70,13 +70,13 @@ Tester des cordons modulables associés à des flèches au sol pour rendre le ch
 
 Explorer un buffet plus confortable, permettant de choisir les produits et de poser son plateau sans perturber la circulation.
 
-## Résultats et limites {#resultats}
+## Résultats et limites
 
 Le projet a abouti à une synthèse de recherche, deux personas, deux parcours utilisateurs « as-is », un atelier d’idéation et un plan de conception UX/UI sur 12 mois. Ce dernier prévoit l’étude de faisabilité, le prototypage, les tests utilisateurs et une éventuelle mise en œuvre. L’enveloppe de 100 000 € est une hypothèse pédagogique, pas un budget réel de Fox Coffee.
 
 Il s’agit d’une recherche qualitative menée sur une seule matinée, avec cinq entretiens. L’atelier a réuni trois participants au lieu des quatre prévus. Les recommandations n’ont pas encore été testées ou installées : les objectifs et indicateurs proposés restent hypothétiques, sans gain mesuré à ce stade.
 
-## Apprentissages {#apprentissages}
+## Apprentissages
 
 Ce projet m’a permis de mener une démarche UX complète sur un service du quotidien, en reliant observation, entretiens, analyse et idéation. Il m’a aussi appris à distinguer une difficulté observée, une hypothèse de solution et une amélioration effectivement démontrée.
 
