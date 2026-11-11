@@ -7,7 +7,6 @@ This starter mirrors the current Figma design system for the portfolio.
 - `src/lib/styles/tokens.css`: primitives, semantic Light/Dark tokens, spacing, radius and typography sizes.
 - `src/lib/styles/typography.css`: utility classes mirroring Figma typography styles.
 - `src/lib/components/Button.svelte`: Primary / Secondary button with hover and keyboard focus states.
-- `src/lib/components/NavLink.svelte`: header navigation link with active state.
 - `src/lib/components/ProjectCard.svelte`: project card used on the portfolio homepage.
 
 ## Astro integration
