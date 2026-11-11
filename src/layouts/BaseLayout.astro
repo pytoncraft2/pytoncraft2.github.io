@@ -48,6 +48,13 @@ const { title, description } = Astro.props;
 						document.documentElement.setAttribute('data-dock', 'left');
 					}
 				} catch (e) {}
+
+				// Défilement fluide activé après le chargement (voir global.css).
+				window.addEventListener('load', function () {
+					requestAnimationFrame(function () {
+						document.documentElement.setAttribute('data-smooth-scroll', '');
+					});
+				});
 			})();
 		</script>
 		<!--

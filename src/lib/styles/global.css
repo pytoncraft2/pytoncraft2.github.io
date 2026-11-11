@@ -15,11 +15,19 @@
 }
 
 html {
-	scroll-behavior: smooth;
 	scroll-padding-top: 1.5rem;
 	scroll-padding-bottom: 6.5rem;
 	scrollbar-width: thin;
 	scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/*
+ * Défilement fluide seulement une fois la page chargée (attribut posé par BaseLayout.astro) :
+ * en multipage, une arrivée sur /#projets doit se placer directement sur l’ancre,
+ * sans défiler depuis le haut de la page.
+ */
+html[data-smooth-scroll] {
+	scroll-behavior: smooth;
 }
 
 @media (min-width: 40rem) {
