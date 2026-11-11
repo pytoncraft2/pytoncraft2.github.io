@@ -1,16 +1,11 @@
 export type TechId =
 	| 'sveltekit'
 	| 'react'
-	| 'twig'
 	| 'fastapi'
-	| 'flask'
 	| 'symfony'
-	| 'nodejs'
 	| 'postgresql'
-	| 'mysql'
 	| 'playwright'
 	| 'git'
-	| 'gitlab'
 	| 'docker'
 	| 'figma';
 
