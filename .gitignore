@@ -1,12 +1,10 @@
 node_modules
 
 # Output
-.output
-.vercel
-.netlify
-.wrangler
-/.svelte-kit
 /build
+
+# Astro
+.astro/
 
 # OS
 .DS_Store
@@ -18,9 +16,5 @@ Thumbs.db
 !.env.example
 !.env.test
 
-# Vite
-vite.config.js.timestamp-*
-vite.config.ts.timestamp-*
-
-# Astro
-.astro/
+# Fichiers temporaires créés au chargement d’une config par Vite/Astro
+*.config.*.timestamp-*
