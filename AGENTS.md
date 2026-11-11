@@ -1,8 +1,11 @@
 ## Project Configuration
 
+- **Framework**: Astro (static site), with Svelte 5 components as islands
 - **Language**: TypeScript
 - **Package Manager**: npm
-- **Add-ons**: sveltekit-adapter, ai-tools
+- **Add-ons**: ai-tools
+
+The Svelte MCP tools below apply to the `.svelte` components in `src/lib/components/`. Pages and layouts are `.astro` files; see `CLAUDE.md` for the architecture.
 
 ---
 

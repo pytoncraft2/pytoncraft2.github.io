@@ -32,6 +32,12 @@ npm run check     # astro check (fichiers .astro et TS) + svelte-check (composan
 
 Il n’y a ni tests, ni linter, ni formatter configurés : `npm run check` puis `npm run build` sont les seules vérifications automatiques. Le rendu visuel se contrôle dans le navigateur (`npm run dev` ou `npm run preview`).
 
+Dépendances :
+
+- TypeScript reste en 6.x tant que `@astrojs/svelte`, `@astrojs/check` et `svelte-check` n’acceptent pas la version 7 : vérifier leurs `peerDependencies` avant de monter de version majeure.
+- Ne pas lancer `npm audit fix --force` : pour l’alerte `deepmerge` (gravité faible, utilisé seulement pendant le build par le plugin Svelte de Vite), il rétrograderait `@astrojs/svelte` en 0.1.2.
+- Astro exige Node ≥ 22.23.4 ; le déploiement utilise la dernière LTS (`node-version: lts/*` dans `.github/workflows/deploy.yml`).
+
 ## Architecture
 
 Astro (site statique multipage), îles Svelte 5 (runes), TypeScript, CSS avec propriétés personnalisées. Le contenu des études de cas est en Markdown, séparé du code. Aucune bibliothèque UI ou d’animation.
