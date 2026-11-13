@@ -247,12 +247,8 @@
 	}
 
 	@media (min-width: 40rem) {
-		:global(html[data-dock='left']) .scene {
+		.scene {
 			margin-left: calc(var(--dock-gutter) / -2);
-		}
-
-		:global(html[data-dock='right']) .scene {
-			margin-left: calc(var(--dock-gutter) / 2);
 		}
 	}
 

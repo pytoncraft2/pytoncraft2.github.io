@@ -48,17 +48,9 @@ html[data-smooth-scroll] {
 		background: var(--scrollbar-thumb-hover);
 	}
 
-	html[data-dock='left'],
-	html[data-dock='right'] {
+	html {
 		scroll-padding-bottom: 1.5rem;
-	}
-
-	html[data-dock='left'] {
 		scroll-padding-left: var(--dock-gutter);
-	}
-
-	html[data-dock='right'] {
-		scroll-padding-right: var(--dock-gutter);
 	}
 }
 

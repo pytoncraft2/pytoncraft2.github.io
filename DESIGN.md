@@ -104,7 +104,7 @@ Les éléments listés sont une direction, pas un inventaire obligatoire. Mieux 
 - La scène occupe une bande du hero (en fond derrière le texte ou en bandeau sous celui-ci), jamais derrière un paragraphe sans garantie de contraste. Si le texte la recouvre, le fond situé directement sous le texte doit rester assez uni pour respecter les contrastes du site.
 - Les éléments animés (cycliste, étoile filante, astre) circulent hors de la zone du titre, des boutons et des points clés.
 - Sur mobile, la scène se simplifie : moins de plans, moins d’étoiles, hauteur réduite, aucun débordement horizontal. Elle ne doit pas repousser les actions principales hors du premier écran.
-- La place du dock (gauche, droite ou bas) reste libre.
+- Le dock occupe le bord gauche sur ordinateur et le bas de l’écran sur mobile.
 
 ### Mouvement
 
@@ -117,7 +117,7 @@ Les éléments listés sont une direction, pas un inventaire obligatoire. Mieux 
 
 ### Implémentation et accessibilité
 
-- Implémentée dans `src/lib/components/HeroScene.svelte` (SVG inline, sans requête réseau ni image), placée dans le `.hero` de l’accueil comme île Astro hydratée en différé (`client:idle`) : sans JavaScript, le décor et ses animations CSS s’affichent, seule la suspension hors écran reste inactive. Le hero fournit la hauteur de la bande de paysage (`--hero-scene-band`) et la réserve en `padding-bottom` pour que les collines restent sous le texte. La scène déborde en pleine largeur (`100vw`, recentrée selon la position du dock) ; `.app` coupe le débordement horizontal (`overflow-x: clip`).
+- Implémentée dans `src/lib/components/HeroScene.svelte` (SVG inline, sans requête réseau ni image), placée dans le `.hero` de l’accueil comme île Astro hydratée en différé (`client:idle`) : sans JavaScript, le décor et ses animations CSS s’affichent, seule la suspension hors écran reste inactive. Le hero fournit la hauteur de la bande de paysage (`--hero-scene-band`) et la réserve en `padding-bottom` pour que les collines restent sous le texte. La scène déborde en pleine largeur (`100vw`, recentrée pour compenser la place du dock à gauche) ; `.app` coupe le débordement horizontal (`overflow-x: clip`).
 - Le premier plan du paysage a la couleur du fond de page : le relief semble sortir de la page, sans bord visible avec la section suivante. Le haut du ciel suit le même principe.
 - Le cycliste entre par la gauche et s’arrête au quart du paysage ; les oiseaux arrivent par la droite et restent en vol plané. Hors écran, les animations sont seulement suspendues. L’animation d’entrée n’est jamais gelée.
 - Scène décorative : `aria-hidden="true"`, aucun élément focusable, `pointer-events: none`. Une interaction ludique éventuelle (par exemple un clic sur l’astre pour changer de thème) doit doubler une commande existante et rester accessible au clavier, jamais en être la seule voie.
@@ -139,11 +139,11 @@ Utiliser `CaseStudyLayout`, `ProjectTags` et `ProjectImage` pour conserver une p
 
 ## Navigation et interactions
 
-La navigation doit rester compréhensible sans découvrir les fonctions avancées du dock. Conserver les accès au contenu, au menu, aux projets et au contact.
+La navigation doit rester évidente : le dock a une place fixe et ne se déplace pas. Conserver les accès au contenu, au menu, aux projets et au contact.
 
 - Le dock ne doit pas recouvrir un texte, une action ou un élément ayant le focus. Préserver l’espace nécessaire selon sa position.
-- Sur ordinateur, en haut de l’accueil, le dock est horizontal et centré sur la ligne d’horizon du paysage, quelle que soit sa place choisie (`dock-horizon.ts`, `data-horizon-y` sur le SVG du paysage). Au défilement, il rejoint cette place : en glissant s’il est en bas, en s’effaçant puis en réapparaissant sur le bord s’il est à gauche ou à droite. Il revient sur l’horizon en haut de page.
-- Son déplacement reste une possibilité complémentaire. Les fonctions essentielles doivent être accessibles sans glisser-déposer.
+- Sur ordinateur, le dock est vertical sur le bord gauche. En haut de l’accueil, il est horizontal et centré sur la ligne d’horizon du paysage (`dock-horizon.ts`, `data-horizon-y` sur le SVG du paysage). Au défilement, il s’efface puis réapparaît sur le bord gauche ; il revient sur l’horizon en haut de page.
+- Aucune fonction ne dépend du glisser-déposer.
 - Un carrousel affiche sa position et propose des contrôles utilisables au clavier et au toucher. Éviter le défilement automatique.
 - Le défilement par sections doit laisser consulter librement les contenus longs et les zones disposant de leur propre défilement.
 - Sur l’accueil, le passage d’une section à l’autre glisse en 0,6 à 0,95 s (`snap-blocks.ts`), avec un départ et une arrivée progressifs.
@@ -158,7 +158,7 @@ Adapter la structure à l’espace disponible plutôt que réduire uniformément
 | Format | Priorités |
 | --- | --- |
 | Mobile | Lecture dans une colonne principale, actions accessibles au toucher, titres adaptés, accès simple à la navigation. |
-| Tablette | Utiliser plusieurs colonnes seulement si chaque contenu conserve une largeur confortable ; vérifier les positions intermédiaires du dock. |
+| Tablette | Utiliser plusieurs colonnes seulement si chaque contenu conserve une largeur confortable ; vérifier la place du dock à la largeur de bascule (`40rem`). |
 | Ordinateur | Exploiter l’espace pour organiser les ensembles, en limitant la largeur des textes et en réservant la place du dock. |
 
 Le contenu doit rester accessible au zoom et sur une largeur étroite, sans défilement horizontal général. Un carrousel peut disposer de son propre défilement horizontal clairement identifiable. L’ordre de lecture et les actions principales restent cohérents entre les formats.

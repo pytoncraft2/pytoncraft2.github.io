@@ -6,141 +6,11 @@
 	let { pathname }: { pathname: string } = $props();
 
 	const homeHref = withBase('/');
-	const storageKey = 'dock-placement';
-	const dragThreshold = 8;
 
-	type DockPlacement = 'bottom' | 'left' | 'right';
-
-	let placement = $state<DockPlacement>('left');
-	let dragging = $state(false);
-	let dragX = $state(0);
-	let dragY = $state(0);
-	let grabX = $state(0);
-	let grabY = $state(0);
-
-	let pending = false;
-	let startX = 0;
-	let startY = 0;
-	let ignoreClick = false;
 	let visible = $state(true);
 	// Empêche le show/hide pendant le premier scroll déclenché par un hash (comme svelte.dev)
 	let hashChanged = false;
 	let lastScroll = 0;
-
-	function isDockPlacement(value: string | null | undefined): value is DockPlacement {
-		return value === 'bottom' || value === 'left' || value === 'right';
-	}
-
-	function isDesktop() {
-		return window.matchMedia('(min-width: 40rem)').matches;
-	}
-
-	function persistPlacement(next: DockPlacement) {
-		placement = next;
-		document.documentElement.dataset.dock = next;
-		localStorage.setItem(storageKey, next);
-	}
-
-	function nearestPlacement(x: number, y: number): DockPlacement {
-		const vw = window.innerWidth;
-		const vh = window.innerHeight;
-		const points: Record<DockPlacement, { x: number; y: number }> = {
-			bottom: { x: vw / 2, y: vh },
-			left: { x: 0, y: vh / 2 },
-			right: { x: vw, y: vh / 2 }
-		};
-
-		let next: DockPlacement = 'bottom';
-		let min = Number.POSITIVE_INFINITY;
-
-		for (const key of ['bottom', 'left', 'right'] as const) {
-			const point = points[key];
-			const dist = (x - point.x) ** 2 + (y - point.y) ** 2;
-			if (dist < min) {
-				min = dist;
-				next = key;
-			}
-		}
-
-		return next;
-	}
-
-	function clearDragStyles() {
-		document.body.style.userSelect = '';
-		document.body.style.cursor = '';
-	}
-
-	function beginDrag(event: PointerEvent, dock: HTMLElement) {
-		if (event.button !== 0 || !isDesktop()) {
-			return;
-		}
-
-		const rect = dock.getBoundingClientRect();
-		pending = true;
-		startX = event.clientX;
-		startY = event.clientY;
-		grabX = event.clientX - rect.left;
-		grabY = event.clientY - rect.top;
-	}
-
-	function onPointerMove(event: PointerEvent) {
-		if (!pending && !dragging) {
-			return;
-		}
-
-		const x = event.clientX;
-		const y = event.clientY;
-
-		if (!dragging) {
-			if (Math.hypot(x - startX, y - startY) < dragThreshold) {
-				return;
-			}
-
-			dragging = true;
-			ignoreClick = true;
-			document.body.style.userSelect = 'none';
-			document.body.style.cursor = 'grabbing';
-		}
-
-		dragX = x;
-		dragY = y;
-	}
-
-	function onPointerUp(event: PointerEvent) {
-		pending = false;
-
-		if (!dragging) {
-			return;
-		}
-
-		dragging = false;
-		clearDragStyles();
-		persistPlacement(nearestPlacement(event.clientX, event.clientY));
-		window.setTimeout(() => {
-			ignoreClick = false;
-		}, 0);
-	}
-
-	function onKeydown(event: KeyboardEvent) {
-		if (event.key !== 'Escape' || (!dragging && !pending)) {
-			return;
-		}
-
-		pending = false;
-		dragging = false;
-		ignoreClick = false;
-		clearDragStyles();
-	}
-
-	function onWindowClick(event: MouseEvent) {
-		if (!ignoreClick) {
-			return;
-		}
-
-		event.preventDefault();
-		event.stopPropagation();
-		ignoreClick = false;
-	}
 
 	function onHashChange() {
 		hashChanged = true;
@@ -157,29 +27,7 @@
 		hashChanged = false;
 	}
 
-	function dockDrag(node: HTMLElement) {
-		function onPointerDown(event: PointerEvent) {
-			beginDrag(event, node);
-		}
-
-		node.addEventListener('pointerdown', onPointerDown);
-		window.addEventListener('click', onWindowClick, true);
-
-		return () => {
-			node.removeEventListener('pointerdown', onPointerDown);
-			window.removeEventListener('click', onWindowClick, true);
-		};
-	}
-
 	onMount(() => {
-		const stored = document.documentElement.dataset.dock || localStorage.getItem(storageKey);
-		if (isDockPlacement(stored)) {
-			persistPlacement(stored);
-		} else {
-			placement = 'left';
-			document.documentElement.dataset.dock = 'left';
-		}
-
 		lastScroll = window.scrollY;
 		hash = window.location.hash;
 
@@ -192,9 +40,6 @@
 		observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-section'] });
 		return () => observer.disconnect();
 	});
-
-	const dropEdges = ['bottom', 'left', 'right'] as const;
-	const preview = $derived(dragging ? nearestPlacement(dragX, dragY) : null);
 
 	let hash = $state('');
 	let section = $state<string | null>(null);
@@ -235,33 +80,15 @@
 </script>
 
 <svelte:window
-	onpointermove={onPointerMove}
-	onpointerup={onPointerUp}
-	onpointercancel={onPointerUp}
-	onkeydown={onKeydown}
 	onscroll={onWindowScroll}
 	onhashchange={onHashChange}
 />
 
-{#if dragging}
-	<div class="slots" aria-hidden="true">
-		{#each dropEdges as edge (edge)}
-			<div class={['slot', preview === edge && 'active']} data-edge={edge}></div>
-		{/each}
-	</div>
-{/if}
-
 <nav
 	id="menu"
-	class={['dock', { dragging, visible }]}
-	style:--drag-x="{dragX}px"
-	style:--drag-y="{dragY}px"
-	style:--grab-x="{grabX}px"
-	style:--grab-y="{grabY}px"
+	class={['dock', { visible }]}
 	aria-label="Principale"
-	data-placement={placement}
 	tabindex="-1"
-	{@attach dockDrag}
 >
 	<ul class="items">
 		{#each items as item (item.id)}
@@ -335,20 +162,6 @@
 			</li>
 		{/each}
 	</ul>
-	<button
-		class="handle"
-		type="button"
-		aria-label="Déplacer le dock"
-	>
-		<svg class="grip" viewBox="0 0 12 18" aria-hidden="true">
-			<circle cx="3" cy="3" r="1.5" />
-			<circle cx="9" cy="3" r="1.5" />
-			<circle cx="3" cy="9" r="1.5" />
-			<circle cx="9" cy="9" r="1.5" />
-			<circle cx="3" cy="15" r="1.5" />
-			<circle cx="9" cy="15" r="1.5" />
-		</svg>
-	</button>
 </nav>
 
 <style>
@@ -440,28 +253,13 @@
 		font: 500 0.75rem / 1 var(--font-sans);
 	}
 
-	.handle {
-		display: none;
-	}
-
-	.slots {
-		display: none;
-	}
-
 	@media (min-width: 40rem) {
 		.dock {
 			--dock-bevel: 3.5rem;
-			right: auto;
-			bottom: var(--spacing-5);
-			left: 50%;
-			width: max-content;
-			padding: var(--spacing-2) var(--spacing-3);
-			border: 1px solid var(--border-default);
-			border-radius: var(--radius-xl);
-			transform: translateX(-50%);
+			--dock-round: 1rem;
 			display: flex;
+			flex-direction: column;
 			align-items: center;
-			cursor: grab;
 		}
 
 		.items {
@@ -479,92 +277,8 @@
 			padding: var(--spacing-2) var(--spacing-3);
 		}
 
-		.handle {
-			display: flex;
-			flex-shrink: 0;
-			order: -1;
-			align-items: center;
-			justify-content: center;
-			min-width: 28px;
-			min-height: 44px;
-			margin: 0;
-			padding: 0;
-			border: 0;
-			border-radius: var(--radius-md);
-			background: transparent;
-			cursor: grab;
-		}
-
-		.grip {
-			display: block;
-			width: 0.75rem;
-			height: 1.125rem;
-			fill: var(--text-secondary);
-		}
-
-		.handle:focus-visible {
-			outline: 2px solid var(--action-focus);
-			outline-offset: 2px;
-		}
-
-		/*
-		 * Accueil, page en haut (`data-dock-horizon`, géré par dock-horizon.ts) : le dock,
-		 * horizontal quelle que soit sa place, est centré sur l’horizon du paysage
-		 * (`--dock-lift`). Au défilement, il rejoint sa place : en glissant s’il est en bas,
-		 * en sortant puis en entrant (`data-dock-switch`) s’il est sur un côté.
-		 */
-		.dock:not(.dragging) {
-			transition:
-				translate 450ms cubic-bezier(0.4, 0, 0.2, 1),
-				opacity 220ms ease;
-		}
-
-		:global(html[data-dock-horizon]) .dock:not(.dragging) {
-			translate: 0 calc(-1 * var(--dock-lift, 0px));
-		}
-
-		:global(html[data-dock-switch]) .dock:not(.dragging) {
-			opacity: 0;
-		}
-
-		:global(html[data-dock-switch='out']) .dock:not(.dragging) {
-			transition:
-				translate 180ms ease-in,
-				opacity 180ms ease-in;
-		}
-
-		/* Nouvelle place posée sans transition, puis révélée à la fin du changement. */
-		:global(html[data-dock-switch='in']) .dock:not(.dragging) {
-			transition: none;
-		}
-
-		:global(html[data-dock-switch][data-dock-horizon]) .dock:not(.dragging) {
-			translate: 0 calc(0.75rem - var(--dock-lift, 0px));
-		}
-
-		:global(html[data-dock-switch][data-dock='left']:not([data-dock-horizon])) .dock:not(.dragging) {
-			translate: -0.75rem 0;
-		}
-
-		:global(html[data-dock-switch][data-dock='right']:not([data-dock-horizon])) .dock:not(.dragging) {
-			translate: 0.75rem 0;
-		}
-
-		.dock.dragging,
-		.dock.dragging .handle {
-			cursor: grabbing;
-		}
-
-		.dock.dragging {
-			top: var(--drag-y);
-			right: auto;
-			bottom: auto;
-			left: var(--drag-x);
-			cursor: grabbing;
-			transform: translate(calc(-1 * var(--grab-x)), calc(-1 * var(--grab-y)));
-		}
-
-		:global(html[data-dock='left']:not([data-dock-horizon])) .dock:not(.dragging) {
+		/* Sur le bord gauche, vertical, en biseau. */
+		:global(html:not([data-dock-horizon])) .dock {
 			top: 50%;
 			right: auto;
 			bottom: auto;
@@ -576,26 +290,14 @@
 				0 100%
 			);
 			padding: var(--dock-bevel) var(--spacing-3) var(--dock-bevel) var(--spacing-2);
-			transform: translateY(-50%);
-		}
-
-		:global(html[data-dock='right']:not([data-dock-horizon])) .dock:not(.dragging) {
-			top: 50%;
-			right: 0;
-			bottom: auto;
-			left: auto;
-			--dock-shape: polygon(
-				100% 0,
-				0 var(--dock-bevel),
-				0 calc(100% - var(--dock-bevel)),
-				100% 100%
-			);
-			padding: var(--dock-bevel) var(--spacing-2) var(--dock-bevel) var(--spacing-3);
+			border: none;
+			border-radius: 0;
+			background: transparent;
 			transform: translateY(-50%);
 		}
 
 		@supports (clip-path: shape(from 0 0, line to 0 0)) {
-			:global(html[data-dock='left']:not([data-dock-horizon])) .dock:not(.dragging) {
+			:global(html:not([data-dock-horizon])) .dock {
 				--dock-shape: shape(
 					from 0 0,
 					line to calc(100% - var(--dock-round)) calc(var(--dock-bevel) - var(--dock-round) / 2),
@@ -607,33 +309,10 @@
 					close
 				);
 			}
-
-			:global(html[data-dock='right']:not([data-dock-horizon])) .dock:not(.dragging) {
-				--dock-shape: shape(
-					from 100% 0,
-					line to var(--dock-round) calc(var(--dock-bevel) - var(--dock-round) / 2),
-					curve to 0 calc(var(--dock-bevel) + var(--dock-round)) with 0 var(--dock-bevel),
-					line to 0 calc(100% - var(--dock-bevel) - var(--dock-round)),
-					curve to var(--dock-round) calc(100% - var(--dock-bevel) + var(--dock-round) / 2)
-						with 0 calc(100% - var(--dock-bevel)),
-					line to 100% 100%,
-					close
-				);
-			}
 		}
 
-		:global(html[data-dock='left']:not([data-dock-horizon])) .dock:not(.dragging),
-		:global(html[data-dock='right']:not([data-dock-horizon])) .dock:not(.dragging) {
-			--dock-round: 1rem;
-			border: none;
-			border-radius: 0;
-			background: transparent;
-		}
-
-		:global(html[data-dock='left']:not([data-dock-horizon])) .dock:not(.dragging)::before,
-		:global(html[data-dock='left']:not([data-dock-horizon])) .dock:not(.dragging)::after,
-		:global(html[data-dock='right']:not([data-dock-horizon])) .dock:not(.dragging)::before,
-		:global(html[data-dock='right']:not([data-dock-horizon])) .dock:not(.dragging)::after {
+		:global(html:not([data-dock-horizon])) .dock::before,
+		:global(html:not([data-dock-horizon])) .dock::after {
 			content: '';
 			position: absolute;
 			z-index: -1;
@@ -641,77 +320,68 @@
 			clip-path: var(--dock-shape);
 		}
 
-		:global(html[data-dock='left']:not([data-dock-horizon])) .dock:not(.dragging)::before,
-		:global(html[data-dock='right']:not([data-dock-horizon])) .dock:not(.dragging)::before {
+		:global(html:not([data-dock-horizon])) .dock::before {
 			background: var(--border-default);
 		}
 
-		:global(html[data-dock='left']:not([data-dock-horizon])) .dock:not(.dragging)::after,
-		:global(html[data-dock='right']:not([data-dock-horizon])) .dock:not(.dragging)::after {
+		:global(html:not([data-dock-horizon])) .dock::after {
+			inset: 1px 1px 1px 0;
 			background: var(--surface-elevated);
 		}
 
-		:global(html[data-dock='left']:not([data-dock-horizon])) .dock:not(.dragging)::after {
-			inset: 1px 1px 1px 0;
-		}
-
-		:global(html[data-dock='right']:not([data-dock-horizon])) .dock:not(.dragging)::after {
-			inset: 1px 0 1px 1px;
-		}
-
-		:global(html[data-dock='left']:not([data-dock-horizon])) .dock,
-		:global(html[data-dock='right']:not([data-dock-horizon])) .dock {
+		:global(html:not([data-dock-horizon])) .items {
 			flex-direction: column;
 		}
 
-		:global(html[data-dock='left']:not([data-dock-horizon])) .items,
-		:global(html[data-dock='right']:not([data-dock-horizon])) .items {
-			flex-direction: column;
-		}
-
-		.slots {
-			display: contents;
-		}
-
-		.slot {
-			position: fixed;
-			z-index: 14;
-			pointer-events: none;
-			border: 1px dashed var(--border-strong);
-			border-radius: var(--radius-xl);
-			background: color-mix(in srgb, var(--action-primary) 8%, transparent);
-			opacity: 0.45;
-		}
-
-		.slot.active {
-			border-color: var(--action-primary);
-			border-style: solid;
-			background: color-mix(in srgb, var(--action-primary) 18%, transparent);
-			opacity: 1;
-		}
-
-		.slot[data-edge='bottom'] {
-			left: 50%;
+		/*
+		 * Accueil, page en haut (`data-dock-horizon`, géré par dock-horizon.ts) : le dock,
+		 * horizontal, est centré sur l’horizon du paysage (`--dock-lift`, mesuré depuis sa
+		 * place en bas). Au défilement, il s’efface puis réapparaît sur le bord gauche
+		 * (`data-dock-switch`), et inversement en haut de page.
+		 */
+		:global(html[data-dock-horizon]) .dock {
+			right: auto;
 			bottom: var(--spacing-5);
-			width: min(28rem, 70vw);
-			height: 4.75rem;
+			left: 50%;
+			width: max-content;
+			padding: var(--spacing-2) var(--spacing-3);
+			border: 1px solid var(--border-default);
+			border-radius: var(--radius-xl);
 			transform: translateX(-50%);
+			translate: 0 calc(-1 * var(--dock-lift, 0px));
 		}
 
-		.slot[data-edge='left'] {
-			top: 50%;
-			left: 0;
-			width: 5.75rem;
-			height: min(28rem, 70vh);
-			transform: translateY(-50%);
+		:global(html[data-dock-horizon]) .items {
+			flex-direction: row;
 		}
 
-		.slot[data-edge='right'] {
-			top: 50%;
-			right: 0;
-			width: 5.75rem;
-			height: min(28rem, 70vh);
-			transform: translateY(-50%);
+		.dock {
+			transition:
+				translate 450ms cubic-bezier(0.4, 0, 0.2, 1),
+				opacity 220ms ease;
+		}
+
+		:global(html[data-dock-switch]) .dock {
+			opacity: 0;
+		}
+
+		:global(html[data-dock-switch='out']) .dock {
+			transition:
+				translate 180ms ease-in,
+				opacity 180ms ease-in;
+		}
+
+		/* Nouvelle place posée sans transition, puis révélée à la fin du changement. */
+		:global(html[data-dock-switch='in']) .dock {
+			transition: none;
+		}
+
+		:global(html[data-dock-switch][data-dock-horizon]) .dock {
+			translate: 0 calc(0.75rem - var(--dock-lift, 0px));
+		}
+
+		:global(html[data-dock-switch]:not([data-dock-horizon])) .dock {
+			translate: -0.75rem 0;
 		}
 	}
 </style>

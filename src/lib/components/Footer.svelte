@@ -23,11 +23,6 @@
 
 	@media (min-width: 40rem) {
 		.footer {
-			padding-bottom: calc(var(--spacing-16) + 4.5rem);
-		}
-
-		:global(html[data-dock='left']) .footer,
-		:global(html[data-dock='right']) .footer {
 			padding-bottom: var(--spacing-8);
 		}
 	}

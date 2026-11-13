@@ -1,9 +1,9 @@
 import { on } from 'svelte/events';
 import type { Attachment } from 'svelte/attachments';
 
-// Défilement au-delà duquel le dock quitte l'horizon pour sa place choisie.
+// Défilement au-delà duquel le dock quitte l'horizon pour le bord gauche.
 const leaveAfterPx = 8;
-// Changement de forme (dock à gauche ou à droite) : sortie, puis entrée à la nouvelle place.
+// Changement de forme : sortie, puis entrée à la nouvelle place.
 const switchOutMs = 180;
 const switchInMs = 220;
 
@@ -34,10 +34,10 @@ function horizonLine(land: SVGSVGElement) {
 
 /**
  * Accueil, page en haut : le dock, horizontal, est centré sur la ligne d'horizon du
- * paysage. Au défilement, il rejoint la place choisie (gauche, droite ou bas), et revient
- * sur l'horizon en haut de page. Expose sur `<html>` :
+ * paysage. Au défilement, il rejoint le bord gauche, et revient sur l'horizon en haut de
+ * page. Expose sur `<html>` :
  * - `data-dock-horizon` : dock sur l'horizon (posé avant le rendu par `index.astro`) ;
- * - `--dock-lift` : décalage vers le haut depuis la place du dock en bas ;
+ * - `--dock-lift` : décalage vers le haut depuis la place horizontale du dock en bas d'écran ;
  * - `data-dock-switch` (`out`, puis `in`) : changement de forme en cours.
  * Le dock fait le reste en CSS. Sur mobile, ou sans place sous l'horizon, rien ne change.
  */
@@ -88,9 +88,9 @@ export const dockHorizon: Attachment<HTMLElement> = (hero) => {
 		}
 	}
 
-	/** Change de place : direct pour le dock en bas, sortie puis entrée pour les côtés. */
+	/** Change de place : sortie, puis entrée à la nouvelle place (direct en mouvement réduit). */
 	function moveTo(onHorizon: boolean, dock: HTMLElement) {
-		if (html.dataset.dock === 'bottom' || prefersReducedMotion()) {
+		if (prefersReducedMotion()) {
 			place(onHorizon, dock);
 			return;
 		}
@@ -117,11 +117,6 @@ export const dockHorizon: Attachment<HTMLElement> = (hero) => {
 		}
 
 		const dock = getDock();
-		// Pendant un déplacement du dock, rien ne bouge ; la dépose relance la mise à jour.
-		if (dock?.classList.contains('dragging')) {
-			return;
-		}
-
 		if (!wantsHorizon(dock)) {
 			if (dock && isOnHorizon()) {
 				moveTo(false, dock);
@@ -148,9 +143,6 @@ export const dockHorizon: Attachment<HTMLElement> = (hero) => {
 		setOnHorizon(false);
 	}
 
-	// Le dock peut être déplacé ailleurs après le chargement.
-	const observer = new MutationObserver(requestUpdate);
-	observer.observe(html, { attributes: true, attributeFilter: ['data-dock'] });
 	const offs = [
 		on(window, 'scroll', requestUpdate, { passive: true }),
 		on(window, 'resize', requestUpdate)
@@ -159,7 +151,6 @@ export const dockHorizon: Attachment<HTMLElement> = (hero) => {
 	return () => {
 		cancelAnimationFrame(frame);
 		window.clearTimeout(timer);
-		observer.disconnect();
 		for (const off of offs) {
 			off();
 		}
