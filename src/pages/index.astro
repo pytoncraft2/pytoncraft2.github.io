@@ -11,6 +11,7 @@ import { getFeaturedProjects } from '#lib/projects.js';
 const name = 'Timothée Hennequin';
 const email = 'timothennequin@gmail.com';
 const linkedInHref = 'https://www.linkedin.com/in/timothee-hennequin/';
+const cvHref = withBase('cv-timothee-hennequin.pdf');
 
 const cards: CarouselProject[] = (await getFeaturedProjects()).map(({ id, data }) => ({
 	slug: id,
@@ -142,6 +143,9 @@ const careerSteps = [
 					))
 				}
 			</ul>
+			<div class="profil-cv">
+				<Button href={cvHref} variant="secondary">Voir mon CV (PDF)</Button>
+			</div>
 		</section>
 
 		<div id="contact" class="anchor"></div>
@@ -427,6 +431,10 @@ const careerSteps = [
 	.step-detail {
 		color: var(--text-secondary);
 		font: 400 var(--text-body-s-size) / var(--text-body-s-line) var(--font-sans);
+	}
+
+	.profil-cv {
+		margin-top: var(--spacing-8);
 	}
 
 	.tech-grid {
