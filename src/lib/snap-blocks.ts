@@ -3,11 +3,19 @@ import type { Attachment } from 'svelte/attachments';
 
 const alignTolerance = 24;
 const trackpadThreshold = 72;
-const snapLockMs = 650;
 const gestureIdleMs = 220;
 const nativeHoldMs = 480;
 const fastDelta = 180;
 const longExtraDelta = 140;
+// Écart minimal d'un cran de molette : les petits écarts de l'inertie d'un trackpad n'en sont pas.
+const wheelNotchDelta = 40;
+// Durée du glissement vers le bloc suivant, proportionnelle à la distance.
+const minDurationMs = 600;
+const maxDurationMs = 950;
+const durationPerPx = 0.75;
+// Écart toléré entre la position attendue et la position réelle avant de considérer
+// que l'utilisateur a repris la main (barre de défilement, recherche dans la page…).
+const takeoverTolerance = 3;
 
 function parseLength(value: string) {
 	const parsed = parseFloat(value);
@@ -94,6 +102,15 @@ function hasOverflowInDirection(block: HTMLElement, direction: 1 | -1) {
 	return rect.top < top - alignTolerance && rect.bottom > top;
 }
 
+function easeInOutCubic(t: number) {
+	return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+function blockScrollTop(block: HTMLElement) {
+	const top = block.getBoundingClientRect().top + window.scrollY - getScrollPadding().top;
+	return Math.min(Math.max(0, top), maxScrollY());
+}
+
 function normalizeDelta(event: WheelEvent) {
 	if (event.deltaMode === 1) {
 		return event.deltaY * 16;
@@ -107,21 +124,74 @@ function normalizeDelta(event: WheelEvent) {
 }
 
 export const snapBlocks: Attachment<HTMLElement> = (root) => {
-	let lockedUntil = 0;
 	let nativeUntil = 0;
 	let accumulated = 0;
 	let lastEventAt = 0;
 	let extraAfterSnap = 0;
+	let frame = 0;
+	// Après l'animation, la molette reste verrouillée jusqu'à une pause de `gestureIdleMs`,
+	// le temps que l'inertie du trackpad s'épuise.
+	let settling = false;
 
 	function resetGesture() {
 		accumulated = 0;
 		extraAfterSnap = 0;
 	}
 
+	function stopAnimation() {
+		if (frame) {
+			cancelAnimationFrame(frame);
+			frame = 0;
+		}
+	}
+
+	function release() {
+		stopAnimation();
+		settling = false;
+	}
+
 	function useNativeScroll(now: number) {
 		nativeUntil = now + nativeHoldMs;
-		lockedUntil = 0;
+		release();
 		resetGesture();
+	}
+
+	function animateTo(top: number) {
+		stopAnimation();
+		const startY = window.scrollY;
+		const distance = top - startY;
+		if (Math.abs(distance) < 1) {
+			return;
+		}
+
+		const duration = Math.min(
+			maxDurationMs,
+			Math.max(minDurationMs, Math.abs(distance) * durationPerPx)
+		);
+		const startedAt = performance.now();
+		let expectedY = startY;
+		settling = false;
+
+		const step = (time: number) => {
+			if (Math.abs(window.scrollY - expectedY) > takeoverTolerance) {
+				release();
+				return;
+			}
+
+			const progress = Math.min(1, Math.max(0, (time - startedAt) / duration));
+			// `instant` contourne le `scroll-behavior: smooth` de la page.
+			window.scrollTo({ top: startY + distance * easeInOutCubic(progress), behavior: 'instant' });
+			expectedY = window.scrollY;
+
+			if (progress < 1) {
+				frame = requestAnimationFrame(step);
+			} else {
+				frame = 0;
+				settling = true;
+			}
+		};
+
+		frame = requestAnimationFrame(step);
 	}
 
 	function onWheel(event: WheelEvent) {
@@ -146,12 +216,25 @@ export const snapBlocks: Attachment<HTMLElement> = (root) => {
 
 		if (now - lastEventAt > gestureIdleMs) {
 			resetGesture();
+			settling = false;
 		}
 
 		lastEventAt = now;
 
 		if (now < nativeUntil || Math.abs(delta) >= fastDelta) {
 			useNativeScroll(now);
+			return;
+		}
+
+		if (frame || settling) {
+			event.preventDefault();
+			// Plusieurs crans de molette juste après l'arrivée : rendre le défilement libre.
+			if (settling && Math.abs(delta) >= wheelNotchDelta) {
+				extraAfterSnap += Math.abs(delta);
+				if (extraAfterSnap >= longExtraDelta) {
+					useNativeScroll(now);
+				}
+			}
 			return;
 		}
 
@@ -177,35 +260,34 @@ export const snapBlocks: Attachment<HTMLElement> = (root) => {
 			return;
 		}
 
-		if (now < lockedUntil) {
-			extraAfterSnap += Math.abs(delta);
-			if (extraAfterSnap >= longExtraDelta) {
-				useNativeScroll(now);
-				return;
-			}
-
-			event.preventDefault();
-			return;
-		}
-
 		event.preventDefault();
 
 		if (Math.sign(accumulated) !== 0 && Math.sign(accumulated) !== direction) {
 			accumulated = 0;
 		}
 
-		if (event.deltaMode === 0 && Math.abs(event.deltaY) < 40) {
+		if (event.deltaMode === 0 && Math.abs(event.deltaY) < wheelNotchDelta) {
 			accumulated += event.deltaY;
 			if (Math.abs(accumulated) < trackpadThreshold) {
 				return;
 			}
 		}
 
-		accumulated = 0;
-		extraAfterSnap = 0;
-		lockedUntil = now + snapLockMs;
-		target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		resetGesture();
+		animateTo(target === blocks[0] ? 0 : blockScrollTop(target));
 	}
 
-	return on(window, 'wheel', onWheel, { passive: false });
+	// Toute autre interaction interrompt le glissement et rend la main.
+	const interruptions = (['pointerdown', 'touchstart', 'keydown'] as const).map((type) =>
+		on(window, type, release, { passive: true })
+	);
+	const offWheel = on(window, 'wheel', onWheel, { passive: false });
+
+	return () => {
+		release();
+		offWheel();
+		for (const off of interruptions) {
+			off();
+		}
+	};
 };
