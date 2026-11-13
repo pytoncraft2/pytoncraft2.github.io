@@ -67,6 +67,27 @@ html[data-smooth-scroll] {
 	animation-timing-function: ease;
 }
 
+/*
+ * Vers ou depuis une étude de cas (type posé dans BaseLayout.astro) : l'ancienne page reste
+ * dessous et la nouvelle apparaît au rythme de la carte. Sinon, le fond nu se verrait autour
+ * de la carte qui s'agrandit, l'ancienne page s'effaçant plus vite (140 ms).
+ */
+html:active-view-transition-type(project)::view-transition-old(root) {
+	animation: none;
+}
+
+/* Animation remplacée en entier : celle du navigateur force le mélange `plus-lighter`. */
+html:active-view-transition-type(project)::view-transition-new(root) {
+	animation: page-fade-in 440ms cubic-bezier(0.4, 0, 0.2, 1) both;
+	mix-blend-mode: normal;
+}
+
+@keyframes page-fade-in {
+	from {
+		opacity: 0;
+	}
+}
+
 ::view-transition-group(.project-frame),
 ::view-transition-group(.project-text),
 ::view-transition-group(.project-media) {

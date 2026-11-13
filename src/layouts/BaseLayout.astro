@@ -52,8 +52,10 @@ const { title, description } = Astro.props;
 		</script>
 		<!--
 			Transitions de vue entre pages (natives, sans routeur JS : voir @view-transition dans global.css).
-			Au retour d'une étude de cas vers l'accueil, la carte du projet quitté reçoit les noms de
-			transition avant le premier rendu, et le carrousel est placé sur sa page.
+			Une transition depuis ou vers une étude de cas reçoit le type `project` (fondu de la page
+			calé sur celui de la carte, voir global.css). Au retour d'une étude de cas vers l'accueil,
+			la carte du projet quitté reçoit les noms de transition avant le premier rendu, et le
+			carrousel est placé sur sa page.
 		-->
 		<script is:inline>
 			window.addEventListener('pagereveal', function (event) {
@@ -61,8 +63,12 @@ const { title, description } = Astro.props;
 					return;
 				}
 
+				var projectPath = /\/projets\/([^/.]+)(?:\.html)?\/?$/;
 				var from = navigation.activation.from && navigation.activation.from.url;
-				var match = from && new URL(from).pathname.match(/\/projets\/([^/.]+)(?:\.html)?\/?$/);
+				var match = from && new URL(from).pathname.match(projectPath);
+				if (event.viewTransition.types && (match || projectPath.test(location.pathname))) {
+					event.viewTransition.types.add('project');
+				}
 				if (!match) {
 					return;
 				}
