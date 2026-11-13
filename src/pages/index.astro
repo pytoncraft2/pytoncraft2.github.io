@@ -92,12 +92,14 @@ const careerSteps = [
 			<HeroScene client:idle />
 		</section>
 
-		<section class="section section-flush snap-block" aria-labelledby="projets">
-			<h2 id="projets" class="ds-h2">Projets sélectionnés</h2>
+		<div id="projets" class="anchor"></div>
+		<section class="section section-flush snap-block" aria-labelledby="projets-title">
+			<h2 id="projets-title" class="ds-h2">Projets sélectionnés</h2>
 			<ProjectCarousel client:load projects={cards} />
 		</section>
 
-		<section id="profil" class="section profil snap-block" aria-labelledby="profil-title">
+		<div id="profil" class="anchor"></div>
+		<section class="section profil snap-block" aria-labelledby="profil-title">
 			<h2 id="profil-title" class="ds-h2">Profil</h2>
 			<p class="ds-body-m">
 				Développeur web, j’interviens aujourd’hui sur la réalisation d’applications et sur la conception UX/UI, de
@@ -133,7 +135,8 @@ const careerSteps = [
 			</ul>
 		</section>
 
-		<section id="contact" class="section snap-block" aria-labelledby="contact-title">
+		<div id="contact" class="anchor"></div>
+		<section class="section snap-block" aria-labelledby="contact-title">
 			<h2 id="contact-title" class="ds-h2">Contact</h2>
 			<p class="ds-body-m">
 				Pour un échange autour d’un poste, d’un projet ou d’une collaboration, vous pouvez me contacter directement.
@@ -147,18 +150,47 @@ const careerSteps = [
 </BaseLayout>
 
 <script>
-	import { snapBlocks } from '#lib/snap-blocks.js';
+	import { snapBlocks, stackBlocks } from '#lib/snap-blocks.js';
 
-	// Défilement par blocs de l’accueil (attachment Svelte réutilisé tel quel).
+	// Défilement et empilement par blocs de l’accueil (attachments Svelte réutilisés tels quels).
 	const page = document.querySelector<HTMLElement>('[data-snap-blocks]');
 	if (page) {
 		snapBlocks(page);
+		stackBlocks(page);
 	}
 </script>
 
 <style>
 	.page {
 		display: contents;
+	}
+
+	/* Empilement : chaque section glisse par-dessus la précédente (voir stackBlocks). */
+	.page[data-stacked] > .snap-block {
+		position: sticky;
+		top: var(--stack-top);
+	}
+
+	/*
+	 * Cibles des ancres, hors des sections : une section collée en haut de l’écran
+	 * ne ferait pas défiler la page vers elle quand on y remonte par un lien.
+	 */
+	.anchor {
+		height: 0;
+	}
+
+	/*
+	 * Le contenu de la section recouverte s’efface (`--stack-opacity`, posé par stackBlocks).
+	 * Dans le hero, seuls le texte et les encarts s’effacent : le paysage reste visible.
+	 */
+	.page[data-stacked] > .section,
+	.page[data-stacked] > .hero > :is(.hero-copy, .proofs) {
+		opacity: var(--stack-opacity, 1);
+	}
+
+	.page[data-stacked] > .section[data-covered],
+	.page[data-stacked] > .hero[data-covered] > :is(.hero-copy, .proofs) {
+		pointer-events: none;
 	}
 
 	.hero {

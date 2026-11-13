@@ -56,7 +56,7 @@ Astro (site statique multipage), îles Svelte 5 (runes), TypeScript, CSS avec pr
 | `src/lib/components/HeroScene.svelte` | Île du paysage jour/nuit derrière le hero (règles dans `DESIGN.md`, « Scène d’accueil ») ; couleurs `--scene-*` dans `tokens.css` |
 | `src/lib/data/skills.ts`, `tech-icons.ts` | Compétences (`TechId`) et logos de `src/lib/assets/tech/` |
 | `src/lib/styles/` | `tokens.css` (couleurs, thèmes, espacements, rayons, tailles), `typography.css` (classes `ds-*`), `global.css` |
-| `src/lib/snap-blocks.ts` | Défilement par blocs `.snap-block` de l’accueil, appelé par un `<script>` de `index.astro` |
+| `src/lib/snap-blocks.ts` | Défilement (`snapBlocks`) et empilement (`stackBlocks`) des blocs `.snap-block` de l’accueil, appelés par un `<script>` de `index.astro` |
 | `public/` | Fichiers servis tels quels : images de couverture des projets, CV, `.nojekyll` |
 
 Il n’existe pas de page « À propos » séparée : le parcours est la section Profil de l’accueil.

@@ -146,6 +146,7 @@ La navigation doit rester compréhensible sans découvrir les fonctions avancée
 - Un carrousel affiche sa position et propose des contrôles utilisables au clavier et au toucher. Éviter le défilement automatique.
 - Le défilement par sections doit laisser consulter librement les contenus longs et les zones disposant de leur propre défilement.
 - Sur l’accueil, le passage d’une section à l’autre glisse en 0,6 à 0,95 s (`snap-blocks.ts`), avec un départ et une arrivée progressifs.
+- Les sections de l’accueil s’empilent : chacune reste collée en haut de l’écran pendant que la suivante glisse par-dessus (`stackBlocks`). Le contenu de la section recouverte s’efface et a disparu avant que les deux contenus se superposent (dans le hero, seuls le texte et les encarts : le paysage reste visible derrière toute la page) ; effacé, il ne reçoit plus les clics, et le focus clavier la ramène à l’écran. Une section plus haute que l’écran ne se colle qu’une fois son bas atteint, pour rester lisible en entier. La dernière section reçoit la marge nécessaire pour s’aligner en haut de l’écran. Les ancres (`#projets`, `#profil`, `#contact`) sont des repères placés hors des sections collées.
 - Distinguer les états disponibles, actifs, survolés et ayant le focus. Ne pas créer un élément qui semble cliquable sans action associée.
 - Les transitions restent brèves et accompagnent un changement compréhensible. Respecter le mouvement réduit et conserver un comportement fonctionnel si une animation n’est pas disponible.
 

@@ -106,8 +106,17 @@ function easeInOutCubic(t: number) {
 	return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
+// Position du bloc dans le flux, même lorsqu'il est collé (`position: sticky`) à l'écran.
+function flowTop(block: HTMLElement) {
+	const previous = block.style.position;
+	block.style.position = 'static';
+	const top = block.getBoundingClientRect().top + window.scrollY;
+	block.style.position = previous;
+	return top;
+}
+
 function blockScrollTop(block: HTMLElement) {
-	const top = block.getBoundingClientRect().top + window.scrollY - getScrollPadding().top;
+	const top = flowTop(block) - getScrollPadding().top;
 	return Math.min(Math.max(0, top), maxScrollY());
 }
 
@@ -288,6 +297,116 @@ export const snapBlocks: Attachment<HTMLElement> = (root) => {
 		offWheel();
 		for (const off of interruptions) {
 			off();
+		}
+	};
+};
+
+/**
+ * Empilement : chaque bloc reste collé en haut de l'écran pendant que le suivant glisse
+ * par-dessus, et s'efface avant que leurs contenus se superposent (opacité exposée en
+ * `--stack-opacity`). Un bloc plus haut que l'écran ne se colle qu'une fois son bas atteint, pour
+ * rester lisible jusqu'au bout. Le dernier bloc reçoit la marge nécessaire pour pouvoir
+ * s'aligner en haut comme les autres. Sans ce script, les blocs défilent normalement.
+ */
+export const stackBlocks: Attachment<HTMLElement> = (root) => {
+	const blocks = [...root.querySelectorAll<HTMLElement>('.snap-block')];
+	const last = blocks[blocks.length - 1];
+	// Défilement, depuis le moment où un bloc se colle, au bout duquel le contenu du
+	// suivant atteint le sien : marge entre eux et espacements intérieurs.
+	let fadeLengths: number[] = [];
+	let gaps: number[] = [];
+	let frame = 0;
+
+	function layout() {
+		const { top, bottom } = getScrollPadding();
+		const available = window.innerHeight - bottom;
+		last.style.removeProperty('margin-bottom');
+		const styles = blocks.map((block) => getComputedStyle(block));
+		gaps = styles.map((style) => parseLength(style.marginBottom));
+		fadeLengths = blocks.slice(0, -1).map((_, i) => {
+			const current = styles[i];
+			const next = styles[i + 1];
+			return Math.max(
+				1,
+				gaps[i] +
+					parseLength(current.paddingBottom) +
+					parseLength(current.borderBottomWidth) +
+					parseLength(next.paddingTop) +
+					parseLength(next.borderTopWidth)
+			);
+		});
+		for (const block of blocks) {
+			const stackTop = Math.min(top, available - block.offsetHeight);
+			block.style.setProperty('--stack-top', `${stackTop}px`);
+		}
+
+		const extra = flowTop(last) - top - maxScrollY();
+		if (extra > 0) {
+			last.style.marginBottom = `${gaps[gaps.length - 1] + extra}px`;
+		}
+		fade();
+	}
+
+	function fade() {
+		frame = 0;
+		for (let i = 0; i < blocks.length - 1; i += 1) {
+			// Avancée du bloc suivant depuis que celui-ci est collé.
+			const advance =
+				blocks[i].getBoundingClientRect().bottom +
+				gaps[i] -
+				blocks[i + 1].getBoundingClientRect().top;
+			const progress = Math.min(1, Math.max(0, advance / fadeLengths[i]));
+			// Sous 1 px d'avancée (arrondis de position), le bloc reste entièrement visible.
+			// Le CSS de la page choisit les éléments du bloc qui s'effacent.
+			if (advance > 1) {
+				blocks[i].style.setProperty('--stack-opacity', (1 - progress).toFixed(3));
+			} else {
+				blocks[i].style.removeProperty('--stack-opacity');
+			}
+			blocks[i].toggleAttribute('data-covered', progress >= 0.5);
+		}
+	}
+
+	function requestFade() {
+		if (!frame) {
+			frame = requestAnimationFrame(fade);
+		}
+	}
+
+	// Le focus clavier sur un bloc effacé ramène ce bloc à l'écran.
+	function onFocusIn(event: FocusEvent) {
+		const block = blocks.find(
+			(item) => item.hasAttribute('data-covered') && event.target instanceof Node && item.contains(event.target)
+		);
+		if (block) {
+			window.scrollTo({ top: block === blocks[0] ? 0 : blockScrollTop(block) });
+		}
+	}
+
+	layout();
+	root.setAttribute('data-stacked', '');
+	const observer = new ResizeObserver(layout);
+	for (const block of blocks) {
+		observer.observe(block);
+	}
+	const offs = [
+		on(window, 'resize', layout),
+		on(window, 'scroll', requestFade, { passive: true }),
+		on(root, 'focusin', onFocusIn)
+	];
+
+	return () => {
+		observer.disconnect();
+		cancelAnimationFrame(frame);
+		for (const off of offs) {
+			off();
+		}
+		root.removeAttribute('data-stacked');
+		for (const block of blocks) {
+			block.style.removeProperty('--stack-top');
+			block.style.removeProperty('--stack-opacity');
+			block.style.removeProperty('margin-bottom');
+			block.removeAttribute('data-covered');
 		}
 	};
 };
