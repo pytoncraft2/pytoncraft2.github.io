@@ -182,39 +182,54 @@
 
 		lastScroll = window.scrollY;
 		hash = window.location.hash;
+
+		// Section courante de l'accueil, posée sur <html> par trackSection (snap-blocks.ts).
+		const readSection = () => {
+			section = document.documentElement.dataset.section ?? null;
+		};
+		readSection();
+		const observer = new MutationObserver(readSection);
+		observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-section'] });
+		return () => observer.disconnect();
 	});
 
 	const dropEdges = ['bottom', 'left', 'right'] as const;
 	const preview = $derived(dragging ? nearestPlacement(dragX, dragY) : null);
 
 	let hash = $state('');
+	let section = $state<string | null>(null);
 	const isHome = $derived(pathname === homeHref || pathname === homeHref.replace(/\/$/, '') || pathname.endsWith('/index.html'));
 	const isProject = $derived(pathname.includes('/projets/'));
+
+	/** Sur l'accueil, la section affichée ; sinon (ou sans suivi), l'ancre de l'adresse. */
+	function isActiveSection(id: string, fromHash: boolean) {
+		return isHome && section ? section === id : fromHash;
+	}
 
 	const items = $derived([
 		{
 			id: 'accueil',
 			label: 'Accueil',
 			href: homeHref,
-			active: isHome && hash !== '#projets' && hash !== '#profil' && hash !== '#contact'
+			active: isActiveSection('accueil', isHome && hash !== '#projets' && hash !== '#profil' && hash !== '#contact')
 		},
 		{
 			id: 'projets',
 			label: 'Projets',
 			href: `${homeHref}#projets`,
-			active: isProject || (isHome && hash === '#projets')
+			active: isProject || isActiveSection('projets', isHome && hash === '#projets')
 		},
 		{
 			id: 'profil',
 			label: 'Profil',
 			href: `${homeHref}#profil`,
-			active: hash === '#profil'
+			active: isActiveSection('profil', hash === '#profil')
 		},
 		{
 			id: 'contact',
 			label: 'Contact',
 			href: `${homeHref}#contact`,
-			active: hash === '#contact'
+			active: isActiveSection('contact', hash === '#contact')
 		}
 	]);
 </script>
@@ -255,7 +270,7 @@
 					class="item"
 					class:active={item.active}
 					href={item.href}
-					aria-current={item.active ? 'page' : undefined}
+					aria-current={item.active ? (isHome ? 'location' : 'page') : undefined}
 				>
 					<span class="icon" aria-hidden="true">
 						{#if item.id === 'accueil'}

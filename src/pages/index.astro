@@ -68,7 +68,7 @@ const careerSteps = [
 		}
 	</script>
 	<div class="page" data-snap-blocks>
-		<section class="hero snap-block" aria-labelledby="hero-title">
+		<section class="hero snap-block" data-section="accueil" aria-labelledby="hero-title">
 			<div class="hero-copy">
 				<p class="eyebrow ds-label-m">Portfolio</p>
 				<h1 id="hero-title" class="ds-h1">{name}</h1>
@@ -103,13 +103,13 @@ const careerSteps = [
 		</section>
 
 		<div id="projets" class="anchor"></div>
-		<section class="section section-flush snap-block" aria-labelledby="projets-title">
+		<section class="section section-flush snap-block" data-section="projets" aria-labelledby="projets-title">
 			<h2 id="projets-title" class="ds-h2">Projets sélectionnés</h2>
 			<ProjectCarousel client:load projects={cards} />
 		</section>
 
 		<div id="profil" class="anchor"></div>
-		<section class="section profil snap-block" aria-labelledby="profil-title">
+		<section class="section profil snap-block" data-section="profil" aria-labelledby="profil-title">
 			<h2 id="profil-title" class="ds-h2">Profil</h2>
 			<p class="ds-body-m">
 				Développeur web, j’interviens aujourd’hui sur la réalisation d’applications et sur la conception UX/UI, de
@@ -149,7 +149,7 @@ const careerSteps = [
 		</section>
 
 		<div id="contact" class="anchor"></div>
-		<section class="section snap-block" aria-labelledby="contact-title">
+		<section class="section snap-block" data-section="contact" aria-labelledby="contact-title">
 			<h2 id="contact-title" class="ds-h2">Contact</h2>
 			<p class="ds-body-m">
 				Pour un échange autour d’un poste, d’un projet ou d’une collaboration, vous pouvez me contacter directement.
@@ -164,13 +164,14 @@ const careerSteps = [
 
 <script>
 	import { dockHorizon } from '#lib/dock-horizon.js';
-	import { snapBlocks, stackBlocks } from '#lib/snap-blocks.js';
+	import { snapBlocks, stackBlocks, trackSection } from '#lib/snap-blocks.js';
 
 	// Défilement et empilement par blocs de l’accueil (attachments Svelte réutilisés tels quels).
 	const page = document.querySelector<HTMLElement>('[data-snap-blocks]');
 	if (page) {
 		snapBlocks(page);
 		stackBlocks(page);
+		trackSection(page);
 	}
 
 	// Dock posé sur l’horizon du paysage tant que la page est en haut.

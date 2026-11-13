@@ -410,3 +410,54 @@ export const stackBlocks: Attachment<HTMLElement> = (root) => {
 		}
 	};
 };
+
+/**
+ * Section courante, exposée sur `<html>` en `data-section` (valeur du `data-section` du
+ * bloc) pour l'état actif du dock : le dernier bloc dont le haut a passé le milieu de
+ * l'écran. Avec l'empilement, c'est celui qui vient de recouvrir les précédents.
+ */
+export const trackSection: Attachment<HTMLElement> = (root) => {
+	const html = document.documentElement;
+	const blocks = [...root.querySelectorAll<HTMLElement>('.snap-block[data-section]')];
+	let frame = 0;
+
+	function update() {
+		frame = 0;
+		const middle = window.innerHeight / 2;
+		let current = blocks[0];
+		for (const block of blocks) {
+			if (block.getBoundingClientRect().top <= middle) {
+				current = block;
+			}
+		}
+
+		if (window.scrollY >= maxScrollY() - 8) {
+			current = blocks[blocks.length - 1];
+		}
+
+		const section = current?.dataset.section;
+		if (section && html.dataset.section !== section) {
+			html.dataset.section = section;
+		}
+	}
+
+	function requestUpdate() {
+		if (!frame) {
+			frame = requestAnimationFrame(update);
+		}
+	}
+
+	update();
+	const offs = [
+		on(window, 'scroll', requestUpdate, { passive: true }),
+		on(window, 'resize', requestUpdate)
+	];
+
+	return () => {
+		cancelAnimationFrame(frame);
+		for (const off of offs) {
+			off();
+		}
+		delete html.dataset.section;
+	};
+};
