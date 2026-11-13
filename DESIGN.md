@@ -109,7 +109,7 @@ Les éléments listés sont une direction, pas un inventaire obligatoire. Mieux 
 ### Mouvement
 
 - Animations CSS sur `transform` et `opacity` uniquement ; pas de boucle JavaScript continue ni de bibliothèque de particules.
-- Animations d’ambiance de faible amplitude, jouées une seule fois à l’arrivée : chaque élément (nuages, oiseaux, arbre, étoiles, étoile filante, cycliste) bouge puis s’arrête à la place qu’il occupe dans le décor fixe. Aucune boucle infinie.
+- Animations d’ambiance de faible amplitude, jouées une seule fois à l’arrivée : chaque élément (nuages, oiseaux, arbre, étoiles, étoile filante, cycliste) bouge puis s’arrête à la place qu’il occupe dans le décor fixe. Aucune boucle infinie. Les animations ne jouent qu’à la première arrivée sur l’accueil dans la session (onglet) : au retour arrière ou à une nouvelle visite, le décor fixe s’affiche directement (`data-scene-played`, `sessionStorage`).
 - Toute animation est terminée en moins de 5 secondes (WCAG 2.2.2) : il n’y a donc pas de bouton pause. Une nouvelle animation plus longue imposerait d’en rétablir un.
 - Avec `prefers-reduced-motion: reduce`, la scène est statique et complète, sans animation d’entrée.
 - Suspendre les animations quand la scène sort de l’écran ou quand l’onglet est masqué.

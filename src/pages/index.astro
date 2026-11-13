@@ -66,6 +66,14 @@ const careerSteps = [
 		if (!location.hash && window.matchMedia('(min-width: 40rem)').matches) {
 			document.documentElement.setAttribute('data-dock-horizon', '');
 		}
+		// Animations du paysage jouées une fois par session (voir HeroScene.svelte).
+		try {
+			if (sessionStorage.getItem('hero-scene-played')) {
+				document.documentElement.setAttribute('data-scene-played', '');
+			} else {
+				sessionStorage.setItem('hero-scene-played', '1');
+			}
+		} catch (e) {}
 	</script>
 	<div class="page" data-snap-blocks>
 		<section class="hero snap-block" data-section="accueil" aria-labelledby="hero-title">

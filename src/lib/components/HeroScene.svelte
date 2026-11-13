@@ -431,6 +431,14 @@
 			animation-name: roll;
 		}
 
+		/*
+		 * Déjà jouées dans la session (retour arrière, nouvelle visite de l’accueil) :
+		 * décor fixe directement (`data-scene-played`, posé avant le rendu par `index.astro`).
+		 */
+		:global(html[data-scene-played]) .scene * {
+			animation: none;
+		}
+
 		/* Hors écran : suspension, l’animation reprend là où elle s’était arrêtée. */
 		.offscreen,
 		.offscreen * {
