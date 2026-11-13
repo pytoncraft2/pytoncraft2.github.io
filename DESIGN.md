@@ -109,17 +109,17 @@ Les éléments listés sont une direction, pas un inventaire obligatoire. Mieux 
 ### Mouvement
 
 - Animations CSS sur `transform` et `opacity` uniquement ; pas de boucle JavaScript continue ni de bibliothèque de particules.
-- Animations d’ambiance lentes et de faible amplitude. Les événements plus visibles (étoile filante, passage du cycliste) restent ponctuels et espacés.
-- Toute animation qui dure plus de 5 secondes doit pouvoir être mise en pause (WCAG 2.2.2) : soit les boucles s’arrêtent d’elles-mêmes, soit un bouton accessible permet de les arrêter.
+- Animations d’ambiance de faible amplitude, jouées une seule fois à l’arrivée : chaque élément (nuages, oiseaux, arbre, étoiles, étoile filante, cycliste) bouge puis s’arrête à la place qu’il occupe dans le décor fixe. Aucune boucle infinie.
+- Toute animation est terminée en moins de 5 secondes (WCAG 2.2.2) : il n’y a donc pas de bouton pause. Une nouvelle animation plus longue imposerait d’en rétablir un.
 - Avec `prefers-reduced-motion: reduce`, la scène est statique et complète, sans animation d’entrée.
 - Suspendre les animations quand la scène sort de l’écran ou quand l’onglet est masqué.
 - L’animation d’entrée ne bloque ni la lecture ni l’interaction et ne gêne pas les transitions de vue existantes.
 
 ### Implémentation et accessibilité
 
-- Implémentée dans `src/lib/components/HeroScene.svelte` (SVG inline, sans requête réseau ni image), placée dans le `.hero` de l’accueil comme île Astro hydratée en différé (`client:idle`) : sans JavaScript, le décor et ses animations CSS s’affichent, seuls le bouton pause et la suspension hors écran restent inactifs. Le hero fournit la hauteur de la bande de paysage (`--hero-scene-band`) et la réserve en `padding-bottom` pour que les collines restent sous le texte. La scène déborde en pleine largeur (`100vw`, recentrée selon la position du dock) ; `.app` coupe le débordement horizontal (`overflow-x: clip`).
+- Implémentée dans `src/lib/components/HeroScene.svelte` (SVG inline, sans requête réseau ni image), placée dans le `.hero` de l’accueil comme île Astro hydratée en différé (`client:idle`) : sans JavaScript, le décor et ses animations CSS s’affichent, seule la suspension hors écran reste inactive. Le hero fournit la hauteur de la bande de paysage (`--hero-scene-band`) et la réserve en `padding-bottom` pour que les collines restent sous le texte. La scène déborde en pleine largeur (`100vw`, recentrée selon la position du dock) ; `.app` coupe le débordement horizontal (`overflow-x: clip`).
 - Le premier plan du paysage a la couleur du fond de page : le relief semble sortir de la page, sans bord visible avec la section suivante. Le haut du ciel suit le même principe.
-- La pause utilisateur fige un décor complet (comme en mouvement réduit) et est mémorisée (`localStorage`, clé `scene-paused`) ; hors écran, les animations sont seulement suspendues. L’animation d’entrée n’est jamais gelée.
+- Le cycliste entre par la gauche et s’arrête au quart du paysage ; les oiseaux arrivent par la droite et restent en vol plané. Hors écran, les animations sont seulement suspendues. L’animation d’entrée n’est jamais gelée.
 - Scène décorative : `aria-hidden="true"`, aucun élément focusable, `pointer-events: none`. Une interaction ludique éventuelle (par exemple un clic sur l’astre pour changer de thème) doit doubler une commande existante et rester accessible au clavier, jamais en être la seule voie.
 - Les couleurs suivent `data-theme` sur `<html>` via les tokens, sans JavaScript, pour rester correctes dès le HTML généré au build et sans flash.
 - Le composant ne doit pas perturber `snapBlocks` ni la hauteur du bloc `.hero`.

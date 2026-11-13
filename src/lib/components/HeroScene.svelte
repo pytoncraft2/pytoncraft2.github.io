@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import type { Attachment } from 'svelte/attachments';
 
 	type Star = {
@@ -11,8 +10,6 @@
 		duration: number;
 		delay: number;
 	};
-
-	const storageKey = 'scene-paused';
 
 	/** Générateur pseudo-aléatoire déterministe : même ciel au pré-rendu et à l’hydratation. */
 	function seeded(seed: number) {
@@ -45,8 +42,9 @@
 				r: round(0.6 + random() * 1.2),
 				opacity: round(0.45 + random() * 0.5),
 				twinkle: result.length % 3 === 0,
-				duration: round(3 + random() * 4),
-				delay: round(-random() * 6)
+				// Un seul scintillement, terminé avant 5 s (au plus 1,4 + 3,5 s).
+				duration: round(2 + random() * 1.5),
+				delay: round(random() * 1.4)
 			});
 		}
 
@@ -55,29 +53,7 @@
 
 	const stars = createStars(46);
 
-	let userPaused = $state(false);
 	let inView = $state(true);
-
-	onMount(() => {
-		try {
-			userPaused = localStorage.getItem(storageKey) === '1';
-		} catch {
-			// Stockage indisponible : l’animation reste active.
-		}
-	});
-
-	function toggleMotion() {
-		userPaused = !userPaused;
-		try {
-			if (userPaused) {
-				localStorage.setItem(storageKey, '1');
-			} else {
-				localStorage.removeItem(storageKey);
-			}
-		} catch {
-			// Préférence non mémorisée, sans conséquence.
-		}
-	}
 
 	const watchVisibility: Attachment<HTMLElement> = (node) => {
 		const observer = new IntersectionObserver(([entry]) => {
@@ -88,7 +64,7 @@
 	};
 </script>
 
-<div class={['scene', { stilled: userPaused, offscreen: !inView }]} aria-hidden="true" {@attach watchVisibility}>
+<div class={['scene', { offscreen: !inView }]} aria-hidden="true" {@attach watchVisibility}>
 	<div class="sky"></div>
 
 	<svg class="sky-layer" viewBox="0 0 1440 640" preserveAspectRatio="xMidYMin slice" focusable="false">
@@ -247,22 +223,6 @@
 	</svg>
 </div>
 
-<button
-	type="button"
-	class="motion-toggle"
-	aria-label={userPaused ? 'Reprendre l’animation du décor' : 'Mettre en pause l’animation du décor'}
-	title={userPaused ? 'Reprendre l’animation du décor' : 'Mettre en pause l’animation du décor'}
-	onclick={toggleMotion}
->
-	<svg class="motion-icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-		{#if userPaused}
-			<path d="M6 4.5 L15.5 10 L6 15.5 Z" fill="currentColor" />
-		{:else}
-			<rect x="5" y="4.5" width="3.5" height="11" rx="1" fill="currentColor" />
-			<rect x="11.5" y="4.5" width="3.5" height="11" rx="1" fill="currentColor" />
-		{/if}
-	</svg>
-</button>
 
 <style>
 	/* Décor pleine largeur, derrière le contenu du hero (qui fournit --hero-scene-band). */
@@ -389,8 +349,9 @@
 		opacity: 0;
 	}
 
+	/* Position d’arrivée du cycliste, au quart du paysage (aussi le décor fixe). */
 	.rider {
-		transform: translateX(880px);
+		transform: translateX(360px);
 	}
 
 	.spokes,
@@ -403,7 +364,10 @@
 		transform-origin: 50% 100%;
 	}
 
-	/* Animations : uniquement transform et opacity. Les boucles d’ambiance s’arrêtent avec .stilled. */
+	/*
+	 * Animations : uniquement transform et opacity. Chaque élément bouge une seule fois et
+	 * s’arrête avant 5 s à la place qu’il occupe dans le décor fixe (WCAG 2.2.2).
+	 */
 	@media (prefers-reduced-motion: no-preference) {
 		.layer {
 			animation: rise 1100ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
@@ -415,32 +379,31 @@
 		}
 
 		.twinkle {
-			animation: twinkle var(--duration) ease-in-out var(--delay) infinite alternate;
+			animation: twinkle var(--duration) ease-in-out var(--delay) both;
 		}
 
 		.meteor {
-			animation: meteor 11s ease-in 3s infinite both;
+			animation: meteor 900ms ease-in 3s both;
 		}
 
-		.cloud-a {
-			animation: drift 46s ease-in-out infinite alternate;
+		.cloud {
+			animation: drift 4.5s cubic-bezier(0.25, 0.6, 0.3, 1) both;
 		}
 
 		.cloud-b {
-			animation: drift 38s ease-in-out -12s infinite alternate-reverse;
-		}
-
-		.cloud-c {
-			animation: drift 52s ease-in-out -20s infinite alternate;
+			animation-name: drift-reverse;
 		}
 
 		.flock {
-			animation: fly 34s linear 5s infinite both;
+			animation: fly 4.4s cubic-bezier(0.25, 0.6, 0.3, 1) both;
 		}
 
-		/* Battement d’ailes par morphose du tracé ; sans support de `d` en CSS, l’oiseau reste en vol plané. */
+		/*
+		 * Battement d’ailes par morphose du tracé, pendant le vol seulement : un nombre pair
+		 * d’allers-retours finit ailes déployées. Sans support de `d` en CSS, vol plané.
+		 */
 		.bird {
-			animation: flap 440ms ease-in-out infinite alternate;
+			animation: flap 440ms ease-in-out 10 alternate;
 		}
 
 		.bird-b {
@@ -452,20 +415,17 @@
 		}
 
 		.foliage {
-			animation: sway 7s ease-in-out infinite alternate;
+			animation: sway 4.5s ease-in-out both;
 		}
 
-		.rider {
-			animation: ride 26s linear 1.6s infinite both;
+		/* Passage unique du cycliste, qui ralentit et s’arrête au quart avant 5 s (WCAG 2.2.2). */
+		.rider,
+		.spokes {
+			animation: ride 4s cubic-bezier(0.25, 0.6, 0.3, 1) 400ms both;
 		}
 
 		.spokes {
-			animation: spin 900ms linear infinite;
-		}
-
-		/* Pause demandée : décor statique complet, comme en mouvement réduit. */
-		.stilled :is(.twinkle, .meteor, .cloud, .flock, .bird, .foliage, .rider, .spokes) {
-			animation: none;
+			animation-name: roll;
 		}
 
 		/* Hors écran : suspension, l’animation reprend là où elle s’était arrêtée. */
@@ -489,7 +449,7 @@
 	}
 
 	@keyframes twinkle {
-		to {
+		50% {
 			opacity: 0.15;
 		}
 	}
@@ -500,13 +460,8 @@
 			opacity: 0;
 		}
 
-		1.5% {
+		18% {
 			opacity: 1;
-		}
-
-		8% {
-			transform: translateX(340px);
-			opacity: 0;
 		}
 
 		100% {
@@ -516,22 +471,21 @@
 	}
 
 	@keyframes drift {
-		to {
-			translate: 60px 0;
+		from {
+			translate: -40px 0;
 		}
 	}
 
+	@keyframes drift-reverse {
+		from {
+			translate: 40px 0;
+		}
+	}
+
+	/* Arrivée par la droite jusqu’à la place de la nuée dans le décor fixe. */
 	@keyframes fly {
-		0% {
-			transform: translate(1520px, 58px);
-		}
-
-		55% {
-			transform: translate(-120px, 40px);
-		}
-
-		100% {
-			transform: translate(-120px, 40px);
+		from {
+			transform: translate(1520px, 40px);
 		}
 	}
 
@@ -546,73 +500,25 @@
 	}
 
 	@keyframes sway {
-		from {
+		25% {
 			transform: rotate(-1.5deg);
 		}
 
-		to {
+		75% {
 			transform: rotate(1.5deg);
 		}
 	}
 
 	@keyframes ride {
-		0% {
+		from {
 			transform: translateX(-140px);
 		}
+	}
 
-		62% {
-			transform: translateX(1580px);
+	/* 500 px parcourus pour une roue de 69 px de circonférence : environ 7,25 tours. */
+	@keyframes roll {
+		from {
+			transform: rotate(-2610deg);
 		}
-
-		100% {
-			transform: translateX(1580px);
-		}
-	}
-
-	@keyframes spin {
-		to {
-			transform: rotate(360deg);
-		}
-	}
-
-	/* Bouton pause : seulement utile quand le décor bouge. */
-	.motion-toggle {
-		position: absolute;
-		right: 0;
-		bottom: var(--spacing-3);
-		z-index: 1;
-		display: none;
-		align-items: center;
-		justify-content: center;
-		min-width: 44px;
-		min-height: 44px;
-		padding: var(--spacing-2);
-		border: 1px solid var(--border-default);
-		border-radius: var(--radius-full);
-		background: var(--surface-elevated);
-		color: var(--text-primary);
-		cursor: pointer;
-	}
-
-	.motion-toggle:hover {
-		background: var(--surface-subtle);
-		border-color: var(--border-strong);
-	}
-
-	.motion-toggle:focus-visible {
-		outline: 2px solid var(--action-focus);
-		outline-offset: 2px;
-	}
-
-	@media (prefers-reduced-motion: no-preference) {
-		.motion-toggle {
-			display: inline-flex;
-		}
-	}
-
-	.motion-icon {
-		display: block;
-		width: 1rem;
-		height: 1rem;
 	}
 </style>
