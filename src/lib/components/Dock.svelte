@@ -513,6 +513,49 @@
 			outline-offset: 2px;
 		}
 
+		/*
+		 * Accueil, page en haut (`data-dock-horizon`, géré par dock-horizon.ts) : le dock,
+		 * horizontal quelle que soit sa place, est centré sur l’horizon du paysage
+		 * (`--dock-lift`). Au défilement, il rejoint sa place : en glissant s’il est en bas,
+		 * en sortant puis en entrant (`data-dock-switch`) s’il est sur un côté.
+		 */
+		.dock:not(.dragging) {
+			transition:
+				translate 450ms cubic-bezier(0.4, 0, 0.2, 1),
+				opacity 220ms ease;
+		}
+
+		:global(html[data-dock-horizon]) .dock:not(.dragging) {
+			translate: 0 calc(-1 * var(--dock-lift, 0px));
+		}
+
+		:global(html[data-dock-switch]) .dock:not(.dragging) {
+			opacity: 0;
+		}
+
+		:global(html[data-dock-switch='out']) .dock:not(.dragging) {
+			transition:
+				translate 180ms ease-in,
+				opacity 180ms ease-in;
+		}
+
+		/* Nouvelle place posée sans transition, puis révélée à la fin du changement. */
+		:global(html[data-dock-switch='in']) .dock:not(.dragging) {
+			transition: none;
+		}
+
+		:global(html[data-dock-switch][data-dock-horizon]) .dock:not(.dragging) {
+			translate: 0 calc(0.75rem - var(--dock-lift, 0px));
+		}
+
+		:global(html[data-dock-switch][data-dock='left']:not([data-dock-horizon])) .dock:not(.dragging) {
+			translate: -0.75rem 0;
+		}
+
+		:global(html[data-dock-switch][data-dock='right']:not([data-dock-horizon])) .dock:not(.dragging) {
+			translate: 0.75rem 0;
+		}
+
 		.dock.dragging,
 		.dock.dragging .handle {
 			cursor: grabbing;
@@ -527,7 +570,7 @@
 			transform: translate(calc(-1 * var(--grab-x)), calc(-1 * var(--grab-y)));
 		}
 
-		:global(html[data-dock='left']) .dock:not(.dragging) {
+		:global(html[data-dock='left']:not([data-dock-horizon])) .dock:not(.dragging) {
 			top: 50%;
 			right: auto;
 			bottom: auto;
@@ -542,7 +585,7 @@
 			transform: translateY(-50%);
 		}
 
-		:global(html[data-dock='right']) .dock:not(.dragging) {
+		:global(html[data-dock='right']:not([data-dock-horizon])) .dock:not(.dragging) {
 			top: 50%;
 			right: 0;
 			bottom: auto;
@@ -558,7 +601,7 @@
 		}
 
 		@supports (clip-path: shape(from 0 0, line to 0 0)) {
-			:global(html[data-dock='left']) .dock:not(.dragging) {
+			:global(html[data-dock='left']:not([data-dock-horizon])) .dock:not(.dragging) {
 				--dock-shape: shape(
 					from 0 0,
 					line to calc(100% - var(--dock-round)) calc(var(--dock-bevel) - var(--dock-round) / 2),
@@ -571,7 +614,7 @@
 				);
 			}
 
-			:global(html[data-dock='right']) .dock:not(.dragging) {
+			:global(html[data-dock='right']:not([data-dock-horizon])) .dock:not(.dragging) {
 				--dock-shape: shape(
 					from 100% 0,
 					line to var(--dock-round) calc(var(--dock-bevel) - var(--dock-round) / 2),
@@ -585,18 +628,18 @@
 			}
 		}
 
-		:global(html[data-dock='left']) .dock:not(.dragging),
-		:global(html[data-dock='right']) .dock:not(.dragging) {
+		:global(html[data-dock='left']:not([data-dock-horizon])) .dock:not(.dragging),
+		:global(html[data-dock='right']:not([data-dock-horizon])) .dock:not(.dragging) {
 			--dock-round: 1rem;
 			border: none;
 			border-radius: 0;
 			background: transparent;
 		}
 
-		:global(html[data-dock='left']) .dock:not(.dragging)::before,
-		:global(html[data-dock='left']) .dock:not(.dragging)::after,
-		:global(html[data-dock='right']) .dock:not(.dragging)::before,
-		:global(html[data-dock='right']) .dock:not(.dragging)::after {
+		:global(html[data-dock='left']:not([data-dock-horizon])) .dock:not(.dragging)::before,
+		:global(html[data-dock='left']:not([data-dock-horizon])) .dock:not(.dragging)::after,
+		:global(html[data-dock='right']:not([data-dock-horizon])) .dock:not(.dragging)::before,
+		:global(html[data-dock='right']:not([data-dock-horizon])) .dock:not(.dragging)::after {
 			content: '';
 			position: absolute;
 			z-index: -1;
@@ -604,31 +647,31 @@
 			clip-path: var(--dock-shape);
 		}
 
-		:global(html[data-dock='left']) .dock:not(.dragging)::before,
-		:global(html[data-dock='right']) .dock:not(.dragging)::before {
+		:global(html[data-dock='left']:not([data-dock-horizon])) .dock:not(.dragging)::before,
+		:global(html[data-dock='right']:not([data-dock-horizon])) .dock:not(.dragging)::before {
 			background: var(--border-default);
 		}
 
-		:global(html[data-dock='left']) .dock:not(.dragging)::after,
-		:global(html[data-dock='right']) .dock:not(.dragging)::after {
+		:global(html[data-dock='left']:not([data-dock-horizon])) .dock:not(.dragging)::after,
+		:global(html[data-dock='right']:not([data-dock-horizon])) .dock:not(.dragging)::after {
 			background: var(--surface-elevated);
 		}
 
-		:global(html[data-dock='left']) .dock:not(.dragging)::after {
+		:global(html[data-dock='left']:not([data-dock-horizon])) .dock:not(.dragging)::after {
 			inset: 1px 1px 1px 0;
 		}
 
-		:global(html[data-dock='right']) .dock:not(.dragging)::after {
+		:global(html[data-dock='right']:not([data-dock-horizon])) .dock:not(.dragging)::after {
 			inset: 1px 0 1px 1px;
 		}
 
-		:global(html[data-dock='left']) .dock,
-		:global(html[data-dock='right']) .dock {
+		:global(html[data-dock='left']:not([data-dock-horizon])) .dock,
+		:global(html[data-dock='right']:not([data-dock-horizon])) .dock {
 			flex-direction: column;
 		}
 
-		:global(html[data-dock='left']) .items,
-		:global(html[data-dock='right']) .items {
+		:global(html[data-dock='left']:not([data-dock-horizon])) .items,
+		:global(html[data-dock='right']:not([data-dock-horizon])) .items {
 			flex-direction: column;
 		}
 

@@ -142,6 +142,7 @@ Utiliser `CaseStudyLayout`, `ProjectTags` et `ProjectImage` pour conserver une p
 La navigation doit rester compréhensible sans découvrir les fonctions avancées du dock. Conserver les accès au contenu, au menu, aux projets et au contact.
 
 - Le dock ne doit pas recouvrir un texte, une action ou un élément ayant le focus. Préserver l’espace nécessaire selon sa position.
+- Sur ordinateur, en haut de l’accueil, le dock est horizontal et centré sur la ligne d’horizon du paysage, quelle que soit sa place choisie (`dock-horizon.ts`, `data-horizon-y` sur le SVG du paysage). Au défilement, il rejoint cette place : en glissant s’il est en bas, en s’effaçant puis en réapparaissant sur le bord s’il est à gauche ou à droite. Il revient sur l’horizon en haut de page.
 - Son déplacement reste une possibilité complémentaire. Les fonctions essentielles doivent être accessibles sans glisser-déposer.
 - Un carrousel affiche sa position et propose des contrôles utilisables au clavier et au toucher. Éviter le défilement automatique.
 - Le défilement par sections doit laisser consulter librement les contenus longs et les zones disposant de leur propre défilement.

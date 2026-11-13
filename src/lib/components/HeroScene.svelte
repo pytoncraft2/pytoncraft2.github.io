@@ -115,7 +115,14 @@
 		</g>
 	</svg>
 
-	<svg class="land" viewBox="0 0 1440 320" preserveAspectRatio="xMidYMax slice" focusable="false">
+	<!-- data-horizon-y : ligne du sol (où roule le cycliste), lue par dock-horizon.ts. -->
+	<svg
+		class="land"
+		viewBox="0 0 1440 320"
+		preserveAspectRatio="xMidYMax slice"
+		focusable="false"
+		data-horizon-y="289"
+	>
 		<defs>
 			<linearGradient id="hero-scene-beam" gradientUnits="userSpaceOnUse" x1="20" y1="0" x2="100" y2="0">
 				<stop offset="0" stop-color="var(--scene-lamp)" stop-opacity="0.5" />

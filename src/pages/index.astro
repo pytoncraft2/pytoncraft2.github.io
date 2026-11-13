@@ -57,6 +57,15 @@ const careerSteps = [
 >
 	<!-- Le script de retour (BaseLayout) a besoin du carrousel dès le premier rendu. -->
 	<link slot="head" rel="expect" href="#projets-carousel" blocking="render" />
+	<!--
+		Dock sur l’horizon dès le premier rendu (avant le dock dans le document), pour éviter
+		qu’il apparaisse d’abord sur un côté ; dock-horizon.ts le place ou le retire ensuite.
+	-->
+	<script is:inline>
+		if (!location.hash && window.matchMedia('(min-width: 40rem)').matches) {
+			document.documentElement.setAttribute('data-dock-horizon', '');
+		}
+	</script>
 	<div class="page" data-snap-blocks>
 		<section class="hero snap-block" aria-labelledby="hero-title">
 			<div class="hero-copy">
@@ -150,6 +159,7 @@ const careerSteps = [
 </BaseLayout>
 
 <script>
+	import { dockHorizon } from '#lib/dock-horizon.js';
 	import { snapBlocks, stackBlocks } from '#lib/snap-blocks.js';
 
 	// Défilement et empilement par blocs de l’accueil (attachments Svelte réutilisés tels quels).
@@ -157,6 +167,12 @@ const careerSteps = [
 	if (page) {
 		snapBlocks(page);
 		stackBlocks(page);
+	}
+
+	// Dock posé sur l’horizon du paysage tant que la page est en haut.
+	const hero = document.querySelector<HTMLElement>('.hero');
+	if (hero) {
+		dockHorizon(hero);
 	}
 </script>
 
