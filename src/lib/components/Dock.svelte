@@ -5,7 +5,6 @@
 	/** Chemin de la page courante, fourni par Astro (Astro.url.pathname). */
 	let { pathname }: { pathname: string } = $props();
 
-	const cvHref = withBase('cv-timothee-hennequin.pdf');
 	const homeHref = withBase('/');
 	const storageKey = 'dock-placement';
 	const dragThreshold = 8;
@@ -197,7 +196,7 @@
 			id: 'accueil',
 			label: 'Accueil',
 			href: homeHref,
-			active: isHome && hash !== '#projets' && hash !== '#contact'
+			active: isHome && hash !== '#projets' && hash !== '#profil' && hash !== '#contact'
 		},
 		{
 			id: 'projets',
@@ -206,17 +205,16 @@
 			active: isProject || (isHome && hash === '#projets')
 		},
 		{
+			id: 'profil',
+			label: 'Profil',
+			href: `${homeHref}#profil`,
+			active: hash === '#profil'
+		},
+		{
 			id: 'contact',
 			label: 'Contact',
 			href: `${homeHref}#contact`,
 			active: hash === '#contact'
-		},
-		{
-			id: 'cv',
-			label: 'CV',
-			href: cvHref,
-			active: false,
-			external: true
 		}
 	]);
 </script>
@@ -258,9 +256,6 @@
 					class:active={item.active}
 					href={item.href}
 					aria-current={item.active ? 'page' : undefined}
-					aria-label={item.external ? `${item.label} (PDF)` : undefined}
-					target={item.external ? '_blank' : undefined}
-					rel={item.external ? 'noreferrer' : undefined}
 				>
 					<span class="icon" aria-hidden="true">
 						{#if item.id === 'accueil'}
@@ -279,7 +274,7 @@
 									stroke-linejoin="round"
 								/>
 							</svg>
-						{:else if item.id === 'parcours'}
+						{:else if item.id === 'profil'}
 							<svg viewBox="0 0 24 24" fill="none">
 								<circle cx="12" cy="8" r="3.25" stroke="currentColor" stroke-width="1.75" />
 								<path
@@ -299,7 +294,7 @@
 								/>
 								<path d="M4 8V6h5l1.5 2" stroke="currentColor" stroke-width="1.75" />
 							</svg>
-						{:else if item.id === 'contact'}
+						{:else}
 							<svg viewBox="0 0 24 24" fill="none">
 								<rect
 									x="3.5"
@@ -316,22 +311,6 @@
 									stroke-width="1.75"
 									stroke-linecap="round"
 									stroke-linejoin="round"
-								/>
-							</svg>
-						{:else}
-							<svg viewBox="0 0 24 24" fill="none">
-								<path
-									d="M7 4h7l5 5v11H7V4Z"
-									stroke="currentColor"
-									stroke-width="1.75"
-									stroke-linejoin="round"
-								/>
-								<path d="M14 4v5h5" stroke="currentColor" stroke-width="1.75" />
-								<path
-									d="M10 13h6M10 16.5h4"
-									stroke="currentColor"
-									stroke-width="1.75"
-									stroke-linecap="round"
 								/>
 							</svg>
 						{/if}
