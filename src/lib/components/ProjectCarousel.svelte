@@ -105,6 +105,14 @@
 			return;
 		}
 
+		// En butée à droite : la dernière page, même incomplète (8 projets par 3 : la butée
+		// montre les projets 6 à 8, dont le plus proche, le 6e, appartient à la page 2).
+		const maxScroll = root.scrollWidth - root.clientWidth;
+		if (maxScroll > 0 && root.scrollLeft >= maxScroll - 2) {
+			projectIndex = (pageCount - 1) * visibleCount;
+			return;
+		}
+
 		let closest = 0;
 		let min = Number.POSITIVE_INFINITY;
 
@@ -199,6 +207,15 @@
 		keepInitialPage();
 		const offScroll = on(node, 'scroll', () => {
 			if (keepInitialPage()) {
+				return;
+			}
+
+			// Défilement lancé par un bouton : l'index reste celui visé jusqu'à l'arrêt du
+			// mouvement (fin de défilement, ou 150 ms sans défilement), sinon il suivrait les
+			// cartes traversées (plusieurs clics enchaînent un défilement plus long).
+			if (projectScrollLock) {
+				window.clearTimeout(projectScrollTimer);
+				projectScrollTimer = window.setTimeout(unlockProjectScroll, 150);
 				return;
 			}
 
