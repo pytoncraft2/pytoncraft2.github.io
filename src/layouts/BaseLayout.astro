@@ -54,7 +54,8 @@ const { title, description } = Astro.props;
 			Transitions de vue entre pages (natives, sans routeur JS : voir @view-transition dans global.css).
 			Une transition entre l'accueil et une étude de cas reçoit le type `project` (fondu de la
 			page calé sur celui de la carte), et d'une étude de cas à la suivante le type
-			`project-next` (simple enchaînement de fondus) : voir global.css. Au retour d'une étude de cas vers l'accueil,
+			`project-next` (simple enchaînement de fondus) ; le retour vers l'accueil reçoit en plus
+			`project-close` : voir global.css. Au retour d'une étude de cas vers l'accueil,
 			la carte du projet quitté reçoit les noms de transition avant le premier rendu, et le
 			carrousel est placé sur sa page.
 		-->
@@ -70,6 +71,10 @@ const { title, description } = Astro.props;
 				var toProject = projectPath.test(location.pathname);
 				if (event.viewTransition.types && (match || toProject)) {
 					event.viewTransition.types.add(match && toProject ? 'project-next' : 'project');
+					// Retour d'une étude de cas vers l'accueil : la fenêtre redevient une carte.
+					if (match && !toProject) {
+						event.viewTransition.types.add('project-close');
+					}
 				}
 				if (!match) {
 					return;

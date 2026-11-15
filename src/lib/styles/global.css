@@ -89,6 +89,15 @@ html:active-view-transition-type(project)::view-transition-new(root) {
 }
 
 /*
+ * Retour d'une étude de cas (type `project-close`) : la carte, dessinée à sa taille par-dessus
+ * la fenêtre qui rétrécit, montrerait son contour dès le début. Elle n'apparaît qu'en fin de
+ * rétrécissement, quand la fenêtre a presque sa taille.
+ */
+html:active-view-transition-type(project-close)::view-transition-new(.project-frame) {
+	animation: page-fade-in 160ms ease-out 280ms both;
+}
+
+/*
  * Barre de titre de la fenêtre d'étude de cas (classe `project-chrome`) : entre l'accueil et une
  * étude de cas, elle s'efface aussitôt au retour et apparaît une fois la fenêtre ouverte à
  * l'aller, au lieu de rester figée en haut de la carte qui change de taille. D'une étude de
