@@ -25,6 +25,9 @@
 	let projectScroller: HTMLUListElement | undefined;
 	let projectIndex = $state(0);
 	let visibleCount = $state(1);
+	// Faux tant que le nombre de projets par page n'est pas mesuré : la page générée au build
+	// ne connaît pas la largeur d'écran (elle compterait « 1 / 8 »).
+	let measured = $state(false);
 	let projectScrollLock = false;
 	let projectScrollTimer = 0;
 	let initialProjectIndex = originProjectIndex();
@@ -188,6 +191,7 @@
 		}
 
 		measureVisibleCount();
+		measured = true;
 		initialProjectIndex = Math.floor(initialProjectIndex / visibleCount) * visibleCount;
 		// La page peut déjà être en place (script de retour de BaseLayout, avant le premier
 		// rendu) : aucun défilement ne suivra, donc l'index est posé ici dans tous les cas.
@@ -234,7 +238,7 @@
 			</li>
 		{/each}
 	</ul>
-	<div class="carousel-nav">
+	<div class={['carousel-nav', { pending: !measured }]}>
 		<button
 			class="carousel-btn"
 			type="button"
@@ -330,6 +334,11 @@
 		align-items: center;
 		justify-content: center;
 		gap: var(--spacing-3);
+	}
+
+	/* Place réservée, contenu masqué jusqu'à la première mesure (voir `measured`). */
+	.carousel-nav.pending {
+		visibility: hidden;
 	}
 
 	.carousel-btn {
