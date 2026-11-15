@@ -97,7 +97,7 @@
 :root[data-theme='dark'],
 [data-theme='dark'] {
   --color-night: #0f0f0f;
-  --color-night-raised: #242424;
+  --color-night-raised: #1f2429;
   --color-ash: #eeeeee;
   --color-smoke: #b7b7b7;
   --color-frost: #aacccc;
