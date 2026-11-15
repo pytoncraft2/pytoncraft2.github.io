@@ -157,7 +157,7 @@ const careerSteps = [
 		</section>
 
 		<div id="contact" class="anchor"></div>
-		<section class="contact snap-block" data-section="contact" aria-labelledby="contact-title">
+		<section class="contact snap-block" data-section="contact" data-stack-empty aria-labelledby="contact-title">
 			<div class="bubble">
 				<h2 id="contact-title" class="ds-h2">Contactez-moi&nbsp;!</h2>
 				<p class="contact-intro ds-body-m">
@@ -489,6 +489,9 @@ const careerSteps = [
 	 * (marge de défilement en haut, marge de la section, bas de <main>, pied de page), au-dessus
 	 * du paysage. Son contenu est une bulle de BD qui sort de la tête du cycliste (position
 	 * `--bubble-x` / `--bubble-y`, calculée par contact-bubble.ts) quand la section est affichée.
+	 * Sur ordinateur, le pied de page se superpose au bas de Contact au lieu de s'empiler
+	 * dessous : la fin de page garde la hauteur de l'écran, et le hero collé n'est pas repoussé
+	 * vers le haut dans les dernières images de la glissade (écrans peu hauts).
 	 */
 	.contact {
 		--footer-height: calc(var(--spacing-6) + var(--text-body-s-line) + 5.5rem);
@@ -549,7 +552,12 @@ const careerSteps = [
 	/* Ordinateur : la bulle flotte au-dessus du cycliste, sa pointe vers sa tête. */
 	@media (min-width: 40rem) {
 		.contact {
-			--footer-height: calc(var(--spacing-6) + var(--text-body-s-line) + var(--spacing-8));
+			--footer-height: 0px;
+		}
+
+		:global(body .app .footer) {
+			position: relative;
+			margin-top: calc(-1 * (var(--spacing-6) + var(--text-body-s-line) + var(--spacing-8)));
 		}
 
 		.bubble {

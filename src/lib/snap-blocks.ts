@@ -318,8 +318,10 @@ export const snapBlocks: Attachment<HTMLElement> = (root) => {
 /**
  * Empilement : chaque bloc reste collé en haut de l'écran pendant que le suivant glisse
  * par-dessus, et s'efface avant que leurs contenus se superposent (opacité exposée en
- * `--stack-opacity`). Sous un bloc suivant opaque, qui le masque de toute façon, le fondu
- * s'étale sur la première moitié de sa course, pour ne pas disparaître d'un coup. Un bloc
+ * `--stack-opacity`). Sous un bloc suivant opaque, qui le masque de toute façon, ou sous un
+ * bloc `data-stack-empty` (rien à afficher pendant sa glissade, son contenu n'apparaît qu'à
+ * l'arrivée), le fondu s'étale sur la première moitié de sa course, pour ne pas disparaître
+ * d'un coup. Un bloc
  * plus haut que l'écran ne se colle qu'une fois son bas atteint, pour rester lisible
  * jusqu'au bout. Le dernier bloc se colle à sa place de fin de page (au-dessus du pied de
  * page) plutôt qu'en haut de l'écran. Sans ce script, les blocs défilent normalement.
@@ -364,7 +366,8 @@ export const stackBlocks: Attachment<HTMLElement> = (root) => {
 				parseLength(current.borderBottomWidth) +
 				parseLength(next.paddingTop) +
 				parseLength(next.borderTopWidth);
-			const halfTravel = hasOpaqueBackground(next) ? (stuckAt[i + 1] - stuckAt[i]) / 2 : 0;
+			const covers = hasOpaqueBackground(next) || blocks[i + 1].hasAttribute('data-stack-empty');
+			const halfTravel = covers ? (stuckAt[i + 1] - stuckAt[i]) / 2 : 0;
 			// Effacé au plus tard quand le suivant est en place (court trajet vers le dernier bloc).
 			const travel = stuckAt[i + 1] - stuckAt[i];
 			return Math.max(1, Math.min(Math.max(beforeOverlap, halfTravel), travel));
