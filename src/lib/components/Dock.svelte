@@ -100,60 +100,30 @@
 					aria-current={item.active ? (isHome ? 'location' : 'page') : undefined}
 				>
 					<span class="icon" aria-hidden="true">
+						<!--
+							Icônes Phosphor (style Duotone) : mountains, map-trifold, path, envelope-simple.
+							Copyright (c) 2023 Phosphor Icons, licence MIT :
+							https://github.com/phosphor-icons/core/blob/main/LICENSE
+						-->
 						{#if item.id === 'accueil'}
-							<svg viewBox="0 0 24 24" fill="none">
-								<path
-									d="M4 11 12 4l8 7"
-									stroke="currentColor"
-									stroke-width="1.75"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-								/>
-								<path
-									d="M6 10.5V20h12v-9.5"
-									stroke="currentColor"
-									stroke-width="1.75"
-									stroke-linejoin="round"
-								/>
-							</svg>
-						{:else if item.id === 'profil'}
-							<svg viewBox="0 0 24 24" fill="none">
-								<circle cx="12" cy="8" r="3.25" stroke="currentColor" stroke-width="1.75" />
-								<path
-									d="M5.5 19.25c.7-3.1 3.1-4.75 6.5-4.75s5.8 1.65 6.5 4.75"
-									stroke="currentColor"
-									stroke-width="1.75"
-									stroke-linecap="round"
-								/>
+							<svg viewBox="0 0 256 256" fill="currentColor">
+								<path opacity=".2" d="M144 52a20 20 0 1 1 20 20a20 20 0 0 1-20-20m49.44 55.92a8 8 0 0 0-13.77 0l-33 55.75l-21-35.67H50.35L8 200h240Z" />
+								<path d="M164 80a28 28 0 1 0-28-28a28 28 0 0 0 28 28m0-40a12 12 0 1 1-12 12a12 12 0 0 1 12-12m90.88 155.92l-54.56-92.08A15.87 15.87 0 0 0 186.55 96a15.85 15.85 0 0 0-13.76 7.84L146.63 148l-44.84-76.1a16 16 0 0 0-27.58 0L1.11 195.94A8 8 0 0 0 8 208h240a8 8 0 0 0 6.88-12.08M88 80l23.57 40H64.43ZM22 192l33-56h66l33 56Zm150.57 0l-16.66-28.28L186.55 112L234 192Z" />
 							</svg>
 						{:else if item.id === 'projets'}
-							<svg viewBox="0 0 24 24" fill="none">
-								<path
-									d="M4 8h6l1.5 2H20v10H4V8Z"
-									stroke="currentColor"
-									stroke-width="1.75"
-									stroke-linejoin="round"
-								/>
-								<path d="M4 8V6h5l1.5 2" stroke="currentColor" stroke-width="1.75" />
+							<svg viewBox="0 0 256 256" fill="currentColor">
+								<path opacity=".2" d="M160 72v144l-64-32V40Z" />
+								<path d="M228.92 49.69a8 8 0 0 0-6.86-1.45l-61.13 15.28l-61.35-30.68a8 8 0 0 0-5.52-.6l-64 16A8 8 0 0 0 24 56v144a8 8 0 0 0 9.94 7.76l61.13-15.28l61.35 30.68a8.15 8.15 0 0 0 3.58.84a8 8 0 0 0 1.94-.24l64-16A8 8 0 0 0 232 200V56a8 8 0 0 0-3.08-6.31M104 52.94l48 24v126.12l-48-24Zm-64 9.31l48-12v127.5l-48 12Zm176 131.5l-48 12V78.25l48-12Z" />
+							</svg>
+						{:else if item.id === 'profil'}
+							<svg viewBox="0 0 256 256" fill="currentColor">
+								<path opacity=".2" d="M224 200a24 24 0 1 1-24-24a24 24 0 0 1 24 24" />
+								<path d="M200 168a32.06 32.06 0 0 0-31 24H72a32 32 0 0 1 0-64h96a40 40 0 0 0 0-80H72a8 8 0 0 0 0 16h96a24 24 0 0 1 0 48H72a48 48 0 0 0 0 96h97a32 32 0 1 0 31-40m0 48a16 16 0 1 1 16-16a16 16 0 0 1-16 16" />
 							</svg>
 						{:else}
-							<svg viewBox="0 0 24 24" fill="none">
-								<rect
-									x="3.5"
-									y="6"
-									width="17"
-									height="12"
-									rx="1.5"
-									stroke="currentColor"
-									stroke-width="1.75"
-								/>
-								<path
-									d="m4.5 7.5 7.5 5.5 7.5-5.5"
-									stroke="currentColor"
-									stroke-width="1.75"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-								/>
+							<svg viewBox="0 0 256 256" fill="currentColor">
+								<path opacity=".2" d="m224 56l-96 88l-96-88Z" />
+								<path d="M224 48H32a8 8 0 0 0-8 8v136a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a8 8 0 0 0-8-8m-20.57 16L128 133.15L52.57 64ZM216 192H40V74.19l82.59 75.71a8 8 0 0 0 10.82 0L216 74.19z" />
 							</svg>
 						{/if}
 					</span>
