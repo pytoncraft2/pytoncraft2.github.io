@@ -115,6 +115,20 @@ function flowTop(block: HTMLElement) {
 	return top;
 }
 
+/**
+ * Fond entièrement opaque (`rgb()`, ou `rgba()` d'alpha 1) : le bloc masque celui qu'il
+ * recouvre. Toute autre valeur est traitée comme transparente, par prudence.
+ */
+function hasOpaqueBackground(style: CSSStyleDeclaration) {
+	const color = style.backgroundColor;
+	if (color.startsWith('rgb(')) {
+		return true;
+	}
+
+	const alpha = color.match(/^rgba\(.*,\s*([\d.]+)\)$/);
+	return alpha !== null && parseFloat(alpha[1]) === 1;
+}
+
 function blockScrollTop(block: HTMLElement) {
 	const top = flowTop(block) - getScrollPadding().top;
 	return Math.min(Math.max(0, top), maxScrollY());
@@ -304,15 +318,16 @@ export const snapBlocks: Attachment<HTMLElement> = (root) => {
 /**
  * Empilement : chaque bloc reste collé en haut de l'écran pendant que le suivant glisse
  * par-dessus, et s'efface avant que leurs contenus se superposent (opacité exposée en
- * `--stack-opacity`). Un bloc plus haut que l'écran ne se colle qu'une fois son bas atteint, pour
- * rester lisible jusqu'au bout. Le dernier bloc reçoit la marge nécessaire pour pouvoir
+ * `--stack-opacity`). Sous un bloc suivant opaque, qui le masque de toute façon, le fondu
+ * s'étale sur la première moitié de sa course, pour ne pas disparaître d'un coup. Un bloc
+ * plus haut que l'écran ne se colle qu'une fois son bas atteint, pour rester lisible
+ * jusqu'au bout. Le dernier bloc reçoit la marge nécessaire pour pouvoir
  * s'aligner en haut comme les autres. Sans ce script, les blocs défilent normalement.
  */
 export const stackBlocks: Attachment<HTMLElement> = (root) => {
 	const blocks = [...root.querySelectorAll<HTMLElement>('.snap-block')];
 	const last = blocks[blocks.length - 1];
-	// Défilement, depuis le moment où un bloc se colle, au bout duquel le contenu du
-	// suivant atteint le sien : marge entre eux et espacements intérieurs.
+	// Défilement, depuis le moment où un bloc se colle, sur lequel il s'efface.
 	let fadeLengths: number[] = [];
 	let gaps: number[] = [];
 	let frame = 0;
@@ -323,24 +338,29 @@ export const stackBlocks: Attachment<HTMLElement> = (root) => {
 		last.style.removeProperty('margin-bottom');
 		const styles = blocks.map((block) => getComputedStyle(block));
 		gaps = styles.map((style) => parseLength(style.marginBottom));
-		fadeLengths = blocks.slice(0, -1).map((_, i) => {
-			const current = styles[i];
-			const next = styles[i + 1];
-			return Math.max(
-				1,
-				gaps[i] +
-					parseLength(current.paddingBottom) +
-					parseLength(current.borderBottomWidth) +
-					parseLength(next.paddingTop) +
-					parseLength(next.borderTopWidth)
-			);
-		});
-		blocks.forEach((block, i) => {
+		const stackTops = blocks.map((block, i) => {
 			// Le premier bloc se colle à sa place de repos : plus bas que la marge de défilement
 			// (espacement de la page), il remonterait de quelques pixels puis s'arrêterait net.
 			const rest = i === 0 ? Math.max(top, flowTop(block)) : top;
 			const stackTop = Math.min(rest, available - block.offsetHeight);
 			block.style.setProperty('--stack-top', `${stackTop}px`);
+			return stackTop;
+		});
+		// Défilement à partir duquel chaque bloc est collé.
+		const stuckAt = blocks.map((block, i) => flowTop(block) - stackTops[i]);
+		fadeLengths = blocks.slice(0, -1).map((_, i) => {
+			const current = styles[i];
+			const next = styles[i + 1];
+			// Jusqu'à ce que le contenu du suivant atteigne le sien : marge entre eux et
+			// espacements intérieurs.
+			const beforeOverlap =
+				gaps[i] +
+				parseLength(current.paddingBottom) +
+				parseLength(current.borderBottomWidth) +
+				parseLength(next.paddingTop) +
+				parseLength(next.borderTopWidth);
+			const halfTravel = hasOpaqueBackground(next) ? (stuckAt[i + 1] - stuckAt[i]) / 2 : 0;
+			return Math.max(1, beforeOverlap, halfTravel);
 		});
 
 		const extra = flowTop(last) - top - maxScrollY();
