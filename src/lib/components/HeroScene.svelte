@@ -434,8 +434,12 @@
 			animation-name: drift-reverse;
 		}
 
+		/*
+		 * Vol à vitesse constante depuis le quart droit du paysage, puis léger ralentissement
+		 * sur la fin (voir @keyframes fly) ; posé avant 5 s.
+		 */
 		.flock {
-			animation: fly 4.4s cubic-bezier(0.25, 0.6, 0.3, 1) both;
+			animation: fly 4.4s linear both;
 		}
 
 		/*
@@ -548,9 +552,19 @@
 	}
 
 	/* Arrivée par la droite jusqu’à la place de la nuée dans le décor fixe. */
+	/*
+	 * 80 % du temps à vitesse constante (89 % du trajet), puis une décélération dont la vitesse
+	 * de départ égale celle du vol (pente initiale de la courbe : 2), pour éviter une cassure.
+	 */
 	@keyframes fly {
 		from {
-			transform: translate(1520px, 40px);
+			transform: translate(1080px, 49px);
+			animation-timing-function: linear;
+		}
+
+		80% {
+			transform: translate(689px, 57px);
+			animation-timing-function: cubic-bezier(0.2, 0.4, 0.4, 1);
 		}
 	}
 
