@@ -65,169 +65,176 @@
 </script>
 
 <div class={['scene', { offscreen: !inView }]} aria-hidden="true" {@attach watchVisibility}>
-	<div class="sky"></div>
+	<!-- Tout le décor, agrandi vers le vélo en bas de l'accueil (voir contact-bubble.ts). -->
+	<div class="zoom">
+		<div class="sky"></div>
 
-	<svg class="sky-layer" viewBox="0 0 1440 640" preserveAspectRatio="xMidYMin slice" focusable="false">
-		<defs>
-			<linearGradient id="hero-scene-trail" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="-110" y2="0">
-				<stop offset="0" stop-color="#ffffff" stop-opacity="0.95" />
-				<stop offset="1" stop-color="#ffffff" stop-opacity="0" />
-			</linearGradient>
-		</defs>
+		<svg class="sky-layer" viewBox="0 0 1440 640" preserveAspectRatio="xMidYMin slice" focusable="false">
+			<defs>
+				<linearGradient id="hero-scene-trail" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="-110" y2="0">
+					<stop offset="0" stop-color="#ffffff" stop-opacity="0.95" />
+					<stop offset="1" stop-color="#ffffff" stop-opacity="0" />
+				</linearGradient>
+			</defs>
 
-		<g class="night">
-			{#each stars as star, index (index)}
-				<circle
-					class={['star', { twinkle: star.twinkle }]}
-					cx={star.x}
-					cy={star.y}
-					r={star.r}
-					opacity={star.opacity}
-					style:--duration="{star.duration}s"
-					style:--delay="{star.delay}s"
+			<g class="night">
+				{#each stars as star, index (index)}
+					<circle
+						class={['star', { twinkle: star.twinkle }]}
+						cx={star.x}
+						cy={star.y}
+						r={star.r}
+						opacity={star.opacity}
+						style:--duration="{star.duration}s"
+						style:--delay="{star.delay}s"
+					/>
+				{/each}
+
+				<g transform="translate(1260 60) rotate(152)">
+					<g class="meteor">
+						<line x1="0" y1="0" x2="-110" y2="0" stroke="url(#hero-scene-trail)" stroke-width="2" stroke-linecap="round" />
+						<circle r="1.8" fill="#ffffff" />
+					</g>
+				</g>
+			</g>
+
+			<g class="day">
+				<g class="cloud cloud-a" transform="translate(940 70)">
+					<rect x="-46" y="0" width="112" height="24" rx="12" />
+					<circle cx="-10" cy="2" r="18" />
+					<circle cx="22" cy="-4" r="24" />
+				</g>
+				<g class="cloud cloud-b" transform="translate(1290 420) scale(0.8)">
+					<rect x="-46" y="0" width="112" height="24" rx="12" />
+					<circle cx="-10" cy="2" r="18" />
+					<circle cx="22" cy="-4" r="24" />
+				</g>
+				<g class="cloud cloud-c" transform="translate(620 470) scale(0.6)">
+					<rect x="-46" y="0" width="112" height="24" rx="12" />
+					<circle cx="-10" cy="2" r="18" />
+					<circle cx="22" cy="-4" r="24" />
+				</g>
+			</g>
+		</svg>
+
+		<!-- data-horizon-y : ligne du sol (où roule le cycliste), lue par dock-horizon.ts. -->
+		<svg
+			class="land"
+			viewBox="0 0 1440 320"
+			preserveAspectRatio="xMidYMax slice"
+			focusable="false"
+			data-horizon-y="289"
+		>
+			<defs>
+				<linearGradient id="hero-scene-beam" gradientUnits="userSpaceOnUse" x1="20" y1="0" x2="100" y2="0">
+					<stop offset="0" stop-color="var(--scene-lamp)" stop-opacity="0.5" />
+					<stop offset="1" stop-color="var(--scene-lamp)" stop-opacity="0" />
+				</linearGradient>
+				<mask id="hero-scene-moon-mask" maskUnits="userSpaceOnUse">
+					<rect x="960" y="40" width="100" height="100" fill="#ffffff" />
+					<circle cx="1024" cy="82" r="22" fill="#000000" />
+				</mask>
+			</defs>
+
+			<!-- Astre : le soleil se couche et la lune se lève quand le thème passe en sombre. -->
+			<g class="layer astre-rise">
+				<g class="astre sun">
+					<circle cx="1010" cy="92" r="62" fill="var(--scene-sun-glow)" />
+					<circle cx="1010" cy="92" r="38" fill="var(--scene-sun)" />
+				</g>
+				<g class="astre moon">
+					<circle cx="1010" cy="92" r="52" fill="var(--scene-moon-glow)" />
+					<circle cx="1010" cy="92" r="28" fill="var(--scene-moon)" mask="url(#hero-scene-moon-mask)" />
+				</g>
+			</g>
+
+			<g class="layer" style:--i="1">
+				<path
+					fill="var(--scene-far)"
+					d="M0 210 L120 150 L210 185 L330 110 L440 170 L560 122 L690 180 L800 136 L930 175 L1050 105 L1180 165 L1300 130 L1440 172 L1440 320 L0 320 Z"
 				/>
-			{/each}
-
-			<g transform="translate(1260 60) rotate(152)">
-				<g class="meteor">
-					<line x1="0" y1="0" x2="-110" y2="0" stroke="url(#hero-scene-trail)" stroke-width="2" stroke-linecap="round" />
-					<circle r="1.8" fill="#ffffff" />
-				</g>
-			</g>
-		</g>
-
-		<g class="day">
-			<g class="cloud cloud-a" transform="translate(940 70)">
-				<rect x="-46" y="0" width="112" height="24" rx="12" />
-				<circle cx="-10" cy="2" r="18" />
-				<circle cx="22" cy="-4" r="24" />
-			</g>
-			<g class="cloud cloud-b" transform="translate(1290 420) scale(0.8)">
-				<rect x="-46" y="0" width="112" height="24" rx="12" />
-				<circle cx="-10" cy="2" r="18" />
-				<circle cx="22" cy="-4" r="24" />
-			</g>
-			<g class="cloud cloud-c" transform="translate(620 470) scale(0.6)">
-				<rect x="-46" y="0" width="112" height="24" rx="12" />
-				<circle cx="-10" cy="2" r="18" />
-				<circle cx="22" cy="-4" r="24" />
-			</g>
-		</g>
-	</svg>
-
-	<!-- data-horizon-y : ligne du sol (où roule le cycliste), lue par dock-horizon.ts. -->
-	<svg
-		class="land"
-		viewBox="0 0 1440 320"
-		preserveAspectRatio="xMidYMax slice"
-		focusable="false"
-		data-horizon-y="289"
-	>
-		<defs>
-			<linearGradient id="hero-scene-beam" gradientUnits="userSpaceOnUse" x1="20" y1="0" x2="100" y2="0">
-				<stop offset="0" stop-color="var(--scene-lamp)" stop-opacity="0.5" />
-				<stop offset="1" stop-color="var(--scene-lamp)" stop-opacity="0" />
-			</linearGradient>
-			<mask id="hero-scene-moon-mask" maskUnits="userSpaceOnUse">
-				<rect x="960" y="40" width="100" height="100" fill="#ffffff" />
-				<circle cx="1024" cy="82" r="22" fill="#000000" />
-			</mask>
-		</defs>
-
-		<!-- Astre : le soleil se couche et la lune se lève quand le thème passe en sombre. -->
-		<g class="layer astre-rise">
-			<g class="astre sun">
-				<circle cx="1010" cy="92" r="62" fill="var(--scene-sun-glow)" />
-				<circle cx="1010" cy="92" r="38" fill="var(--scene-sun)" />
-			</g>
-			<g class="astre moon">
-				<circle cx="1010" cy="92" r="52" fill="var(--scene-moon-glow)" />
-				<circle cx="1010" cy="92" r="28" fill="var(--scene-moon)" mask="url(#hero-scene-moon-mask)" />
-			</g>
-		</g>
-
-		<g class="layer" style:--i="1">
-			<path
-				fill="var(--scene-far)"
-				d="M0 210 L120 150 L210 185 L330 110 L440 170 L560 122 L690 180 L800 136 L930 175 L1050 105 L1180 165 L1300 130 L1440 172 L1440 320 L0 320 Z"
-			/>
-			<path fill="var(--scene-snow)" d="M330 110 L303.6 126.5 L316 122 L326 128 L338 121 L354.2 123.2 Z" />
-			<path fill="var(--scene-snow)" d="M1050 105 L1023.6 120.4 L1036 117 L1046 123 L1060 116 L1078.6 118.2 Z" />
-		</g>
-
-		<g class="day">
-			<g class="flock">
-				<!-- Chaque oiseau est dessiné autour de son corps (0, 0) : seules les ailes bougent. -->
-				<path class="bird" transform="translate(12 0)" d="M-12 -5 Q-6 -7 0 0 Q6 -7 12 -5" />
-				<g transform="translate(40 -14) scale(0.83)">
-					<path class="bird bird-b" d="M-12 -5 Q-6 -7 0 0 Q6 -7 12 -5" />
-				</g>
-				<g transform="translate(52 8) scale(0.67)">
-					<path class="bird bird-c" d="M-12 -5 Q-6 -7 0 0 Q6 -7 12 -5" />
-				</g>
-			</g>
-		</g>
-
-		<g class="layer" style:--i="2">
-			<path
-				fill="var(--scene-mid)"
-				d="M0 230 C160 190 300 200 420 220 C560 245 700 195 860 200 C1010 205 1120 240 1260 225 C1350 215 1400 205 1440 210 L1440 320 L0 320 Z"
-			/>
-		</g>
-
-		<g class="layer" style:--i="3">
-			<path
-				fill="var(--scene-near)"
-				d="M0 250 C120 222 250 214 370 236 C450 251 520 266 620 270 C760 274 840 262 960 248 C1080 234 1200 230 1300 242 C1370 250 1410 256 1440 258 L1440 320 L0 320 Z"
-			/>
-
-			<g fill="var(--scene-tree-shade)">
-				<path d="M1246 178 L1226 238 L1266 238 Z" />
-				<path d="M1278 200 L1264 240 L1292 240 Z" />
+				<path fill="var(--scene-snow)" d="M330 110 L303.6 126.5 L316 122 L326 128 L338 121 L354.2 123.2 Z" />
+				<path fill="var(--scene-snow)" d="M1050 105 L1023.6 120.4 L1036 117 L1046 123 L1060 116 L1078.6 118.2 Z" />
 			</g>
 
-			<rect x="415" y="196" width="10" height="52" rx="3" fill="var(--scene-trunk)" />
-			<g class="foliage">
-				<circle cx="420" cy="178" r="34" fill="var(--scene-tree)" />
-				<circle cx="394" cy="194" r="24" fill="var(--scene-tree-shade)" />
-				<circle cx="448" cy="192" r="26" fill="var(--scene-tree)" />
-			</g>
-		</g>
-
-		<g class="layer" style:--i="4">
-			<path fill="var(--scene-ground)" d="M0 292 C300 286 600 288 720 288 C900 288 1200 286 1440 290 L1440 320 L0 320 Z" />
-		</g>
-
-		<g transform="translate(0 289)">
-			<g class="rider">
-				<polygon class="night beam" points="20,-31 100,-14 100,0" fill="url(#hero-scene-beam)" />
-				<g fill="none" stroke="var(--scene-bike)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-					<circle cx="-20" cy="-11" r="11" />
-					<circle cx="20" cy="-11" r="11" />
-					<g class="spokes">
-						<line x1="-28" y1="-11" x2="-12" y2="-11" />
-						<line x1="-20" y1="-19" x2="-20" y2="-3" />
+			<g class="day">
+				<g class="flock">
+					<!-- Chaque oiseau est dessiné autour de son corps (0, 0) : seules les ailes bougent. -->
+					<path class="bird" transform="translate(12 0)" d="M-12 -5 Q-6 -7 0 0 Q6 -7 12 -5" />
+					<g transform="translate(40 -14) scale(0.83)">
+						<path class="bird bird-b" d="M-12 -5 Q-6 -7 0 0 Q6 -7 12 -5" />
 					</g>
-					<g class="spokes">
-						<line x1="12" y1="-11" x2="28" y2="-11" />
-						<line x1="20" y1="-19" x2="20" y2="-3" />
+					<g transform="translate(52 8) scale(0.67)">
+						<path class="bird bird-c" d="M-12 -5 Q-6 -7 0 0 Q6 -7 12 -5" />
 					</g>
-					<polyline points="-20,-11 -2,-12 -8,-30 -20,-11" />
-					<polyline points="-8,-30 14,-31 -2,-12" />
-					<polyline points="14,-31 20,-11" />
-					<polyline points="14,-31 17,-37 22,-37" />
-					<line x1="-12" y1="-32" x2="-4" y2="-32" />
 				</g>
-				<g fill="none" stroke="var(--scene-rider)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
-					<polyline points="-8,-35 2,-24 -1,-12" />
-					<polyline points="-8,-35 6,-52" />
-					<polyline points="6,-50 20,-37" />
-				</g>
-				<circle cx="10" cy="-60" r="6.5" fill="var(--scene-rider)" />
-				<circle class="night" cx="21" cy="-34" r="2.2" fill="var(--scene-lamp)" />
 			</g>
-		</g>
-	</svg>
+
+			<g class="layer" style:--i="2">
+				<path
+					fill="var(--scene-mid)"
+					d="M0 230 C160 190 300 200 420 220 C560 245 700 195 860 200 C1010 205 1120 240 1260 225 C1350 215 1400 205 1440 210 L1440 320 L0 320 Z"
+				/>
+			</g>
+
+			<g class="layer" style:--i="3">
+				<path
+					fill="var(--scene-near)"
+					d="M0 250 C120 222 250 214 370 236 C450 251 520 266 620 270 C760 274 840 262 960 248 C1080 234 1200 230 1300 242 C1370 250 1410 256 1440 258 L1440 320 L0 320 Z"
+				/>
+
+				<g fill="var(--scene-tree-shade)">
+					<path d="M1246 178 L1226 238 L1266 238 Z" />
+					<path d="M1278 200 L1264 240 L1292 240 Z" />
+				</g>
+
+				<rect x="415" y="196" width="10" height="52" rx="3" fill="var(--scene-trunk)" />
+				<g class="foliage">
+					<circle cx="420" cy="178" r="34" fill="var(--scene-tree)" />
+					<circle cx="394" cy="194" r="24" fill="var(--scene-tree-shade)" />
+					<circle cx="448" cy="192" r="26" fill="var(--scene-tree)" />
+				</g>
+			</g>
+
+			<g class="layer" style:--i="4">
+				<path fill="var(--scene-ground)" d="M0 292 C300 286 600 288 720 288 C900 288 1200 286 1440 290 L1440 320 L0 320 Z" />
+			</g>
+
+			<g transform="translate(0 289)">
+				<g class="rider">
+					<polygon class="night beam" points="20,-31 100,-14 100,0" fill="url(#hero-scene-beam)" />
+					<g fill="none" stroke="var(--scene-bike)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+						<circle cx="-20" cy="-11" r="11" />
+						<circle cx="20" cy="-11" r="11" />
+						<g class="spokes">
+							<line x1="-28" y1="-11" x2="-12" y2="-11" />
+							<line x1="-20" y1="-19" x2="-20" y2="-3" />
+						</g>
+						<g class="spokes">
+							<line x1="12" y1="-11" x2="28" y2="-11" />
+							<line x1="20" y1="-19" x2="20" y2="-3" />
+						</g>
+						<polyline points="-20,-11 -2,-12 -8,-30 -20,-11" />
+						<polyline points="-8,-30 14,-31 -2,-12" />
+						<polyline points="14,-31 20,-11" />
+						<polyline points="14,-31 17,-37 22,-37" />
+						<line x1="-12" y1="-32" x2="-4" y2="-32" />
+					</g>
+					<g fill="none" stroke="var(--scene-rider)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+						<polyline points="-8,-35 2,-24 -1,-12" />
+						<polyline points="-8,-35 6,-52" />
+						<polyline class="arm" points="6,-50 20,-37" />
+						<!-- Bras levé (coucou), autour de l'épaule : affiché en bas de l'accueil. -->
+						<g transform="translate(6 -50)">
+							<polyline class="wave-arm" points="0,0 9,-7 11,-20" />
+						</g>
+					</g>
+					<circle cx="10" cy="-60" r="6.5" fill="var(--scene-rider)" />
+					<circle class="night" cx="21" cy="-34" r="2.2" fill="var(--scene-lamp)" />
+				</g>
+			</g>
+		</svg>
+	</div>
 </div>
 
 
@@ -250,6 +257,36 @@
 		.scene {
 			margin-left: calc(var(--dock-gutter) / -2);
 		}
+	}
+
+	/*
+	 * Bas de l'accueil (section Contact affichée) : le décor s'agrandit vers le vélo
+	 * (`--zoom-origin`, posé par contact-bubble.ts) et le cycliste fait coucou.
+	 */
+	.zoom {
+		position: absolute;
+		inset: 0;
+		transform-origin: var(--zoom-origin, 25% 100%);
+	}
+
+	@media (min-width: 40rem) {
+		:global(html[data-section='contact']) .zoom {
+			scale: var(--zoom-scale, 1.6);
+		}
+	}
+
+	.wave-arm {
+		opacity: 0;
+		transform-box: view-box;
+		transform-origin: 0 0;
+	}
+
+	:global(html[data-section='contact']) .scene .arm {
+		opacity: 0;
+	}
+
+	:global(html[data-section='contact']) .scene .wave-arm {
+		opacity: 1;
 	}
 
 	.sky {
@@ -439,6 +476,23 @@
 			animation: none;
 		}
 
+		.zoom {
+			transition: scale 900ms cubic-bezier(0.4, 0, 0.2, 1);
+		}
+
+		/*
+		 * Coucou, à chaque arrivée en bas de page pendant le zoom : le bras quitte le guidon et
+		 * se lève, fait six allers-retours, puis redescend (fini en 3,3 s). Chaque étape ne
+		 * s'applique qu'une fois commencée (`forwards`), la suivante prenant le relais.
+		 * Plus précis que la règle des animations déjà jouées, qui ne le concerne pas.
+		 */
+		:global(html[data-section='contact']) .scene .wave-arm {
+			animation:
+				raise 450ms cubic-bezier(0.3, 0, 0.2, 1) 600ms both,
+				wave 300ms ease-in-out 1050ms 6 alternate forwards,
+				lower 450ms ease-in-out 2850ms forwards;
+		}
+
 		/* Hors écran : suspension, l’animation reprend là où elle s’était arrêtée. */
 		.offscreen,
 		.offscreen * {
@@ -530,6 +584,37 @@
 	@keyframes roll {
 		from {
 			transform: rotate(-2610deg);
+		}
+	}
+
+	/* Bras levé dessiné vers le haut ; tourné de 104°, il rejoint le guidon. */
+	@keyframes raise {
+		from {
+			transform: rotate(104deg);
+		}
+
+		to {
+			transform: rotate(-12deg);
+		}
+	}
+
+	@keyframes lower {
+		from {
+			transform: rotate(-12deg);
+		}
+
+		to {
+			transform: rotate(104deg);
+		}
+	}
+
+	@keyframes wave {
+		from {
+			transform: rotate(-12deg);
+		}
+
+		to {
+			transform: rotate(22deg);
 		}
 	}
 </style>

@@ -157,20 +157,27 @@ const careerSteps = [
 		</section>
 
 		<div id="contact" class="anchor"></div>
-		<section class="section snap-block" data-section="contact" aria-labelledby="contact-title">
-			<h2 id="contact-title" class="ds-h2">Contact</h2>
-			<p class="ds-body-m">
-				Pour un échange autour d’un poste, d’un projet ou d’une collaboration, vous pouvez me contacter directement.
-			</p>
-			<div class="contact-links">
-				<a href={`mailto:${email}`}>{email}</a>
-				<a href={linkedInHref} target="_blank" rel="noreferrer">LinkedIn</a>
+		<section class="contact snap-block" data-section="contact" aria-labelledby="contact-title">
+			<div class="bubble">
+				<h2 id="contact-title" class="ds-h2">Contactez-moi&nbsp;!</h2>
+				<p class="contact-intro ds-body-m">
+					Pour un échange autour d’un poste, d’un projet ou d’une collaboration, vous pouvez me contacter directement.
+				</p>
+				<div class="contact-actions">
+					<Button href={`mailto:${email}`}>M’écrire</Button>
+					<Button href={linkedInHref} variant="secondary">LinkedIn</Button>
+					<Button href={cvHref} variant="secondary">Voir mon CV (PDF)</Button>
+				</div>
+				<p class="contact-email ds-body-s">
+					Ou directement : <a href={`mailto:${email}`}>{email}</a>
+				</p>
 			</div>
 		</section>
 	</div>
 </BaseLayout>
 
 <script>
+	import { contactBubble } from '#lib/contact-bubble.js';
 	import { dockHorizon } from '#lib/dock-horizon.js';
 	import { snapBlocks, stackBlocks, trackSection } from '#lib/snap-blocks.js';
 
@@ -180,6 +187,12 @@ const careerSteps = [
 		snapBlocks(page);
 		stackBlocks(page);
 		trackSection(page);
+	}
+
+	// Bulle de contact au-dessus du cycliste, et zoom du décor vers lui, en bas de l'accueil.
+	const contact = document.querySelector<HTMLElement>('.contact');
+	if (contact) {
+		contactBubble(contact);
 	}
 
 	// Dock posé sur l’horizon du paysage tant que la page est en haut.
@@ -471,29 +484,133 @@ const careerSteps = [
 		color: var(--text-primary);
 	}
 
-	.contact-links a {
-		min-height: 44px;
-		display: inline-flex;
-		align-items: center;
+	/*
+	 * Fin de page : Contact, transparente, occupe la hauteur de l'écran jusqu'au pied de page
+	 * (marge de défilement en haut, marge de la section, bas de <main>, pied de page), au-dessus
+	 * du paysage. Son contenu est une bulle de BD qui sort de la tête du cycliste (position
+	 * `--bubble-x` / `--bubble-y`, calculée par contact-bubble.ts) quand la section est affichée.
+	 */
+	.contact {
+		--footer-height: calc(var(--spacing-6) + var(--text-body-s-line) + 5.5rem);
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-end;
+		min-height: calc(100svh - 1.5rem - 2 * var(--spacing-8) - var(--footer-height));
+		margin-bottom: var(--spacing-8);
+	}
+
+	.bubble {
+		--bubble-border: 2px solid var(--text-primary);
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: var(--spacing-4);
+		padding: var(--spacing-6);
+		border: var(--bubble-border);
+		border-radius: 1.5rem;
+		background: var(--surface-elevated);
+		box-shadow: 4px 4px 0 var(--text-primary);
+	}
+
+	.contact h2,
+	.contact-intro,
+	.contact-email {
+		margin: 0;
+	}
+
+	.contact-intro {
+		max-width: 32rem;
+		color: var(--text-secondary);
+	}
+
+	.contact-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--spacing-3);
+	}
+
+	.contact-email {
+		color: var(--text-secondary);
+	}
+
+	.contact-email a {
 		color: var(--action-primary);
-		font: 500 var(--text-label-m-size) / var(--text-label-m-line) var(--font-sans);
-		text-decoration: none;
+		font-weight: 500;
 	}
 
-	.contact-links a:hover {
-		text-decoration: underline;
-	}
-
-	.contact-links a:focus-visible {
+	.contact-email a:focus-visible {
 		outline: 2px solid var(--action-focus);
 		outline-offset: 2px;
 		border-radius: var(--radius-sm);
 	}
 
-	.contact-links {
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--spacing-4);
+	/* Ordinateur : la bulle flotte au-dessus du cycliste, sa pointe vers sa tête. */
+	@media (min-width: 40rem) {
+		.contact {
+			--footer-height: calc(var(--spacing-6) + var(--text-body-s-line) + var(--spacing-8));
+		}
+
+		.bubble {
+			position: absolute;
+			bottom: calc(100% - var(--bubble-y, 60%));
+			left: max(0px, calc(var(--bubble-x, 20%) - 3rem));
+			width: min(34rem, 100% - max(0px, var(--bubble-x, 20%) - 3rem));
+			transform-origin: 3rem calc(100% + 2rem);
+		}
+
+		/* Pointe : un triangle bordé (contour) et un triangle plein (fond) superposés. */
+		.bubble::before,
+		.bubble::after {
+			content: '';
+			position: absolute;
+			top: 100%;
+			left: min(var(--bubble-x, 20%), 3rem);
+			width: 0;
+			height: 0;
+			border-style: solid;
+		}
+
+		.bubble::before {
+			border-width: 1.5rem 1.5rem 0 0;
+			border-color: var(--text-primary) transparent transparent transparent;
+			translate: 0 0;
+		}
+
+		.bubble::after {
+			margin-top: -3px;
+			margin-left: 2px;
+			border-width: calc(1.5rem - 4px) calc(1.5rem - 4px) 0 0;
+			border-color: var(--surface-elevated) transparent transparent transparent;
+		}
+
+		/* Cachée tant que la section n'est pas affichée (le contenu reste dans la page). */
+		.bubble {
+			opacity: 0;
+			scale: 0.6;
+		}
+
+		:global(html[data-section='contact']) .bubble,
+		.bubble:focus-within {
+			opacity: 1;
+			scale: 1;
+		}
+	}
+
+	@media (min-width: 40rem) and (prefers-reduced-motion: no-preference) {
+		.bubble {
+			transition:
+				opacity 200ms ease,
+				scale 200ms ease;
+		}
+
+		/* Apparition après le zoom (900 ms), avec un léger rebond. */
+		:global(html[data-section='contact']) .bubble {
+			transition:
+				opacity 250ms ease 650ms,
+				scale 450ms cubic-bezier(0.34, 1.56, 0.64, 1) 650ms;
+		}
 	}
 
 	@media (min-width: 40rem) {
