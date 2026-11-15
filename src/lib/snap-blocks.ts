@@ -321,12 +321,12 @@ export const snapBlocks: Attachment<HTMLElement> = (root) => {
  * `--stack-opacity`). Sous un bloc suivant opaque, qui le masque de toute façon, le fondu
  * s'étale sur la première moitié de sa course, pour ne pas disparaître d'un coup. Un bloc
  * plus haut que l'écran ne se colle qu'une fois son bas atteint, pour rester lisible
- * jusqu'au bout. Le dernier bloc reçoit la marge nécessaire pour pouvoir
- * s'aligner en haut comme les autres. Sans ce script, les blocs défilent normalement.
+ * jusqu'au bout. Le dernier bloc se colle à sa place de fin de page (au-dessus du pied de
+ * page) plutôt qu'en haut de l'écran. Sans ce script, les blocs défilent normalement.
  */
 export const stackBlocks: Attachment<HTMLElement> = (root) => {
 	const blocks = [...root.querySelectorAll<HTMLElement>('.snap-block')];
-	const last = blocks[blocks.length - 1];
+	const lastIndex = blocks.length - 1;
 	// Défilement, depuis le moment où un bloc se colle, sur lequel il s'efface.
 	let fadeLengths: number[] = [];
 	let gaps: number[] = [];
@@ -335,13 +335,18 @@ export const stackBlocks: Attachment<HTMLElement> = (root) => {
 	function layout() {
 		const { top, bottom } = getScrollPadding();
 		const available = window.innerHeight - bottom;
-		last.style.removeProperty('margin-bottom');
 		const styles = blocks.map((block) => getComputedStyle(block));
 		gaps = styles.map((style) => parseLength(style.marginBottom));
 		const stackTops = blocks.map((block, i) => {
 			// Le premier bloc se colle à sa place de repos : plus bas que la marge de défilement
 			// (espacement de la page), il remonterait de quelques pixels puis s'arrêterait net.
-			const rest = i === 0 ? Math.max(top, flowTop(block)) : top;
+			// Le dernier se colle là où la fin de page le laisse, juste au-dessus du pied de page.
+			let rest = top;
+			if (i === 0) {
+				rest = Math.max(top, flowTop(block));
+			} else if (i === lastIndex) {
+				rest = Math.max(top, flowTop(block) - maxScrollY());
+			}
 			const stackTop = Math.min(rest, available - block.offsetHeight);
 			block.style.setProperty('--stack-top', `${stackTop}px`);
 			return stackTop;
@@ -360,13 +365,10 @@ export const stackBlocks: Attachment<HTMLElement> = (root) => {
 				parseLength(next.paddingTop) +
 				parseLength(next.borderTopWidth);
 			const halfTravel = hasOpaqueBackground(next) ? (stuckAt[i + 1] - stuckAt[i]) / 2 : 0;
-			return Math.max(1, beforeOverlap, halfTravel);
+			// Effacé au plus tard quand le suivant est en place (court trajet vers le dernier bloc).
+			const travel = stuckAt[i + 1] - stuckAt[i];
+			return Math.max(1, Math.min(Math.max(beforeOverlap, halfTravel), travel));
 		});
-
-		const extra = flowTop(last) - top - maxScrollY();
-		if (extra > 0) {
-			last.style.marginBottom = `${gaps[gaps.length - 1] + extra}px`;
-		}
 		fade();
 	}
 
@@ -428,7 +430,6 @@ export const stackBlocks: Attachment<HTMLElement> = (root) => {
 		for (const block of blocks) {
 			block.style.removeProperty('--stack-top');
 			block.style.removeProperty('--stack-opacity');
-			block.style.removeProperty('margin-bottom');
 			block.removeAttribute('data-covered');
 		}
 	};
