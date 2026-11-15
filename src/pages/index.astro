@@ -534,8 +534,10 @@ const careerSteps = [
 		margin-bottom: var(--spacing-8);
 	}
 
+	/* Contour et ombre de la bulle : adoucis en thème sombre, où le texte principal est presque blanc. */
 	.bubble {
-		--bubble-border: 2px solid var(--text-primary);
+		--bubble-ink: var(--text-primary);
+		--bubble-border: 2px solid var(--bubble-ink);
 		position: relative;
 		display: flex;
 		flex-direction: column;
@@ -545,7 +547,11 @@ const careerSteps = [
 		border: var(--bubble-border);
 		border-radius: var(--radius-xl);
 		background: var(--surface-elevated);
-		box-shadow: 4px 4px 0 var(--text-primary);
+		box-shadow: 4px 4px 0 var(--bubble-ink);
+	}
+
+	:global(html[data-theme='dark']) .bubble {
+		--bubble-ink: var(--text-secondary);
 	}
 
 	.contact h2,
@@ -613,7 +619,7 @@ const careerSteps = [
 
 		.bubble::before {
 			border-width: 1.5rem 1.5rem 0 0;
-			border-color: var(--text-primary) transparent transparent transparent;
+			border-color: var(--bubble-ink) transparent transparent transparent;
 			translate: 0 0;
 		}
 
