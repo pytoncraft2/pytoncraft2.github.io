@@ -335,10 +335,13 @@ export const stackBlocks: Attachment<HTMLElement> = (root) => {
 					parseLength(next.borderTopWidth)
 			);
 		});
-		for (const block of blocks) {
-			const stackTop = Math.min(top, available - block.offsetHeight);
+		blocks.forEach((block, i) => {
+			// Le premier bloc se colle à sa place de repos : plus bas que la marge de défilement
+			// (espacement de la page), il remonterait de quelques pixels puis s'arrêterait net.
+			const rest = i === 0 ? Math.max(top, flowTop(block)) : top;
+			const stackTop = Math.min(rest, available - block.offsetHeight);
 			block.style.setProperty('--stack-top', `${stackTop}px`);
-		}
+		});
 
 		const extra = flowTop(last) - top - maxScrollY();
 		if (extra > 0) {
