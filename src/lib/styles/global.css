@@ -89,6 +89,20 @@ html:active-view-transition-type(project)::view-transition-new(root) {
 }
 
 /*
+ * Barre de titre de la fenêtre d'étude de cas (classe `project-chrome`) : entre l'accueil et une
+ * étude de cas, elle s'efface aussitôt au retour et apparaît une fois la fenêtre ouverte à
+ * l'aller, au lieu de rester figée en haut de la carte qui change de taille. D'une étude de
+ * cas à la suivante, les deux barres forment une paire : fondu enchaîné par défaut.
+ */
+html:active-view-transition-type(project)::view-transition-old(.project-chrome) {
+	animation: page-fade-out 120ms ease-in both;
+}
+
+html:active-view-transition-type(project)::view-transition-new(.project-chrome) {
+	animation: page-fade-in 200ms ease-out 320ms both;
+}
+
+/*
  * D'une étude de cas à la suivante (type `project-next`) : les fenêtres portent des noms
  * différents, donc pas de morphose. Sans ce réglage, l'ancienne fenêtre resterait affichée
  * par-dessus la nouvelle pendant toute la transition. L'ancienne page et ses éléments

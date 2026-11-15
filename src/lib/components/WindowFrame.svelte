@@ -20,7 +20,15 @@
 	style:view-transition-name={transitionName}
 	style:view-transition-class={transitionName ? 'project-frame' : undefined}
 >
-	<div class="titlebar">
+	<!--
+		Barre nommée à part pour les transitions de vue : elle n'est pas figée dans l'image de la
+		fenêtre qui se transforme en carte (voir global.css, classe project-chrome).
+	-->
+	<div
+		class="titlebar"
+		style:view-transition-name={transitionName ? 'project-titlebar' : undefined}
+		style:view-transition-class={transitionName ? 'project-chrome' : undefined}
+	>
 		<a class="back" href={parent.href}>
 			<svg class="chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true">
 				<path
