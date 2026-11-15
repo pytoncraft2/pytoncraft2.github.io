@@ -9,7 +9,7 @@ const riderHeight = 68;
 // Agrandissement du décor en bas de page (`--zoom-scale`, lu par HeroScene).
 const zoomScale = 1.6;
 // Écart entre le haut de la tête du cycliste et la pointe de la bulle.
-const bubbleGap = 20;
+const bubbleGap = 36;
 
 /**
  * Bas de l'accueil : le décor s'agrandit vers le vélo et une bulle de BD (le contenu de la
