@@ -24,30 +24,30 @@ const { title, description } = Astro.props;
 		<!-- Avant tout rendu : thème mémorisé, pour éviter un flash. -->
 		<script is:inline>
 			(function () {
-				try {
-					var stored = localStorage.getItem('theme');
-					var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-					var theme =
-						stored === 'light' || stored === 'dark' ? stored : prefersDark ? 'dark' : 'light';
-					document.documentElement.setAttribute('data-theme', theme);
-					document.documentElement.style.colorScheme = theme;
+					try {
+						var stored = localStorage.getItem('theme');
+						var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+						var theme =
+							stored === 'light' || stored === 'dark' ? stored : prefersDark ? 'dark' : 'light';
+						document.documentElement.setAttribute('data-theme', theme);
+						document.documentElement.style.colorScheme = theme;
 
-					var themeColor = theme === 'dark' ? '#0f0f0f' : '#eee9ec';
-					var meta = document.querySelector('meta[name="theme-color"]');
-					if (!meta) {
-						meta = document.createElement('meta');
-						meta.setAttribute('name', 'theme-color');
-						document.head.appendChild(meta);
-					}
-					meta.setAttribute('content', themeColor);
-				} catch (e) {}
+						var themeColor = theme === 'dark' ? '#0f0f0f' : '#eee9ec';
+						var meta = document.querySelector('meta[name="theme-color"]');
+						if (!meta) {
+							meta = document.createElement('meta');
+							meta.setAttribute('name', 'theme-color');
+							document.head.appendChild(meta);
+						}
+						meta.setAttribute('content', themeColor);
+					} catch (e) {}
 
-				// Défilement fluide activé après le chargement (voir global.css).
-				window.addEventListener('load', function () {
-					requestAnimationFrame(function () {
-						document.documentElement.setAttribute('data-smooth-scroll', '');
+					// Défilement fluide activé après le chargement (voir global.css).
+					window.addEventListener('load', function () {
+						requestAnimationFrame(function () {
+							document.documentElement.setAttribute('data-smooth-scroll', '');
+						});
 					});
-				});
 			})();
 		</script>
 		<!--
@@ -60,49 +60,79 @@ const { title, description } = Astro.props;
 			carrousel est placé sur sa page.
 		-->
 		<script is:inline>
-			window.addEventListener('pagereveal', function (event) {
-				if (!event.viewTransition || !window.navigation || !navigation.activation) {
-					return;
-				}
-
+			(function () {
 				var projectPath = /\/projets\/([^/.]+)(?:\.html)?\/?$/;
-				var from = navigation.activation.from && navigation.activation.from.url;
-				var match = from && new URL(from).pathname.match(projectPath);
-				var toProject = projectPath.test(location.pathname);
-				if (event.viewTransition.types && (match || toProject)) {
-					event.viewTransition.types.add(match && toProject ? 'project-next' : 'project');
-					// Retour d'une étude de cas vers l'accueil : la fenêtre redevient une carte.
-					if (match && !toProject) {
-						event.viewTransition.types.add('project-close');
+
+				// D'une étude de cas à la suivante, rien ne se transforme : on retire les noms de
+				// transition de la page (fenêtre, titre, image, barre, pied de page) pour n'animer que
+				// la page entière. Appelé sur l'ancienne page (pageswap) et la nouvelle (pagereveal).
+				function unnameProjectParts() {
+					document.querySelectorAll('main *, footer').forEach(function (element) {
+						var name = getComputedStyle(element).viewTransitionName;
+						if (name && name !== 'none') {
+							element.style.viewTransitionName = 'none';
+						}
+					});
+				}
+
+				window.addEventListener('pageswap', function (event) {
+					var target = event.activation && event.activation.entry && event.activation.entry.url;
+					if (
+						event.viewTransition &&
+						target &&
+						projectPath.test(location.pathname) &&
+						projectPath.test(new URL(target).pathname)
+					) {
+						unnameProjectParts();
 					}
-				}
-				if (!match) {
-					return;
-				}
-
-				var root = document.documentElement;
-				var card = document.querySelector('[data-project-card="' + match[1] + '"]');
-				if (!card) {
-					return;
-				}
-
-				root.dataset.projectTransition = match[1];
-				card.setAttribute('data-transition', '');
-
-				var item = card.closest('li');
-				var list = item && item.parentElement;
-				if (item && list) {
-					var gap = parseFloat(getComputedStyle(list).columnGap) || 0;
-					var perPage = Math.max(1, Math.round((list.clientWidth + gap) / (item.offsetWidth + gap)));
-					var index = Array.prototype.indexOf.call(list.children, item);
-					var first = list.children[Math.floor(index / perPage) * perPage];
-					list.scrollLeft = first ? first.offsetLeft : 0;
-				}
-
-				event.viewTransition.finished.finally(function () {
-					delete root.dataset.projectTransition;
 				});
-			});
+
+				window.addEventListener('pagereveal', function (event) {
+					if (!event.viewTransition || !window.navigation || !navigation.activation) {
+						return;
+					}
+
+					var from = navigation.activation.from && navigation.activation.from.url;
+					var match = from && new URL(from).pathname.match(projectPath);
+					var toProject = projectPath.test(location.pathname);
+					if (match && toProject) {
+						unnameProjectParts();
+					}
+					if (event.viewTransition.types && (match || toProject)) {
+						event.viewTransition.types.add(match && toProject ? 'project-next' : 'project');
+						// Retour d'une étude de cas vers l'accueil : la fenêtre redevient une carte.
+						if (match && !toProject) {
+							event.viewTransition.types.add('project-close');
+						}
+					}
+					if (!match) {
+						return;
+					}
+
+					var root = document.documentElement;
+					var card = document.querySelector('[data-project-card="' + match[1] + '"]');
+					if (!card) {
+						return;
+					}
+
+					root.dataset.projectTransition = match[1];
+					card.setAttribute('data-transition', '');
+
+					var item = card.closest('li');
+					var list = item && item.parentElement;
+					if (item && list) {
+						var gap = parseFloat(getComputedStyle(list).columnGap) || 0;
+						var perPage = Math.max(1, Math.round((list.clientWidth + gap) / (item.offsetWidth + gap)));
+						var index = Array.prototype.indexOf.call(list.children, item);
+						var first = list.children[Math.floor(index / perPage) * perPage];
+						list.scrollLeft = first ? first.offsetLeft : 0;
+					}
+
+					event.viewTransition.finished.finally(function () {
+						delete root.dataset.projectTransition;
+					});
+				});
+			})();
 		</script>
 		<title>{title}</title>
 		<meta name="description" content={description} />

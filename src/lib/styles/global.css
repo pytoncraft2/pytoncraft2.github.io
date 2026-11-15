@@ -100,8 +100,7 @@ html:active-view-transition-type(project-close)::view-transition-new(.project-fr
 /*
  * Barre de titre de la fenêtre d'étude de cas (classe `project-chrome`) : entre l'accueil et une
  * étude de cas, elle s'efface aussitôt au retour et apparaît une fois la fenêtre ouverte à
- * l'aller, au lieu de rester figée en haut de la carte qui change de taille. D'une étude de
- * cas à la suivante, les deux barres forment une paire : fondu enchaîné par défaut.
+ * l'aller, au lieu de rester figée en haut de la carte qui change de taille.
  */
 html:active-view-transition-type(project)::view-transition-old(.project-chrome) {
 	animation: page-fade-out 120ms ease-in both;
@@ -112,23 +111,18 @@ html:active-view-transition-type(project)::view-transition-new(.project-chrome) 
 }
 
 /*
- * D'une étude de cas à la suivante (type `project-next`) : les fenêtres portent des noms
- * différents, donc pas de morphose. Sans ce réglage, l'ancienne fenêtre resterait affichée
- * par-dessus la nouvelle pendant toute la transition. L'ancienne page et ses éléments
- * s'effacent vite, puis la nouvelle apparaît ; l'en-tête et le dock, identiques, ne bougent pas.
+ * D'une étude de cas à la suivante (type `project-next`) : les éléments nommés pour la
+ * morphose carte ↔ fenêtre (fenêtre, titre, image, barre, pied de page) perdent leur nom sur
+ * les deux pages (script de BaseLayout.astro), sinon chacun s'anime à part et laisse des
+ * morceaux de l'ancienne page. Seule la page entière change : l'ancienne s'efface, puis la
+ * nouvelle apparaît, sans superposition ; l'en-tête et le dock, identiques, ne bougent pas.
  */
-html:active-view-transition-type(project-next)::view-transition-old(root),
-html:active-view-transition-type(project-next)::view-transition-old(.project-frame),
-html:active-view-transition-type(project-next)::view-transition-old(.project-text),
-html:active-view-transition-type(project-next)::view-transition-old(.project-media) {
-	animation: page-fade-out 160ms ease-in both;
+html:active-view-transition-type(project-next)::view-transition-old(root) {
+	animation: page-fade-out 140ms ease-in both;
 }
 
-html:active-view-transition-type(project-next)::view-transition-new(root),
-html:active-view-transition-type(project-next)::view-transition-new(.project-frame),
-html:active-view-transition-type(project-next)::view-transition-new(.project-text),
-html:active-view-transition-type(project-next)::view-transition-new(.project-media) {
-	animation: page-fade-in 260ms ease-out 120ms both;
+html:active-view-transition-type(project-next)::view-transition-new(root) {
+	animation: page-fade-in 200ms ease-out 140ms both;
 	mix-blend-mode: normal;
 }
 
