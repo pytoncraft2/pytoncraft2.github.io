@@ -50,6 +50,10 @@
   --scene-rider: var(--color-grape);
   --scene-bike: var(--color-shadow);
   --scene-lamp: #ffe7a8;
+  --scene-helmet: #1d7383;
+  /* Feu arrière, allumé seulement la nuit */
+  --scene-rear: #ff6b5e;
+  --scene-rear-glow: rgb(255 90 70 / 0.35);
 
   /* Layout */
   --spacing-0: 0;
@@ -132,6 +136,7 @@
   --scene-trunk: #1d1b24;
   --scene-rider: var(--color-smoke);
   --scene-bike: var(--color-frost);
+  --scene-helmet: var(--color-frost);
 }
 
 /* Permet au ciel de la scène d’accueil de passer en douceur du jour à la nuit */

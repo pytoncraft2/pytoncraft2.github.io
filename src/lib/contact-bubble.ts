@@ -2,10 +2,10 @@ import { on } from 'svelte/events';
 import type { Attachment } from 'svelte/attachments';
 
 // Pied du vélo arrêté dans le dessin du paysage (repère du SVG `.land`, 1440 × 320) et
-// hauteur du cycliste au-dessus de ce point, tête comprise.
+// hauteur du cycliste au-dessus de ce point, casque compris.
 const bikeX = 370;
 const bikeY = 289;
-const riderHeight = 68;
+const riderHeight = 70;
 // Agrandissement du décor en bas de page (`--zoom-scale`, lu par HeroScene).
 const zoomScale = 1.6;
 // Écart entre le haut de la tête du cycliste et la pointe de la bulle.

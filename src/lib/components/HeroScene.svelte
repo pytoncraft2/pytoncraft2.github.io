@@ -202,17 +202,19 @@
 
 			<g transform="translate(0 289)">
 				<g class="rider">
-					<polygon class="night beam" points="20,-31 100,-14 100,0" fill="url(#hero-scene-beam)" />
+					<!-- Faisceau du phare avant, dont la pointe part de la lampe. -->
+					<polygon class="night beam" points="19,-33 100,-17 100,0" fill="url(#hero-scene-beam)" />
 					<g fill="none" stroke="var(--scene-bike)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
 						<circle cx="-20" cy="-11" r="11" />
 						<circle cx="20" cy="-11" r="11" />
-						<g class="spokes">
-							<line x1="-28" y1="-11" x2="-12" y2="-11" />
-							<line x1="-20" y1="-19" x2="-20" y2="-3" />
+						<!-- Rayons : 12 par roue (6 diamètres tous les 30°), moyeu au centre. -->
+						<g class="spokes" stroke-width="0.8">
+							<path d="M-29.5 -11H-10.5M-28.23 -15.75L-11.77 -6.25M-24.75 -19.23L-15.25 -2.77M-20 -20.5V-1.5M-15.25 -19.23L-24.75 -2.77M-11.77 -15.75L-28.23 -6.25" />
+							<circle cx="-20" cy="-11" r="1.6" fill="var(--scene-bike)" />
 						</g>
-						<g class="spokes">
-							<line x1="12" y1="-11" x2="28" y2="-11" />
-							<line x1="20" y1="-19" x2="20" y2="-3" />
+						<g class="spokes" stroke-width="0.8">
+							<path d="M10.5 -11H29.5M11.77 -15.75L28.23 -6.25M15.25 -19.23L24.75 -2.77M20 -20.5V-1.5M24.75 -19.23L15.25 -2.77M28.23 -15.75L11.77 -6.25" />
+							<circle cx="20" cy="-11" r="1.6" fill="var(--scene-bike)" />
 						</g>
 						<polyline points="-20,-11 -2,-12 -8,-30 -20,-11" />
 						<polyline points="-8,-30 14,-31 -2,-12" />
@@ -220,17 +222,33 @@
 						<polyline points="14,-31 17,-37 22,-37" />
 						<line x1="-12" y1="-32" x2="-4" y2="-32" />
 					</g>
+					<!-- Phare avant, sur le tube de direction (allumé la nuit). -->
+					<rect x="15.5" y="-35" width="4" height="3.4" rx="1.2" fill="var(--scene-bike)" />
+					<circle class="night" cx="19" cy="-33.3" r="1.7" fill="var(--scene-lamp)" />
+					<!-- Feu arrière, sur le hauban : visible seulement la nuit. -->
+					<circle class="night" cx="-11" cy="-25.3" r="3.8" fill="var(--scene-rear-glow)" />
+					<rect class="night" x="-12.3" y="-26.5" width="2.6" height="2.4" rx="0.8" fill="var(--scene-rear)" />
 					<g fill="none" stroke="var(--scene-rider)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+						<!-- Bras qui reste sur le guidon (épaule, coude, main), derrière le buste. -->
+						<polyline points="6,-50 11,-41 19,-37" />
 						<polyline points="-8,-35 2,-24 -1,-12" />
 						<polyline points="-8,-35 6,-52" />
-						<polyline class="arm" points="6,-50 20,-37" />
-						<!-- Bras levé (coucou), autour de l'épaule : affiché en bas de l'accueil. -->
-						<g transform="translate(6 -50)">
-							<polyline class="wave-arm" points="0,0 9,-7 11,-20" />
-						</g>
 					</g>
 					<circle cx="10" cy="-60" r="6.5" fill="var(--scene-rider)" />
-					<circle class="night" cx="21" cy="-34" r="2.2" fill="var(--scene-lamp)" />
+					<path d="M2.4,-61 A7.7,7.7 0 0 1 17.8,-61.6 L19.5,-60.4 Z" fill="var(--scene-helmet)" />
+					<!--
+						Bras qui fait coucou : même forme que le bras du guidon, avec lequel il se confond au
+						repos. Il tourne à l'épaule (.wave-arm) et l'avant-bras se déplie au coude
+						(.wave-forearm). Dessiné après la tête pour passer devant le casque.
+					-->
+					<g fill="none" stroke="var(--scene-rider)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(6 -50)">
+						<g class="wave-arm">
+							<polyline points="0,0 5,9" />
+							<g transform="translate(5 9)">
+								<polyline class="wave-forearm" points="0,0 8,4" />
+							</g>
+						</g>
+					</g>
 				</g>
 			</g>
 		</svg>
@@ -275,18 +293,11 @@
 		}
 	}
 
-	.wave-arm {
-		opacity: 0;
+	/* Bras qui fait coucou : rotations autour de l'épaule et du coude (origine de leur groupe). */
+	.wave-arm,
+	.wave-forearm {
 		transform-box: view-box;
 		transform-origin: 0 0;
-	}
-
-	:global(html[data-section='contact']) .scene .arm {
-		opacity: 0;
-	}
-
-	:global(html[data-section='contact']) .scene .wave-arm {
-		opacity: 1;
 	}
 
 	.sky {
@@ -485,9 +496,9 @@
 		}
 
 		/*
-		 * Coucou, à chaque arrivée en bas de page pendant le zoom : le bras quitte le guidon et
-		 * se lève, fait six allers-retours, puis redescend (fini en 3,3 s). Chaque étape ne
-		 * s'applique qu'une fois commencée (`forwards`), la suivante prenant le relais.
+		 * Coucou, à chaque arrivée en bas de page pendant le zoom : le bras quitte le guidon
+		 * (où il se confond avec l’autre bras, et reste en mouvement réduit), se lève, fait six
+		 * allers-retours, puis redescend (fini en 3,3 s). Chaque étape ne s'applique qu'une fois commencée (`forwards`), la suivante prenant le relais.
 		 * Plus précis que la règle des animations déjà jouées, qui ne le concerne pas.
 		 */
 		:global(html[data-section='contact']) .scene .wave-arm {
@@ -495,6 +506,13 @@
 				raise 450ms cubic-bezier(0.3, 0, 0.2, 1) 600ms both,
 				wave 300ms ease-in-out 1050ms 6 alternate forwards,
 				lower 450ms ease-in-out 2850ms forwards;
+		}
+
+		/* L'avant-bras se déplie pendant la montée et se replie à la descente. */
+		:global(html[data-section='contact']) .scene .wave-forearm {
+			animation:
+				unfold 450ms cubic-bezier(0.3, 0, 0.2, 1) 600ms both,
+				fold 450ms ease-in-out 2850ms forwards;
 		}
 
 		/* Hors écran : suspension, l’animation reprend là où elle s’était arrêtée. */
@@ -601,34 +619,59 @@
 		}
 	}
 
-	/* Bras levé dessiné vers le haut ; tourné de 104°, il rejoint le guidon. */
+	/*
+	 * Bras du coucou dessiné comme le bras du guidon (0°). Levé : bras tourné à −169° à
+	 * l’épaule, avant-bras déplié de 48° au coude ; il bat ensuite jusqu’à −199°.
+	 * Les deux extrémités sont explicites : une extrémité omise prendrait la valeur laissée
+	 * par les animations précédentes de la liste (le bras ne redescendrait pas).
+	 */
 	@keyframes raise {
 		from {
-			transform: rotate(104deg);
+			transform: rotate(0deg);
 		}
 
 		to {
-			transform: rotate(-12deg);
+			transform: rotate(-169deg);
 		}
 	}
 
 	@keyframes lower {
 		from {
-			transform: rotate(-12deg);
+			transform: rotate(-169deg);
 		}
 
 		to {
-			transform: rotate(104deg);
+			transform: rotate(0deg);
 		}
 	}
 
 	@keyframes wave {
 		from {
-			transform: rotate(-12deg);
+			transform: rotate(-169deg);
 		}
 
 		to {
-			transform: rotate(22deg);
+			transform: rotate(-199deg);
+		}
+	}
+
+	@keyframes unfold {
+		from {
+			transform: rotate(0deg);
+		}
+
+		to {
+			transform: rotate(48deg);
+		}
+	}
+
+	@keyframes fold {
+		from {
+			transform: rotate(48deg);
+		}
+
+		to {
+			transform: rotate(0deg);
 		}
 	}
 </style>
