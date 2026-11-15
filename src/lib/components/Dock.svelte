@@ -17,6 +17,23 @@
 		hash = window.location.hash;
 	}
 
+	/** Sur l'accueil, « Accueil » remonte en haut de la page au lieu de la recharger. */
+	function onItemClick(event: MouseEvent, id: string) {
+		const plainClick =
+			event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
+		if (id !== 'accueil' || !isHome || !plainClick) {
+			return;
+		}
+
+		event.preventDefault();
+		if (window.location.hash) {
+			history.replaceState(history.state, '', window.location.pathname + window.location.search);
+			hash = '';
+		}
+		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		window.scrollTo({ top: 0, behavior: reduceMotion ? 'instant' : 'smooth' });
+	}
+
 	function onWindowScroll() {
 		const scroll = window.scrollY;
 		if (!hashChanged) {
@@ -97,6 +114,7 @@
 					class="item"
 					class:active={item.active}
 					href={item.href}
+					onclick={(event) => onItemClick(event, item.id)}
 					aria-current={item.active ? (isHome ? 'location' : 'page') : undefined}
 				>
 					<span class="icon" aria-hidden="true">
