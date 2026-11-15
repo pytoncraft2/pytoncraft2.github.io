@@ -78,6 +78,25 @@ const careerSteps = [
 				{ once: true }
 			);
 		}
+		// Section affichée dès la première image (élément actif du dock, ensuite tenu à jour par
+		// trackSection) : au retour arrière, celle qu’on avait quittée ; sinon, celle de l’ancre.
+		try {
+			var navigationEntry = performance.getEntriesByType('navigation')[0];
+			var savedSection = sessionStorage.getItem('home-section');
+			var hashSection = location.hash.slice(1);
+			var sections = ['accueil', 'projets', 'profil', 'contact'];
+			document.documentElement.dataset.section =
+				navigationEntry && navigationEntry.type === 'back_forward' && sections.indexOf(savedSection) >= 0
+					? savedSection
+					: sections.indexOf(hashSection) >= 0
+						? hashSection
+						: 'accueil';
+		} catch (e) {}
+		window.addEventListener('pagehide', function () {
+			try {
+				sessionStorage.setItem('home-section', document.documentElement.dataset.section || '');
+			} catch (e) {}
+		});
 		// Animations du paysage jouées une fois par session (voir HeroScene.svelte).
 		try {
 			if (sessionStorage.getItem('hero-scene-played')) {

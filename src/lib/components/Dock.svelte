@@ -112,7 +112,8 @@
 			<li>
 				<a
 					class="item"
-					class:active={item.active}
+					class:active={!isHome && item.active}
+					data-item={item.id}
 					href={item.href}
 					onclick={(event) => onItemClick(event, item.id)}
 					aria-current={item.active ? (isHome ? 'location' : 'page') : undefined}
@@ -216,7 +217,16 @@
 		background: var(--surface-subtle);
 	}
 
-	.item.active {
+	/*
+	 * Élément actif. Sur l'accueil, il suit `data-section` sur <html> en CSS : la section est
+	 * posée avant la première image (script de index.astro, puis trackSection), donc le dock
+	 * est juste dès l'affichage, même avant l'hydratation de l'île.
+	 */
+	.item.active,
+	:global(html[data-section='accueil']) .item[data-item='accueil'],
+	:global(html[data-section='projets']) .item[data-item='projets'],
+	:global(html[data-section='profil']) .item[data-item='profil'],
+	:global(html[data-section='contact']) .item[data-item='contact'] {
 		color: var(--action-primary);
 		background: var(--surface-subtle);
 	}
