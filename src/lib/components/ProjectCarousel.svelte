@@ -189,6 +189,9 @@
 
 		measureVisibleCount();
 		initialProjectIndex = Math.floor(initialProjectIndex / visibleCount) * visibleCount;
+		// La page peut déjà être en place (script de retour de BaseLayout, avant le premier
+		// rendu) : aucun défilement ne suivra, donc l'index est posé ici dans tous les cas.
+		projectIndex = initialProjectIndex;
 		keepInitialPage();
 		const offScroll = on(node, 'scroll', () => {
 			if (keepInitialPage()) {
