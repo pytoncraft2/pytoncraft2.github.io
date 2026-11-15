@@ -624,16 +624,23 @@ const careerSteps = [
 			border-color: var(--surface-elevated) transparent transparent transparent;
 		}
 
-		/* Cachée tant que la section n'est pas affichée (le contenu reste dans la page). */
+		/*
+		 * Cachée tant que la section n'est pas affichée (le contenu reste dans la page). Cachée,
+		 * elle ignore le pointeur : un clic sur un de ses liens invisibles lui donnerait le
+		 * focus et la ferait apparaître (et masquerait ce qui est dessous). Le clavier, lui,
+		 * l'affiche en y entrant.
+		 */
 		.bubble {
 			opacity: 0;
 			scale: 0.6;
+			pointer-events: none;
 		}
 
 		:global(html[data-section='contact']) .bubble,
 		.bubble:focus-within {
 			opacity: 1;
 			scale: 1;
+			pointer-events: auto;
 		}
 	}
 
