@@ -88,6 +88,33 @@ html:active-view-transition-type(project)::view-transition-new(root) {
 	}
 }
 
+/*
+ * D'une étude de cas à la suivante (type `project-next`) : les fenêtres portent des noms
+ * différents, donc pas de morphose. Sans ce réglage, l'ancienne fenêtre resterait affichée
+ * par-dessus la nouvelle pendant toute la transition. L'ancienne page et ses éléments
+ * s'effacent vite, puis la nouvelle apparaît ; l'en-tête et le dock, identiques, ne bougent pas.
+ */
+html:active-view-transition-type(project-next)::view-transition-old(root),
+html:active-view-transition-type(project-next)::view-transition-old(.project-frame),
+html:active-view-transition-type(project-next)::view-transition-old(.project-text),
+html:active-view-transition-type(project-next)::view-transition-old(.project-media) {
+	animation: page-fade-out 160ms ease-in both;
+}
+
+html:active-view-transition-type(project-next)::view-transition-new(root),
+html:active-view-transition-type(project-next)::view-transition-new(.project-frame),
+html:active-view-transition-type(project-next)::view-transition-new(.project-text),
+html:active-view-transition-type(project-next)::view-transition-new(.project-media) {
+	animation: page-fade-in 260ms ease-out 120ms both;
+	mix-blend-mode: normal;
+}
+
+@keyframes page-fade-out {
+	to {
+		opacity: 0;
+	}
+}
+
 ::view-transition-group(.project-frame),
 ::view-transition-group(.project-text),
 ::view-transition-group(.project-media) {
