@@ -61,10 +61,22 @@ const careerSteps = [
 	<!--
 		Dock sur l’horizon dès le premier rendu (avant le dock dans le document), pour éviter
 		qu’il apparaisse d’abord sur un côté ; dock-horizon.ts le place ou le retire ensuite.
+		Au retour arrière, le défilement est restauré avant la première image (pagereveal) : si
+		la page n’est pas en haut, le dock reste sur le côté, sans quoi la transition de vue le
+		ferait voyager vers l’horizon puis revenir.
 	-->
 	<script is:inline>
 		if (!location.hash && window.matchMedia('(min-width: 40rem)').matches) {
 			document.documentElement.setAttribute('data-dock-horizon', '');
+			window.addEventListener(
+				'pagereveal',
+				function () {
+					if (window.scrollY > 8) {
+						document.documentElement.removeAttribute('data-dock-horizon');
+					}
+				},
+				{ once: true }
+			);
 		}
 		// Animations du paysage jouées une fois par session (voir HeroScene.svelte).
 		try {
