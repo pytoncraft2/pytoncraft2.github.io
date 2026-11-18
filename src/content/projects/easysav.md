@@ -6,7 +6,7 @@ tags: ["2021–2025", "Expérience pro", "Développement web"]
 description: "Formulaires métiers et interface d’administration."
 stack: ["Symfony", "Twig", "EasyAdmin"]
 role: "Développement web"
-year: "2020-2025"
+year: "2021-2025"
 featured: true
 image: "easysav.png"
 imageAlt: "Interface de l’outil EasySAV"
