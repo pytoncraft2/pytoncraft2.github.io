@@ -1,7 +1,7 @@
 ---
 title: "Resident Streamer"
 order: 3
-meta: "Projet Epitech · Phaser 3, TypeScript, Colyseus"
+meta: "Web@cadémie · Phaser 3, TypeScript, Colyseus"
 tags: ["2022", "Projet académique", "Développement web", "Temps réel"]
 description: "Jeu de speedrun coopératif en 2D pour 2 à 4 joueurs, développé en binôme avec une architecture multijoueur."
 stack: ["Phaser 3", "TypeScript", "Colyseus", "Node.js"]
@@ -14,7 +14,7 @@ imageAlt: "Capture du jeu Resident Streamer : salle futuriste avec personnages e
 
 ## Contexte
 
-Resident Streamer est un projet libre réalisé en binôme durant ma formation Epitech. Nous avons choisi de concevoir un jeu vidéo coopératif jouable dans le navigateur, avec pour objectif de rapprocher streamers et viewers autour de défis de speedrun.
+Resident Streamer est le projet libre de ma Web@cadémie à Epitech, réalisé en binôme dans un dépôt dédié. Nous avons choisi de concevoir un jeu vidéo coopératif jouable dans le navigateur, avec pour objectif de rapprocher streamers et viewers autour de défis de speedrun.
 
 Le concept : une équipe de 2 à 4 joueurs traverse plusieurs pièces et affronte des boss pour terminer le parcours le plus rapidement possible. Quatre personnages aux capacités différentes favorisent la coopération.
 
