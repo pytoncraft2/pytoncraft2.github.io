@@ -1,6 +1,6 @@
 ---
 title: "Job Board"
-order: 8
+order: 7
 meta: "Pré-MSc Epitech · React, Symfony, API Platform"
 tags: ["2022", "Projet académique", "Développement web", "Full-stack"]
 description: "Plateforme d'offres d'emploi développée en binôme : API Symfony sécurisée par JWT, interface React pour postuler, et espace recruteur pour publier des offres et lire les candidatures."

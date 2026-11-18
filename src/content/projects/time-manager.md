@@ -1,6 +1,6 @@
 ---
 title: "Time Manager"
-order: 10
+order: 9
 meta: "MSc Epitech · SvelteKit, Elixir, PostgreSQL"
 tags: ["2023", "Projet académique", "Développement web", "Visualisation de données"]
 description: "Application de pointage pour une équipe de travail, développée à quatre : saisie des temps, graphiques d'heures travaillées et vues adaptées à l'employé, au manager et à la direction."

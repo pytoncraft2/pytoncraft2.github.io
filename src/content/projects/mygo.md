@@ -1,6 +1,6 @@
 ---
 title: "MyGo"
-order: 7
+order: 6
 meta: "Web@cadémie · Go, Gin, WebSocket"
 tags: ["2022", "Projet académique", "Développement web", "Temps réel"]
 description: "Jeu de dessin multijoueur dans le navigateur : un joueur dessine un mot, les autres le devinent dans le chat, avec un dessin partagé en temps réel par WebSocket."

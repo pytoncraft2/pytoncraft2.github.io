@@ -1,6 +1,6 @@
 ---
 title: "Sensor Sensei"
-order: 5
+order: 14
 meta: "Projet Epitech MSc · ESP32-S3, LoRa, C++"
 tags: ["2025", "Projet académique", "IoT", "Systèmes embarqués"]
 description: "Station de mesure environnementale : un capteur transmet température, humidité, pression et poussières en LoRa à une passerelle qui les affiche sur une page web locale."

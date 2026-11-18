@@ -1,6 +1,6 @@
 ---
 title: "Fox Coffee"
-order: 11
+order: 10
 meta: "Étude terrain · Recherche UX · Atelier Miro"
 tags: ["2026", "Étude de cas", "Recherche UX", "Service Design"]
 description: "Étude qualitative de l’expérience chez Fox Coffee à Metz : 8 observations, 5 entretiens, personas, parcours et atelier d’idéation."
