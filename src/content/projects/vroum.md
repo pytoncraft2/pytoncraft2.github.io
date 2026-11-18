@@ -26,7 +26,7 @@ D'autres événements ont ensuite fait apparaître des besoins plus complexes, a
 
 ## Mon rôle
 
-Je suis le principal contributeur technique de Vroum. Je conçois et développe la majorité des évolutions du produit, du front-end SvelteKit au backend FastAPI, tout en participant aux choix produit et UX avec l'équipe de LaToileScoute.
+Je suis le principal contributeur technique et le mainteneur de Vroum : environ 2 400 des quelque 2 600 commits du dépôt sont les miens, d'autres bénévoles ayant contribué ponctuellement. Je conçois et développe la majorité des évolutions du produit, du front-end SvelteKit au backend FastAPI, tout en participant aux choix produit et UX avec l'équipe de LaToileScoute.
 
 Je peux proposer une évolution, en concevoir et tester une première solution, puis la présenter à l'équipe. Les choix importants sont discutés collectivement avant validation et déploiement en production.
 
@@ -64,7 +64,27 @@ FastAPI permettait notamment d'utiliser les WebSockets nativement et de supprime
 
 Vroum repose aujourd'hui sur SvelteKit, FastAPI et PostgreSQL. L'application permet d'organiser participants, véhicules et matériel pour des covoiturages simples comme pour des événements impliquant plusieurs villes ou dates.
 
-Au fil des évolutions, l'interface a également été adaptée aux usages mobiles et à l'accessibilité, avec notamment une navigation au clavier et au lecteur d'écran, une meilleure gestion du focus et des interactions adaptées aux petits écrans.
+Au fil des évolutions, l'interface a également été adaptée aux usages mobiles et à l'accessibilité, avec notamment une navigation au clavier et au lecteur d'écran, une meilleure gestion du focus et des interactions adaptées aux petits écrans. Les participants peuvent par exemple être sélectionnés et déplacés au clavier, et le focus revient au bon endroit après la fermeture d'une fenêtre.
+
+## Qualité et maintenabilité
+
+Un outil associatif doit pouvoir être maintenu sur plusieurs années, par des bénévoles qui changent. Une partie importante de mon travail porte donc sur ce qui ne se voit pas à l'écran.
+
+### Tester avant de livrer
+
+Les parcours principaux sont couverts par 59 scénarios de tests de bout en bout avec Playwright, qui pilotent l'application comme un utilisateur : création d'un covoiturage, mode multi-trajets, recherche, administration d'un événement, envoi des e-mails de notification… Côté serveur, 13 modules de tests unitaires vérifient la logique de l'API.
+
+### Automatiser la livraison
+
+Chaque modification passe par une chaîne d'intégration continue GitLab : construction, tests, publication d'une version, puis déploiement sur un environnement de préproduction avant la production. Les mises à jour des dépendances sont proposées automatiquement par Renovate, puis vérifiées par cette même chaîne.
+
+### Rendre les évolutions lisibles
+
+Depuis la première version de décembre 2023, 37 versions ont été publiées, avec un numéro de version sémantique et un journal des modifications qui décrit chaque changement pour les utilisateurs comme pour les contributeurs.
+
+### Permettre à d'autres de reprendre l'outil
+
+Le dépôt comprend un guide pour les développeurs (environnement Docker, tests, contribution) et un guide pour les administrateurs. Ce dernier permet à une autre association d'installer sa propre instance de Vroum, avec son nom, ses couleurs et sa feuille de style. Le code est publié sous licence MIT.
 
 ## Résultats
 
@@ -77,3 +97,9 @@ Les retours d'utilisation ont directement alimenté plusieurs évolutions du pro
 Vroum m'a appris à faire évoluer un produit dans la durée plutôt qu'à chercher une solution définitive dès la première version. Les usages réels font régulièrement apparaître des besoins difficiles à anticiper.
 
 Le projet m'a également appris qu'une bonne décision peut être un renoncement : la solution techniquement la plus ambitieuse n'est pas nécessairement celle qui répond le mieux au besoin ou aux contraintes de maintenance.
+
+## Explorer le projet
+
+- [Utiliser Vroum](https://vroum.latoilescoute.net)
+- [Consulter le code source](https://git.latoilescoute.net/dev/vroum/vroum)
+- [Lire le journal des modifications](https://git.latoilescoute.net/dev/vroum/vroum/-/blob/main/CHANGELOG.md)
