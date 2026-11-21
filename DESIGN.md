@@ -34,7 +34,7 @@ La personnalité visuelle doit soutenir cette lecture. La priorité reste la com
 
 L’interface évoque un environnement de travail numérique à travers les fenêtres de contenu et le dock. Cette inspiration se traduit par des cadres, des surfaces et des repères de navigation, sans imposer la complexité d’un système de fenêtres superposées.
 
-L’accueil ajoute une touche plus personnelle : une scène illustrée de paysage (voir « Scène d’accueil »), héritée de mon premier portfolio. Elle est le seul espace illustré et animé du site ; les autres pages restent sobres.
+L’accueil ajoute une touche plus personnelle : une scène illustrée de paysage (voir « Scène d’accueil »), héritée de mon premier portfolio. La frise du Profil en reprend le paysage et le cycliste. Les autres pages restent sobres.
 
 - Conserver une base neutre et un accent bleu pour les actions et repères interactifs, conformément aux tokens du portfolio.
 - Employer les bordures discrètes et les arrondis partagés pour regrouper les contenus.
@@ -70,6 +70,8 @@ La scène d’accueil accompagne cette introduction sans la remplacer : le nom, 
 Les projets sélectionnés constituent la preuve principale. Chaque carte présente un titre, des tags utiles, une description courte et un lien explicite vers l’étude de cas. Un visuel sert à identifier le projet et à comprendre sa nature.
 
 Les compétences, le parcours et les moyens de contact complètent cette lecture. Ne pas multiplier les sections qui répètent la même information. Toute affirmation chiffrée doit rester vérifiable et correctement contextualisée.
+
+Au pied du Profil, le vélo relie les quatre étapes du parcours en un passage à l’arrivée du bandeau à l’écran. La frise reste entièrement lisible après le passage, et s’affiche directement en mouvement réduit.
 
 ## Scène d’accueil
 

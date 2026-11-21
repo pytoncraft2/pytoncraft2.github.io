@@ -1,0 +1,129 @@
+---
+const careerSteps = [
+	{
+		id: 'webacademie',
+		period: '2020–2022',
+		name: 'Web@cadémie',
+		detail: 'Formation en développement web, Nancy.'
+	},
+	{
+		id: 'easysav',
+		period: '2021–2025',
+		name: 'EasySAV',
+		detail: 'Développeur web en alternance, Metz.'
+	},
+	{
+		id: 'epitech',
+		period: '2022–2025',
+		name: 'Epitech',
+		detail:
+			'Pré-MSc puis MSc IoT, Nancy. Titre obtenu : « Architecte logiciel, développeur d’applications », niveau\u00A07.'
+	},
+	{
+		id: 'openclassrooms',
+		period: 'Depuis 2026',
+		name: 'OpenClassrooms',
+		detail: 'Formation Product Designer, certification UX/UI Designer niveau\u00A06 en cours.'
+	}
+];
+---
+<section class="career" aria-labelledby="parcours-title">
+	<h3 id="parcours-title">Parcours</h3>
+	<div class="landscape" aria-hidden="true">
+		<svg class="hills" viewBox="0 0 1200 90" preserveAspectRatio="none">
+			<path fill="var(--scene-far)" d="M0 72 110 51 170 63 315 15 350 26 382 18 500 57 651 37 718 46 861 14 930 32 1005 25 1200 57V90H0Z"/>
+			<path fill="var(--scene-mid)" d="M0 66Q148 28 310 62T642 58T958 60T1200 46V90H0Z"/>
+			<path fill="var(--scene-near)" d="M0 76Q210 54 423 77T805 71T1200 75V90H0Z"/>
+		</svg>
+		<div class="road">
+			<div class="trail"></div>
+			{careerSteps.map((_, i) => <i style={`left:${i * 100 / (careerSteps.length - 1)}%`}></i>)}
+			<svg class="bike" viewBox="-34 -71 68 74">
+				<g fill="none" stroke="var(--scene-bike)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+					{[-20, 20].map(x => <g transform={`translate(${x} -11)`}>
+						<circle r="11" /><path class="spokes" stroke-width="0.9" d="M-10 0H10 M0 -10V10 M-7 -7 7 7 M-7 7 7 -7" />
+					</g>)}
+					<path d="M-20 -11 -8 -30 -2 -12Z M-8 -30 14 -31 -2 -12 M20 -11 14 -31 17 -37H22 M-12 -32H-4"/>
+				</g>
+				<path fill="none" stroke="var(--scene-rider)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" d="m-1 -12 3 -12 -10 -11 14 -17 6 11 7 4"/>
+				<circle cx="10" cy="-60" r="6.5" fill="var(--scene-rider)"/>
+				<path d="M2 -61a8 8 0 0 1 16 0l2 1Z" fill="var(--scene-helmet)"/>
+			</svg>
+		</div>
+	</div>
+	<ol>
+		{careerSteps.map((step, i) => (
+			<li style={`--delay:${i * 3.6 / (careerSteps.length - 1)}s`}>
+				<p class="date">{step.period}</p>
+				<p class="name">{step.name}</p>
+				<p>{step.detail}</p>
+			</li>
+		))}
+	</ol>
+</section>
+
+<script>
+	const route = document.querySelector('.career');
+	const landscape = route?.querySelector('.landscape');
+	if (route && landscape && 'IntersectionObserver' in window) {
+		route.setAttribute('data-waiting', '');
+		const observer = new IntersectionObserver(([entry]) => {
+			if (entry.isIntersecting || entry.boundingClientRect.bottom <= 0) {
+				route.removeAttribute('data-waiting');
+				route.setAttribute('data-started', '');
+				observer.disconnect();
+			}
+		}, { threshold: 0 });
+		observer.observe(landscape);
+	}
+</script>
+
+<style>
+	.career {
+		margin: var(--spacing-8) calc(-1 * var(--spacing-8)) calc(-1 * var(--spacing-8));
+		border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+		overflow: hidden;
+		background: var(--surface-subtle);
+		color: var(--text-primary);
+	}
+	h3 {
+		margin: 0;
+		padding: var(--spacing-5) var(--spacing-8) 0;
+		font: 600 var(--text-body-m-size) / var(--text-body-m-line) var(--font-sans);
+	}
+	.landscape {
+		height: 5rem;
+		position: relative;
+		background: linear-gradient(var(--surface-subtle), var(--scene-sky-horizon));
+	}
+	.hills { width: 100%; height: 100%; display: block; }
+	.road { position: absolute; inset: auto 12.5% 0; height: 2px; background: var(--border-strong); }
+	.trail { height: 100%; background: var(--action-primary); transform-origin: left; }
+	.road i {
+		position: absolute; top: 50%; translate: -50% -50%;
+		width: .6rem; height: .6rem; border-radius: 50%;
+		background: var(--action-primary); border: 2px solid var(--surface-subtle);
+	}
+	.bike { position: absolute; bottom: 0; left: 100%; translate: -50% 0; width: 3.25rem; }
+	ol { list-style: none; margin: 0; padding: var(--spacing-5) var(--spacing-8) var(--spacing-8); display: grid; gap: var(--spacing-5); }
+	p { margin: 0; color: var(--text-secondary); font: 400 var(--text-body-s-size) / var(--text-body-s-line) var(--font-sans); }
+	.date { font-weight: 600; color: var(--action-primary); }
+	.name { margin: var(--spacing-1) 0; font-weight: 600; font-size: var(--text-body-m-size); color: var(--text-primary); }
+	@media (min-width: 64rem) {
+		ol { grid-template-columns: repeat(4,minmax(0,1fr)); gap: 0; padding-inline: 0; }
+		li { padding-inline: var(--spacing-4); text-align: center; }
+	}
+	@media (prefers-reduced-motion: no-preference) {
+		[data-waiting] li { opacity: 0; }
+		[data-waiting] .bike { left: 0; }
+		[data-waiting] .trail { transform: scaleX(0); }
+		[data-started] li { animation: reveal 300ms ease-out var(--delay) backwards; }
+		[data-started] .bike { animation: ride 3.6s linear; }
+		[data-started] .trail { animation: draw 3.6s linear; }
+		[data-started] .spokes { animation: spin .45s linear 8; }
+	}
+	@keyframes ride { from { left: 0; } to { left: 100%; } }
+	@keyframes draw { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+	@keyframes spin { to { transform: rotate(1turn); } }
+	@keyframes reveal { from { opacity: 0; transform: translateY(.4rem); } }
+</style>
