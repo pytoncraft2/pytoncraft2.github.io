@@ -82,6 +82,13 @@ const careerSteps = [
 		const align = () => {
 			frame = 0;
 			if (html.hasAttribute('data-contact-shortcut') || html.hasAttribute('data-reduced-motion')) return;
+			if (matchMedia('(max-width: 39.99rem)').matches) {
+				if (html.hasAttribute('data-career-started')) {
+					html.removeAttribute('data-career-started');
+					html.setAttribute('data-career-finished', '');
+				}
+				return;
+			}
 			if (html.dataset.section !== 'profil') {
 				if (html.hasAttribute('data-career-started')) {
 					const rider = land.querySelector<SVGGElement>('.rider');
@@ -201,14 +208,103 @@ const careerSteps = [
 	p { margin: 0; color: var(--text-secondary); font: 400 var(--text-body-s-size) / var(--text-body-s-line) var(--font-sans); }
 	.date { font-weight: 600; color: var(--action-primary); }
 	.name { margin: var(--spacing-1) 0; font-weight: 600; font-size: var(--text-body-m-size); color: var(--text-primary); }
+	@media (min-width: 40rem) {
+		:global(html[data-reduced-motion]) .career {
+			margin-top: var(--spacing-5);
+			padding: var(--spacing-5);
+			border: 1px solid var(--border-default);
+			border-radius: var(--radius-lg);
+			background: var(--surface-elevated);
+		}
+
+		:global(html[data-reduced-motion]) h3 {
+			padding: 0;
+			background: none;
+		}
+
+		:global(html[data-reduced-motion]) .road {
+			margin-top: var(--spacing-5);
+		}
+
+		:global(html[data-reduced-motion]) .road i {
+			border-color: var(--surface-elevated);
+		}
+
+		:global(html[data-reduced-motion]) ol {
+			padding-bottom: 0;
+			background: none;
+		}
+	}
+
+	@media (min-width: 40rem) and (max-width: 63.99rem) {
+		:global(html[data-reduced-motion]) .road { display: none; }
+		:global(html[data-reduced-motion]) ol { padding-inline: 0; }
+	}
+
+	@media (max-width: 39.99rem) {
+		.career {
+			margin-top: var(--spacing-5);
+			padding: var(--spacing-5);
+			border: 1px solid var(--border-default);
+			border-radius: var(--radius-lg);
+			background: var(--surface-elevated);
+		}
+
+		h3 {
+			margin-bottom: var(--spacing-3);
+			padding: 0;
+			background: none;
+		}
+
+		.road { display: none; }
+
+		ol {
+			--step-gap: var(--spacing-4);
+			padding: 0;
+			gap: var(--step-gap);
+			background: none;
+		}
+
+		li {
+			position: relative;
+			padding-inline-start: var(--spacing-5);
+		}
+
+		li::before,
+		li:not(:last-child)::after {
+			content: '';
+			position: absolute;
+		}
+
+		li::before {
+			inset-block-start: 0.4rem;
+			inset-inline-start: 0;
+			width: 0.4rem;
+			height: 0.4rem;
+			border-radius: 50%;
+			background: var(--action-primary);
+		}
+
+		li:not(:last-child)::after {
+			inset-block: 0.95rem calc(-1 * var(--step-gap) - 0.25rem);
+			inset-inline-start: calc(0.2rem - 0.5px);
+			width: 1px;
+			background: var(--border-strong);
+		}
+
+		.date { color: var(--text-secondary); }
+	}
+
 	@media (min-width: 64rem) {
 		ol { grid-template-columns: repeat(4,minmax(0,1fr)); gap: 0; padding-inline: 0; }
 		li { padding-inline: var(--spacing-4); text-align: center; }
 	}
-	@media (prefers-reduced-motion: no-preference) {
+	@media (min-width: 40rem) and (prefers-reduced-motion: no-preference) {
 		:global(html[data-career-waiting]:not([data-reduced-motion])) li { opacity: 0; }
 		:global(html[data-career-waiting]:not([data-reduced-motion])) .trail { transform: scaleX(0); }
 		:global(html[data-section='profil'][data-career-started]) li { animation: reveal 300ms ease-out var(--delay) backwards; }
+	}
+	@media (prefers-reduced-motion: no-preference) {
 		:global(html[data-section='profil'][data-career-started]) .trail { animation: draw 3.6s linear; }
 		:global(html[data-career-started] .hero .land g:has(> .rider)) { animation: career-ride 3.6s linear, career-exit 600ms ease-out 3.6s forwards; }
 		:global(html[data-section='contact'][data-career-started] .hero .land g:has(> .rider)) { animation-play-state: paused; }

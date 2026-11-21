@@ -433,6 +433,12 @@ const cards: CarouselProject[] = (await getFeaturedProjects()).map(({ id, data }
 		min-width: 0;
 	}
 
+	@media (max-width: 39.99rem) {
+		.proofs {
+			display: none;
+		}
+	}
+
 	.proofs-list {
 		display: flex;
 		flex-direction: row;
@@ -709,11 +715,22 @@ const cards: CarouselProject[] = (await getFeaturedProjects()).map(({ id, data }
 		}
 	}
 
+	@media (max-width: 39.99rem) {
+		.bubble {
+			border: 1px solid var(--border-default);
+			border-radius: var(--radius-lg);
+			box-shadow: none;
+		}
+	}
+
 	:global(html[data-reduced-motion]) .contact {
 		min-height: auto;
 	}
 
 	:global(html[data-reduced-motion]) .bubble {
+		border: 1px solid var(--border-default);
+		border-radius: var(--radius-lg);
+		box-shadow: none;
 		position: relative;
 		inset: auto;
 		width: 100%;
