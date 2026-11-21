@@ -1,0 +1,343 @@
+<section id="cyclist-game" class="game" data-cyclist-game hidden aria-labelledby="cyclist-game-title" aria-describedby="cyclist-game-intro">
+	<header>
+		<h2 id="cyclist-game-title" class="ds-h2">Le parcours à vélo</h2>
+		<button type="button" class="close" data-close aria-label="Fermer le jeu"><span aria-hidden="true">×</span></button>
+	</header>
+
+	<p id="cyclist-game-intro">Tape les lettres du mot posé sur la route pour le franchir. Échap permet de quitter la partie. Deux obstacles manqués coûtent deux sacoches, puis le vélo devient un monocycle au troisième.</p>
+
+	<div class="start" data-game-start>
+		<button type="button" data-start="timed">Jouer · 5 s par mot</button>
+		<button type="button" data-start="untimed">Jouer sans chrono</button>
+	</div>
+
+	<div data-game-round hidden>
+		<p class="visually-hidden" data-prompt id="cyclist-game-word"></p>
+		<label class="visually-hidden" for="cyclist-game-input">Tape le mot sur la route</label>
+		<input class="visually-hidden" id="cyclist-game-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="cyclist-game-word" />
+		<button type="button" data-skip>Passer le mot</button>
+	</div>
+
+	<p class="announcement" role="status"></p>
+	<div data-game-result hidden>
+		<h3 tabindex="-1" class="ds-h3" data-result></h3>
+		<button type="button" data-replay>Rejouer</button>
+	</div>
+</section>
+
+<script>
+	import { createGameLandscape } from "../game-landscape";
+
+	const obstacles = ['web', 'grille', 'clavier', 'prototype', 'contraste'];
+	const roundDuration = 5000;
+	const wheelRadius = 11; // Rayon des roues dans le repère du SVG.
+	const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+	const launch = document.querySelector<HTMLButtonElement>('[data-game-launch]');
+	const settings = launch?.closest<HTMLElement>('#portfolio-settings');
+	const settingsButton = document.querySelector<HTMLButtonElement>('[popovertarget="portfolio-settings"]');
+	const game = document.querySelector<HTMLElement>('[data-cyclist-game]');
+	const hero = game?.closest<HTMLElement>('.hero');
+	const land = hero?.querySelector<SVGSVGElement>('svg.land');
+	const hazard = land?.querySelector<SVGGElement>('[data-game-obstacle]');
+	const desktop = matchMedia('(min-width: 64rem) and (any-pointer: fine)');
+	const start = game?.querySelector<HTMLElement>('[data-game-start]');
+	const round = game?.querySelector<HTMLElement>('[data-game-round]');
+	const result = game?.querySelector<HTMLElement>('[data-game-result]');
+	const resultTitle = game?.querySelector<HTMLElement>('[data-result]');
+	const input = game?.querySelector('input');
+	const prompt = game?.querySelector<HTMLElement>('[data-prompt]');
+	const announcement = game?.querySelector<HTMLElement>('.announcement');
+	if (launch && game && hero && land && hazard && start && round && result && resultTitle && input && prompt && announcement) {
+		let index = 0;
+		let missed = 0;
+		let timed = true;
+		let frame = 0;
+		let deadline = 0;
+		let renderedProgress = 0;
+		const landscape = createGameLandscape(land);
+		let distance = 0;
+		let previousTime = 0;
+
+		const svg = 'http://www.w3.org/2000/svg';
+		const lettering = document.createElementNS(svg, 'text');
+		lettering.classList.add('road-word');
+		lettering.setAttribute('y', '-3');
+		hazard.append(lettering);
+		let wordWidth = 0;
+		const droppedBags: { element: SVGRectElement; startDistance: number }[] = [];
+
+		const clearDroppedBags = () => {
+			for (const { element } of droppedBags) element.remove();
+			droppedBags.length = 0;
+		};
+
+		const dropBag = (bag: SVGRectElement | null) => {
+			if (!bag) return;
+			const element = bag.cloneNode() as SVGRectElement;
+			element.removeAttribute('class');
+			element.setAttribute('data-dropped-bag', '');
+			hazard.before(element);
+			droppedBags.push({ element, startDistance: distance });
+		};
+
+		const draw = (progress: number) => {
+			renderedProgress = progress;
+			const reduced = document.documentElement.hasAttribute('data-reduced-motion') || motionPreference.matches;
+			const matrix = land.getScreenCTM();
+			if (!matrix) return;
+			const bounds = land.getBoundingClientRect();
+			const riderX = (bounds.left + bounds.width / 4 - matrix.e) / matrix.a;
+			const roadsideX = (bounds.left + bounds.width * 0.94 - matrix.e) / matrix.a - wordWidth;
+			const obstacleX = reduced ? roadsideX : roadsideX - (roadsideX - riderX - 28) * progress;
+			hero.style.setProperty('--game-rider-x', `${riderX}px`);
+			if (!reduced && distance > 0) landscape.draw(distance);
+			hero.style.setProperty('--game-wheel-angle', `${distance / wheelRadius}rad`);
+			hazard.setAttribute('transform', `translate(${obstacleX} ${land.dataset.horizonY})`);
+			const groundY = Number(land.dataset.horizonY);
+			for (const { element, startDistance } of droppedBags) {
+				const travelled = distance - startDistance;
+				const settled = reduced || round.hidden;
+				const drift = settled ? Math.max(travelled, 32) : travelled;
+				const progress = settled ? 1 : Math.min(1, travelled / 55);
+				const drop = 1 + (progress * progress) * (-element.y.baseVal.value - element.height.baseVal.value);
+				element.setAttribute('transform', `translate(${riderX - drift} ${groundY + drop})`);
+			}
+		};
+
+		const showStart = () => {
+			cancelAnimationFrame(frame);
+			index = 0;
+			distance = 0;
+			clearDroppedBags();
+			landscape.reset();
+			missed = 0;
+			hero.dataset.gameMissed = '0';
+			lettering.replaceChildren();
+			start.hidden = false;
+			round.hidden = true;
+			result.hidden = true;
+			announcement.textContent = '';
+			draw(0);
+		};
+
+		const finishObstacle = (success: boolean) => {
+			cancelAnimationFrame(frame);
+			if (!success) {
+				if (missed < 2) {
+					const bag = missed === 0 ? '.game-bag-one' : '.game-bag-two';
+					dropBag(land.querySelector<SVGRectElement>(bag));
+				}
+				missed += 1;
+			}
+			hero.dataset.gameMissed = String(missed);
+			index += 1;
+
+			if (index === obstacles.length) {
+				lettering.replaceChildren();
+				round.hidden = true;
+				draw(0);
+				result.hidden = false;
+				const score = obstacles.length - missed;
+				const arrival = missed >= 3 ? 'en monocycle' : 'à vélo';
+				resultTitle.textContent = `${score} obstacle${score === 1 ? '' : 's'} franchi${score === 1 ? '' : 's'} sur ${obstacles.length}, arrivée ${arrival} !`;
+				announcement.textContent = '';
+				resultTitle.focus({ preventScroll: true });
+				return;
+			}
+
+			const feedback = success ? 'Obstacle franchi.' :
+				missed <= 2 ? 'Obstacle manqué. Une sacoche en moins.' :
+				missed === 3 ? 'Obstacle manqué. Le vélo devient un monocycle !' : 'Obstacle manqué.';
+			showObstacle(feedback);
+		};
+
+		const tick = (now: number) => {
+			const reduced = document.documentElement.hasAttribute('data-reduced-motion') || motionPreference.matches;
+			if (!reduced) distance += Math.min(now - previousTime, 64) * 0.18;
+			previousTime = now;
+			const elapsed = Math.min(1, Math.max(0, 1 - (deadline - now) / roundDuration));
+			// Sans chrono, le mot ralentit puis attend devant la roue.
+			draw(timed ? elapsed : Math.sin(elapsed * Math.PI / 2));
+			if (timed && elapsed === 1) finishObstacle(false);
+			else frame = requestAnimationFrame(tick);
+		};
+
+		const showObstacle = (feedback = '') => {
+			const obstacle = obstacles[index];
+			prompt.textContent = `Mot ${index + 1} sur ${obstacles.length} · ${obstacle}`;
+			lettering.replaceChildren(...Array.from(obstacle.toUpperCase(), char => {
+				const letter = document.createElementNS(svg, 'tspan');
+				letter.textContent = char;
+				return letter;
+			}));
+			wordWidth = lettering.getComputedTextLength();
+			input.value = '';
+			draw(0);
+			if (document.activeElement === input && feedback) {
+				announcement.textContent = `${feedback} Mot suivant : ${obstacle}.`;
+			} else {
+				announcement.textContent = feedback;
+				input.focus({ preventScroll: true });
+			}
+			previousTime = performance.now();
+			deadline = previousTime + roundDuration;
+			frame = requestAnimationFrame(tick);
+		};
+
+		const close = (restoreFocus: boolean) => {
+			cancelAnimationFrame(frame);
+			game.hidden = true;
+			hero.removeAttribute('data-playing');
+			hero.removeAttribute('data-game-missed');
+			lettering.replaceChildren();
+			clearDroppedBags();
+			hero.style.removeProperty('--game-rider-x');
+			landscape.reset();
+			hero.style.removeProperty('--game-wheel-angle');
+			launch.hidden = !desktop.matches;
+			if (restoreFocus) settingsButton?.focus({ preventScroll: true });
+		};
+
+		const syncAvailability = () => {
+			if (!desktop.matches && !game.hidden) close(false);
+			launch.hidden = !desktop.matches || !game.hidden;
+		};
+		syncAvailability();
+		desktop.addEventListener('change', syncAvailability);
+		const refreshScene = () => {
+			if (!game.hidden) draw(renderedProgress);
+		};
+		window.addEventListener('resize', refreshScene, { passive: true });
+		new MutationObserver(refreshScene).observe(document.documentElement, {
+			attributes: true, attributeFilter: ['data-reduced-motion']
+		});
+
+		launch.addEventListener('click', () => {
+			settings?.hidePopover();
+			window.scrollTo({ top: 0, behavior: 'instant' });
+			launch.hidden = true;
+			game.hidden = false;
+			hero.setAttribute('data-playing', '');
+			showStart();
+			game.querySelector<HTMLElement>('[data-close]')?.focus({ preventScroll: true });
+		});
+		game.querySelector('[data-close]')?.addEventListener('click', () => close(true));
+		game.addEventListener('keydown', event => {
+			if (event.key === 'Escape') close(true);
+		});
+		new MutationObserver(() => {
+			if (!game.hidden && document.documentElement.dataset.section !== 'accueil') close(false);
+		}).observe(document.documentElement, { attributes: true, attributeFilter: ['data-section'] });
+
+		game.querySelectorAll<HTMLButtonElement>('[data-start]').forEach(button => {
+			button.addEventListener('click', () => {
+				timed = button.dataset.start === 'timed';
+				start.hidden = true;
+				round.hidden = false;
+				showObstacle();
+			});
+		});
+		game.querySelector('[data-replay]')?.addEventListener('click', () => {
+			showStart();
+			start.querySelector('button')?.focus({ preventScroll: true });
+		});
+		game.querySelector('[data-skip]')?.addEventListener('click', () => finishObstacle(false));
+		const updateLetters = () => {
+			const word = obstacles[index];
+			if (!word || round.hidden) return;
+			const typed = input.value.toLocaleLowerCase('fr');
+			let matched = 0;
+			while (matched < word.length && typed[matched] === word[matched]) matched++;
+			const hasError = matched < typed.length;
+			// Keep the valid prefix so the next key can retry the missed letter.
+			if (hasError) input.value = typed.slice(0, matched);
+			Array.from(lettering.children).forEach((letter, i) => {
+				letter.classList.toggle('matched', i < matched);
+				letter.classList.toggle('retry', hasError && i === matched);
+			});
+			if (matched === word.length) finishObstacle(true);
+			else if (hasError) announcement.textContent = `Lettre attendue · ${word[matched].toUpperCase()}`;
+		};
+		input.addEventListener('input', event => {
+			if (!(event instanceof InputEvent && event.isComposing)) updateLetters();
+		});
+		input.addEventListener('compositionend', updateLetters);
+		hero.addEventListener('click', event => {
+			if (game.hidden || round.hidden || !(event.target instanceof Element)) return;
+			if (!event.target.closest('button, input, a')) input.focus({ preventScroll: true });
+		});
+	}
+</script>
+
+<style>
+	.game {
+		width: min(100%, 36rem);
+		padding: clamp(1rem, 3vw, 1.5rem);
+		border: 1px solid var(--border-strong);
+		border-radius: var(--radius-xl);
+		background: var(--surface-elevated);
+		color: var(--text-primary);
+	}
+
+	header, .start, .controls {
+		display: flex;
+		align-items: center;
+		gap: var(--spacing-2);
+	}
+
+	header { justify-content: space-between; }
+	h2, h3 { margin: 0; }
+	p { color: var(--text-secondary); }
+
+	.game button, input {
+		min-height: 44px;
+		border: 1px solid var(--border-strong);
+		border-radius: var(--radius-md);
+		padding: var(--spacing-2) var(--spacing-3);
+		background: var(--surface-subtle);
+		color: var(--text-primary);
+		font: inherit;
+	}
+
+	.game button { cursor: pointer; }
+	.game button:hover { border-color: var(--action-primary); }
+	.close { min-width: 44px; flex-shrink: 0; }
+
+	.start, .controls { flex-wrap: wrap; margin-top: var(--spacing-4); }
+	.visually-hidden, .game:has([data-game-round]:not([hidden])) :is(h2, .announcement) {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		min-height: 0;
+		padding: 0;
+		border: 0;
+		overflow: hidden;
+		clip-path: inset(50%);
+	}
+	.game:has([data-game-round]:not([hidden])) {
+		display: flex;
+		align-items: center;
+		gap: var(--spacing-2);
+		width: fit-content;
+		padding: 0;
+		border: 0;
+		background: transparent;
+	}
+	.game:has([data-game-round]:not([hidden])) #cyclist-game-intro { display: none; }
+	:global(.road-word) {
+		font: 800 25px var(--font-sans);
+		letter-spacing: 1px;
+		fill: var(--text-primary);
+		stroke: var(--surface-elevated);
+		stroke-width: 3px;
+		paint-order: stroke fill;
+	}
+	:global(.road-word .matched) { fill: var(--action-primary); text-decoration: underline; }
+	:global(.road-word .retry) { text-decoration: underline wavy; }
+	:global(.hero:has(#cyclist-game-input:focus-visible) .road-word) {
+		filter: drop-shadow(0 2px 1px var(--surface-elevated));
+	}
+	.announcement { margin: var(--spacing-3) 0 0; }
+	[data-game-result] button { margin-top: var(--spacing-3); }
+	[hidden] { display: none !important; }
+</style>
