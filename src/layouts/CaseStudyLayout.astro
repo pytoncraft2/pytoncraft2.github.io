@@ -38,12 +38,13 @@ const { id: slug, data } = project;
 					{data.title}
 				</h1>
 				<ProjectTags tags={data.tags} transitionName={`project-${slug}-tags`} />
-				<p
-					class="subtitle ds-body-l"
+				<div
+					class="brief"
 					style={`view-transition-name: project-${slug}-summary; view-transition-class: project-text;`}
 				>
-					{data.description}
-				</p>
+					{data.summary && <h2 class="brief-title ds-h3">En bref</h2>}
+					<p class="subtitle ds-body-l">{data.summary ?? data.description}</p>
+				</div>
 			</header>
 
 			<!-- Contenu Markdown (src/content/projects/<slug>.md). -->
@@ -87,6 +88,10 @@ const { id: slug, data } = project;
 		max-width: 60ch;
 		margin: 0;
 		color: var(--text-secondary);
+	}
+
+	.brief-title {
+		margin: 0 0 var(--spacing-2);
 	}
 
 	h1 {

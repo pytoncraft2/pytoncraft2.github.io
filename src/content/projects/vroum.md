@@ -4,6 +4,9 @@ order: 1
 meta: "Production · SvelteKit, FastAPI, PostgreSQL"
 tags: ["2023–Aujourd’hui", "Production", "Développement web", "Produit"]
 description: "Outil de covoiturage collaboratif utilisé par des groupes scouts."
+summary: >-
+  Vroum aide les groupes scouts à répartir les participants et le matériel entre les véhicules d’un rassemblement.
+  Principal développeur et mainteneur de l’outil, j’ai conçu un mode multi-trajets pour les événements où les véhicules partent de plusieurs villes à des dates différentes.
 stack: ["SvelteKit", "FastAPI", "PostgreSQL"]
 role: "Développement web et participation aux décisions produit"
 year: "2023-present"

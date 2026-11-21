@@ -15,6 +15,7 @@ const projects = defineCollection({
 		meta: z.string(),
 		tags: z.array(z.string()),
 		description: z.string(),
+		summary: z.string().trim().min(1).optional(),
 		stack: z.array(z.string()),
 		role: z.string(),
 		year: z.string(),

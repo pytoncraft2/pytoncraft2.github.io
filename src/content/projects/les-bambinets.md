@@ -4,6 +4,9 @@ order: 13
 meta: "Formation UX/UI · Figma"
 tags: ["2026", "Formation", "UX/UI Design"]
 description: "Application éducative autour de la langue des signes."
+summary: >-
+  Les Bambinets est un prototype éducatif pour découvrir et mémoriser des signes.
+  J’ai conçu un parcours qui relie les deux temps de l’apprentissage : on découvre un signe en vidéo, puis on le retrouve dans un quiz pour vérifier ce qu’on a retenu.
 stack: ["Figma"]
 role: "UX/UI Design"
 year: "2026-2027"

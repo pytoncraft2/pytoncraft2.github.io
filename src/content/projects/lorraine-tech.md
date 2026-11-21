@@ -4,6 +4,9 @@ order: 5
 meta: "Web@cadémie · React, Symfony, accessibilité"
 tags: ["2021–2022", "Projet académique", "Développement web", "Accessibilité"]
 description: "Boutique en ligne développée à quatre avec React et Symfony, puis reprise pour la rendre plus accessible : thème sombre, taille du texte, inversion des couleurs et PWA."
+summary: >-
+  Lorraine Tech est une boutique en ligne développée à quatre.
+  J’ai créé le panier et les pages produit, puis repris l’interface pour que chacun puisse ajuster la taille du texte ou inverser les couleurs.
 stack: ["React", "Symfony", "Bootstrap", "PWA"]
 role: "Développement front-end (panier, catalogue, administration), puis options d'accessibilité et PWA"
 year: "2021-2022"

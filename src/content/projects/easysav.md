@@ -4,6 +4,9 @@ order: 2
 meta: "Startup · Symfony, Twig, EasyAdmin"
 tags: ["2021–2025", "Expérience pro", "Développement web"]
 description: "Formulaires métiers et interface d’administration."
+summary: >-
+  EasySAV aide les techniciens de maintenance à remplir leurs attestations d’entretien sur le terrain.
+  Pendant mon alternance, j’ai ajouté le préremplissage des informations déjà connues et un mode brouillon pour permettre aux techniciens de reprendre une saisie interrompue.
 stack: ["Symfony", "Twig", "EasyAdmin"]
 role: "Développement web"
 year: "2021-2025"

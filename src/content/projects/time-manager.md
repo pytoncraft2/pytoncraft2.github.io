@@ -4,6 +4,9 @@ order: 9
 meta: "MSc Epitech · SvelteKit, Elixir, PostgreSQL"
 tags: ["2023", "Projet académique", "Développement web", "Visualisation de données"]
 description: "Application de pointage pour une équipe de travail, développée à quatre : saisie des temps, graphiques d'heures travaillées et vues adaptées à l'employé, au manager et à la direction."
+summary: >-
+  Time Manager permet aux employés de pointer et aux responsables de suivre les heures travaillées par leur équipe.
+  J’ai développé les vues de gestion des équipes et les graphiques qui rendent les heures enregistrées lisibles en un coup d’œil.
 stack: ["SvelteKit", "Elixir / Phoenix", "PostgreSQL", "FusionCharts", "Docker"]
 role: "Développement du front SvelteKit : connexion, profil, équipes et graphiques des heures travaillées"
 year: "2023"

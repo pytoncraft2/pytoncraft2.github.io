@@ -4,6 +4,9 @@ order: 11
 meta: "Formation Product Design · Prototype no-code · Recherche UX"
 tags: ["2026", "Formation", "Product Design", "Tests utilisateurs"]
 description: "Prototype mobile de découverte et de publication d’événements, amélioré grâce à des micro-tests et documenté pour la passation aux développeurs."
+summary: >-
+  Eventorias est un prototype mobile pour découvrir des événements à Paris ou en publier un.
+  Lors des tests, une personne a hésité après avoir ajouté un événement à son calendrier. J’ai modifié la fiche pour que la confirmation y reste visible.
 stack: ["Lovable", "Maze", "Notion", "Canva"]
 role: "Recherche UX, prototypage, tests et passation"
 year: "2026"
