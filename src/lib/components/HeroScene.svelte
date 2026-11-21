@@ -137,7 +137,7 @@
 			</defs>
 
 			<!-- Astre : le soleil se couche et la lune se lève quand le thème passe en sombre. -->
-			<g class="layer astre-rise">
+			<g class="layer astre-rise" style:--depth-offset="16px">
 				<g class="astre sun">
 					<circle cx="1010" cy="92" r="62" fill="var(--scene-sun-glow)" />
 					<circle cx="1010" cy="92" r="38" fill="var(--scene-sun)" />
@@ -148,7 +148,7 @@
 				</g>
 			</g>
 
-			<g class="layer" style:--i="1">
+			<g class="layer" style:--i="1" style:--depth-offset="12px">
 				<path
 					fill="var(--scene-far)"
 					d="M0 210 L120 150 L210 185 L330 110 L440 170 L560 122 L690 180 L800 136 L930 175 L1050 105 L1180 165 L1300 130 L1440 172 L1440 320 L0 320 Z"
@@ -170,14 +170,14 @@
 				</g>
 			</g>
 
-			<g class="layer" style:--i="2">
+			<g class="layer" style:--i="2" style:--depth-offset="7px">
 				<path
 					fill="var(--scene-mid)"
 					d="M0 230 C160 190 300 200 420 220 C560 245 700 195 860 200 C1010 205 1120 240 1260 225 C1350 215 1400 205 1440 210 L1440 320 L0 320 Z"
 				/>
 			</g>
 
-			<g class="layer" style:--i="3">
+			<g class="layer" style:--i="3" style:--depth-offset="3px">
 				<path
 					fill="var(--scene-near)"
 					d="M0 250 C120 222 250 214 370 236 C450 251 520 266 620 270 C760 274 840 262 960 248 C1080 234 1200 230 1300 242 C1370 250 1410 256 1440 258 L1440 320 L0 320 Z"
@@ -290,6 +290,21 @@
 	@media (min-width: 40rem) {
 		:global(html[data-section='contact']) .zoom {
 			scale: var(--zoom-scale, 1.6);
+		}
+	}
+
+	@media (min-width: 40rem) and (prefers-reduced-motion: no-preference) {
+		.sky-layer {
+			--depth-offset: 20px;
+		}
+
+		.sky-layer,
+		.layer {
+			transition: translate 900ms cubic-bezier(0.4, 0, 0.2, 1);
+		}
+
+		:global(html[data-section='contact']:not([data-reduced-motion])) :is(.sky-layer, .layer) {
+			translate: 0 var(--depth-offset, 0px);
 		}
 	}
 
