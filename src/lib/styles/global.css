@@ -26,8 +26,10 @@ html {
  * en multipage, une arrivée sur /#projets doit se placer directement sur l’ancre,
  * sans défiler depuis le haut de la page.
  */
-html[data-smooth-scroll] {
-	scroll-behavior: smooth;
+@media (prefers-reduced-motion: no-preference) {
+	html[data-smooth-scroll] {
+		scroll-behavior: smooth;
+	}
 }
 
 @media (min-width: 40rem) {
@@ -86,6 +88,20 @@ html:active-view-transition-type(project)::view-transition-new(root) {
 	from {
 		opacity: 0;
 	}
+}
+
+/* À l’ouverture, le groupe animé porte le fond de la carte jusqu’à la taille
+ * de la fenêtre. Le bouton appartient uniquement à la vue de départ. */
+html:active-view-transition-type(project-open)::view-transition-group(.project-frame) {
+	background: var(--surface-elevated);
+}
+
+html:active-view-transition-type(project-open)::view-transition-old(.project-frame) {
+	opacity: 0;
+}
+
+html:active-view-transition-type(project-open)::view-transition-new(.project-frame) {
+	animation: page-fade-in 440ms ease both;
 }
 
 /*
@@ -218,6 +234,21 @@ html.theme-transition *::after {
 	::view-transition-new(*) {
 		animation: none !important;
 	}
+}
+
+html[data-reduced-motion] {
+	scroll-behavior: auto;
+}
+
+html[data-reduced-motion] *,
+html[data-reduced-motion] *::before,
+html[data-reduced-motion] *::after {
+	animation: none !important;
+	transition: none !important;
+}
+
+html[data-reduced-motion] .scene .zoom {
+	scale: none !important;
 }
 
 body {

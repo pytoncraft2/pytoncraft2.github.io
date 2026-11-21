@@ -33,26 +33,7 @@ const cards: CarouselProject[] = (await getFeaturedProjects()).map(({ id, data }
 >
 	<!-- Le script de retour (BaseLayout) a besoin du carrousel dès le premier rendu. -->
 	<link slot="head" rel="expect" href="#projets-carousel" blocking="render" />
-	<!--
-		Dock sur l’horizon dès le premier rendu (avant le dock dans le document), pour éviter
-		qu’il apparaisse d’abord sur un côté ; dock-horizon.ts le place ou le retire ensuite.
-		Au retour arrière, le défilement est restauré avant la première image (pagereveal) : si
-		la page n’est pas en haut, le dock reste sur le côté, sans quoi la transition de vue le
-		ferait voyager vers l’horizon puis revenir.
-	-->
 	<script is:inline>
-		if (!location.hash && window.matchMedia('(min-width: 40rem)').matches) {
-			document.documentElement.setAttribute('data-dock-horizon', '');
-			window.addEventListener(
-				'pagereveal',
-				function () {
-					if (window.scrollY > 8) {
-						document.documentElement.removeAttribute('data-dock-horizon');
-					}
-				},
-				{ once: true }
-			);
-		}
 		// Section affichée dès la première image (élément actif du dock, ensuite tenu à jour par
 		// trackSection) : au retour arrière, celle qu’on avait quittée ; sinon, celle de l’ancre.
 		try {
@@ -73,12 +54,16 @@ const cards: CarouselProject[] = (await getFeaturedProjects()).map(({ id, data }
 			} catch (e) {}
 		});
 		// Animations du paysage jouées une fois par session (voir HeroScene.svelte).
+		var referringPage = document.referrer && new URL(document.referrer);
+		if (location.hash === '#projets' && referringPage && referringPage.origin === location.origin &&
+			/\/projets\/[^/]+\/?$/.test(referringPage.pathname)) {
+			document.documentElement.setAttribute('data-scene-played', '');
+		}
 		try {
 			if (sessionStorage.getItem('hero-scene-played')) {
 				document.documentElement.setAttribute('data-scene-played', '');
-			} else {
-				sessionStorage.setItem('hero-scene-played', '1');
 			}
+			sessionStorage.setItem('hero-scene-played', '1');
 		} catch (e) {}
 	</script>
 	<div class="page" data-snap-blocks>
@@ -123,27 +108,29 @@ const cards: CarouselProject[] = (await getFeaturedProjects()).map(({ id, data }
 		</section>
 
 		<div id="profil" class="anchor"></div>
-		<section class="section profil snap-block" data-section="profil" aria-labelledby="profil-title">
-			<h2 id="profil-title" class="ds-h2">Profil</h2>
-			<p class="ds-body-m">
-				Développeur web, j’interviens aujourd’hui sur la réalisation d’applications et sur la conception UX/UI, de
-				l’analyse des besoins jusqu’à l’interface.
-			</p>
-			<h3 id="tech-title" class="subhead">Technologies</h3>
-			<ul class="tech-grid" aria-labelledby="tech-title">
-				{
-					homeTechs.map((item) => (
-						<li>
-							<span class="tech-item">
-								<TechIcon name={item.id} />
-								<span>{item.label}</span>
-							</span>
-						</li>
-					))
-				}
-			</ul>
-			<div class="profil-cv">
-				<Button href={cvHref} variant="secondary">Voir mon CV (PDF)</Button>
+		<section class="section profil section-flush snap-block" data-section="profil" data-stack-cover aria-labelledby="profil-title">
+			<div class="profil-card">
+				<h2 id="profil-title" class="ds-h2">Profil</h2>
+				<p class="ds-body-m">
+					Développeur web, j’interviens aujourd’hui sur la réalisation d’applications et sur la conception UX/UI, de
+					l’analyse des besoins jusqu’à l’interface.
+				</p>
+				<h3 id="tech-title" class="subhead">Technologies</h3>
+				<ul class="tech-grid" aria-labelledby="tech-title">
+					{
+						homeTechs.map((item) => (
+							<li>
+								<span class="tech-item">
+									<TechIcon name={item.id} />
+									<span>{item.label}</span>
+								</span>
+							</li>
+						))
+					}
+				</ul>
+				<div class="profil-cv">
+					<Button href={cvHref} variant="secondary">Voir mon CV (PDF)</Button>
+				</div>
 			</div>
 			<CareerRoute />
 		</section>
@@ -170,7 +157,6 @@ const cards: CarouselProject[] = (await getFeaturedProjects()).map(({ id, data }
 
 <script>
 	import { contactBubble } from '#lib/contact-bubble.js';
-	import { dockHorizon } from '#lib/dock-horizon.js';
 	import { snapBlocks, stackBlocks, trackSection } from '#lib/snap-blocks.js';
 
 	// Défilement et empilement par blocs de l’accueil (attachments Svelte réutilisés tels quels).
@@ -187,20 +173,186 @@ const cards: CarouselProject[] = (await getFeaturedProjects()).map(({ id, data }
 		contactBubble(contact);
 	}
 
-	// Dock posé sur l’horizon du paysage tant que la page est en haut.
-	const hero = document.querySelector<HTMLElement>('.hero');
-	if (hero) {
-		dockHorizon(hero);
+	// Seulement une étape au clavier si la liste déborde et peut être défilée.
+	const proofs = document.querySelector<HTMLElement>('.proofs-list');
+	if (proofs) {
+		const updateProofsTabStop = () => {
+			const scrollable = getComputedStyle(proofs).overflowX === 'auto' &&
+				proofs.scrollWidth > proofs.clientWidth + 1;
+			if (scrollable) proofs.tabIndex = 0;
+			else proofs.removeAttribute('tabindex');
+		};
+		const observer = new ResizeObserver(updateProofsTabStop);
+		observer.observe(proofs);
+		window.addEventListener('resize', updateProofsTabStop, { passive: true });
+		for (const note of proofs.children) observer.observe(note);
+		updateProofsTabStop();
 	}
+
+	const carousel = document.getElementById('projets-carousel');
+	if (carousel) {
+		let gesture: { pointerId: number; x: number; y: number; scrollLeft: number } | undefined;
+		let dragged = false;
+		let settleFrame = 0;
+		const stopSettling = () => {
+			cancelAnimationFrame(settleFrame);
+			carousel.removeAttribute('data-settling');
+		};
+		carousel.addEventListener('keydown', (event) => {
+			if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+			if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+			if (!(event.target instanceof HTMLAnchorElement)) return;
+
+			const card = event.target.closest('li');
+			if (!card || card.parentElement !== carousel) return;
+			event.preventDefault();
+
+			const sibling = event.key === 'ArrowRight' ? card.nextElementSibling : card.previousElementSibling;
+			const link = sibling?.querySelector<HTMLAnchorElement>('a[href]');
+			if (!sibling || !link) return;
+
+			stopSettling();
+			const viewport = carousel.getBoundingClientRect();
+			const bounds = sibling.getBoundingClientRect();
+			const offset = bounds.left < viewport.left
+				? bounds.left - viewport.left
+				: Math.max(0, bounds.right - viewport.right);
+			if (Math.abs(offset) > 1) {
+				carousel.scrollTo({ left: carousel.scrollLeft + offset, behavior: 'instant' });
+			}
+			link.focus({ preventScroll: true });
+		});
+
+		carousel.addEventListener('wheel', stopSettling, { passive: true });
+		window.addEventListener('keydown', stopSettling);
+		document.addEventListener('pointerdown', (event) => {
+			if (!(event.target instanceof Node) || !carousel.contains(event.target) || event.pointerType !== 'mouse') {
+				stopSettling();
+			}
+		}, { capture: true });
+
+		carousel.addEventListener('pointerdown', (event) => {
+			dragged = false;
+			if (event.pointerType !== 'mouse' || event.button !== 0 || carousel.scrollWidth <= carousel.clientWidth) return;
+			cancelAnimationFrame(settleFrame);
+			gesture = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, scrollLeft: carousel.scrollLeft };
+		});
+
+		window.addEventListener('pointermove', (event) => {
+			if (gesture?.pointerId !== event.pointerId) return;
+			if (!(event.buttons & 1)) {
+				endDrag(event);
+				return;
+			}
+			const delta = event.clientX - gesture.x;
+			if (!dragged) {
+				const vertical = Math.abs(event.clientY - gesture.y);
+				if (vertical > 6 && vertical > Math.abs(delta)) {
+					gesture = undefined;
+					stopSettling();
+					return;
+				}
+				if (Math.abs(delta) < 6) return;
+				dragged = true;
+				carousel.setAttribute('data-dragging', '');
+				carousel.setPointerCapture(event.pointerId);
+				window.getSelection()?.removeAllRanges();
+			}
+			carousel.scrollTo({ left: gesture.scrollLeft - delta, behavior: 'instant' });
+		});
+
+		const endDrag = (event: PointerEvent) => {
+			if (gesture?.pointerId !== event.pointerId) return;
+			gesture = undefined;
+			if (!dragged && !carousel.hasAttribute('data-settling')) return;
+			// Garder le snap désactivé jusqu’à l’arrivée sur la carte choisie.
+			carousel.setAttribute('data-settling', '');
+			carousel.removeAttribute('data-dragging');
+			const start = carousel.scrollLeft;
+			const limit = carousel.scrollWidth - carousel.clientWidth;
+			const stops = Array.from(carousel.children, card => Math.min((card as HTMLElement).offsetLeft, limit));
+			const target = stops.reduce((best, left) => Math.abs(left - start) < Math.abs(best - start) ? left : best, 0);
+			const distance = target - start;
+			if (Math.abs(distance) < 1 || document.documentElement.hasAttribute('data-reduced-motion') || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+				carousel.scrollTo({ left: target, behavior: 'instant' });
+				stopSettling();
+				return;
+			}
+			const started = performance.now();
+			const duration = Math.min(320, 160 + Math.abs(distance) / 2);
+			function advance(now: number) {
+				const progress = document.documentElement.hasAttribute('data-reduced-motion')
+					? 1
+					: Math.min(1, (now - started) / duration);
+				carousel?.scrollTo({ left: start + distance * (1 - (1 - progress) ** 3), behavior: 'instant' });
+				if (progress < 1) settleFrame = requestAnimationFrame(advance);
+				else stopSettling();
+			}
+			settleFrame = requestAnimationFrame(advance);
+		};
+
+		window.addEventListener('pointerup', endDrag);
+		window.addEventListener('pointercancel', endDrag);
+		carousel.addEventListener('lostpointercapture', endDrag);
+		carousel.addEventListener('dragstart', (event) => {
+			if (gesture) event.preventDefault();
+		});
+		carousel.addEventListener('click', (event) => {
+			if (!dragged || event.detail === 0) return;
+			event.preventDefault();
+			event.stopImmediatePropagation();
+		}, { capture: true });
+	}
+
 </script>
 
 <style>
+	@media (pointer: fine) {
+		:global(#projets-carousel) {
+			cursor: grab;
+		}
+	}
+
+	:global(#projets-carousel > li) {
+		display: flex;
+	}
+
+	:global(#projets-carousel .link) {
+		align-self: flex-start;
+		min-height: 44px;
+		padding-inline: var(--spacing-4);
+		border: 1px solid color-mix(in srgb, var(--action-primary) 65%, transparent);
+		border-radius: var(--radius-md);
+		cursor: pointer;
+	}
+
+	:global(#projets-carousel .link:hover),
+	:global(#projets-carousel .link:focus-visible) {
+		border-color: var(--action-primary);
+		background: color-mix(in srgb, var(--action-primary) 10%, transparent);
+		text-decoration: none;
+	}
+
+
+	:global(#projets-carousel:is([data-dragging], [data-settling])) {
+		scroll-snap-type: none;
+	}
+
+	:global(#projets-carousel[data-dragging]) {
+		user-select: none;
+	}
+
+	:global(#projets-carousel[data-dragging]),
+	:global(#projets-carousel[data-dragging] *) {
+		cursor: grabbing;
+	}
+
 	.page {
 		display: contents;
 	}
 
 	/* Empilement : chaque section glisse par-dessus la précédente (voir stackBlocks). */
-	.page[data-stacked] > .snap-block {
+	:global(html:not([data-reduced-motion])) .page[data-stacked] > .snap-block {
 		position: sticky;
 		top: var(--stack-top);
 	}
@@ -217,13 +369,13 @@ const cards: CarouselProject[] = (await getFeaturedProjects()).map(({ id, data }
 	 * Le contenu de la section recouverte s’efface (`--stack-opacity`, posé par stackBlocks).
 	 * Dans le hero, seuls le texte et les encarts s’effacent : le paysage reste visible.
 	 */
-	.page[data-stacked] > .section,
-	.page[data-stacked] > .hero > :is(.hero-copy, .proofs) {
+	:global(html:not([data-reduced-motion])) .page[data-stacked] > .section,
+	:global(html:not([data-reduced-motion])) .page[data-stacked] > .hero > :is(.hero-copy, .proofs) {
 		opacity: var(--stack-opacity, 1);
 	}
 
-	.page[data-stacked] > .section[data-covered],
-	.page[data-stacked] > .hero[data-covered] > :is(.hero-copy, .proofs) {
+	:global(html:not([data-reduced-motion])) .page[data-stacked] > .section[data-covered],
+	:global(html:not([data-reduced-motion])) .page[data-stacked] > .hero[data-covered] > :is(.hero-copy, .proofs) {
 		pointer-events: none;
 	}
 
@@ -234,8 +386,19 @@ const cards: CarouselProject[] = (await getFeaturedProjects()).map(({ id, data }
 		isolation: isolate;
 		display: grid;
 		gap: var(--spacing-8);
-		padding-bottom: calc(var(--hero-scene-band) * 0.8);
+		padding-bottom: calc(var(--hero-scene-band) * 0.7);
 		margin-bottom: clamp(var(--spacing-10), 6vw, var(--spacing-16));
+	}
+
+
+	:global(html[data-section='projets']) .hero :global(.rider) {
+		opacity: 0;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.hero :global(.rider) {
+			transition: opacity 220ms ease;
+		}
 	}
 
 	.hero-copy {
@@ -283,6 +446,11 @@ const cards: CarouselProject[] = (await getFeaturedProjects()).map(({ id, data }
 		scrollbar-width: thin;
 		scroll-snap-type: x proximity;
 		-webkit-overflow-scrolling: touch;
+	}
+
+	.proofs-list:focus-visible {
+		outline: 2px solid var(--action-focus);
+		outline-offset: 2px;
 	}
 
 	.proof-note {
@@ -356,6 +524,13 @@ const cards: CarouselProject[] = (await getFeaturedProjects()).map(({ id, data }
 	.section p {
 		margin: 0 0 var(--spacing-4);
 		max-width: 40rem;
+	}
+
+	.profil-card {
+		padding: var(--spacing-8);
+		background: var(--surface-elevated);
+		border: 1px solid var(--border-default);
+		border-radius: var(--radius-lg);
 	}
 
 	.profil .subhead {
@@ -482,9 +657,11 @@ const cards: CarouselProject[] = (await getFeaturedProjects()).map(({ id, data }
 		.bubble {
 			position: absolute;
 			bottom: calc(100% - var(--bubble-y, 60%));
-			left: max(0px, calc(var(--bubble-x, 20%) - 3rem));
-			width: min(34rem, 100% - max(0px, var(--bubble-x, 20%) - 3rem));
-			transform-origin: 3rem calc(100% + 2rem);
+			--bubble-left: max(0px, calc(var(--bubble-x, 20%) - 3rem));
+			--pointer-x: clamp(1rem, var(--bubble-x, 20%), 3rem);
+			left: var(--bubble-left);
+			width: min(34rem, calc(100% - var(--bubble-left)));
+			transform-origin: var(--pointer-x) calc(100% + 2rem);
 		}
 
 		/* Pointe : un triangle bordé (contour) et un triangle plein (fond) superposés. */
@@ -493,7 +670,7 @@ const cards: CarouselProject[] = (await getFeaturedProjects()).map(({ id, data }
 			content: '';
 			position: absolute;
 			top: 100%;
-			left: min(var(--bubble-x, 20%), 3rem);
+			left: var(--pointer-x);
 			width: 0;
 			height: 0;
 			border-style: solid;
@@ -532,6 +709,28 @@ const cards: CarouselProject[] = (await getFeaturedProjects()).map(({ id, data }
 		}
 	}
 
+	:global(html[data-reduced-motion]) .contact {
+		min-height: auto;
+	}
+
+	:global(html[data-reduced-motion]) .bubble {
+		position: relative;
+		inset: auto;
+		width: 100%;
+		opacity: 1;
+		scale: 1;
+		pointer-events: auto;
+	}
+
+	:global(html[data-reduced-motion]) .bubble::before,
+	:global(html[data-reduced-motion]) .bubble::after {
+		display: none;
+	}
+
+	:global(html[data-reduced-motion] body .app .footer) {
+		margin-top: 0;
+	}
+
 	@media (min-width: 40rem) and (prefers-reduced-motion: no-preference) {
 		.bubble {
 			transition:
@@ -539,11 +738,15 @@ const cards: CarouselProject[] = (await getFeaturedProjects()).map(({ id, data }
 				scale 200ms ease;
 		}
 
+		:global(html[data-section='contact']:is([data-career-started], [data-career-finished])) .bubble {
+			--contact-delay: 750ms;
+		}
+
 		/* Apparition après le zoom (900 ms), avec un léger rebond. */
 		:global(html[data-section='contact']) .bubble {
 			transition:
-				opacity 250ms ease 650ms,
-				scale 450ms cubic-bezier(0.34, 1.56, 0.64, 1) 650ms;
+				opacity 250ms ease var(--contact-delay, 650ms),
+				scale 450ms cubic-bezier(0.34, 1.56, 0.64, 1) var(--contact-delay, 650ms);
 		}
 	}
 

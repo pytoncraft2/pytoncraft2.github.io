@@ -10,19 +10,9 @@
 
 	let theme = $state<'light' | 'dark'>('light');
 	let themeTimer = 0;
-	let visible = $state(true);
-	let hashChanged = false;
-	let lastScroll = 0;
-
-	function onWindowScroll() {
-		const scroll = window.scrollY;
-		if (!hashChanged) {
-			visible = scroll === lastScroll ? visible : scroll < 50 || scroll < lastScroll;
-		}
-
-		lastScroll = scroll;
-		hashChanged = false;
-	}
+	let settingsOpen = $state(false);
+	let reducedMotion = $state(false);
+	let systemReducesMotion = $state(false);
 
 	function syncBrowserChrome(next: 'light' | 'dark') {
 		document.documentElement.style.colorScheme = next;
@@ -43,8 +33,31 @@
 			syncBrowserChrome(current);
 		}
 
-		lastScroll = window.scrollY;
+		const root = document.documentElement;
+		const media = matchMedia('(prefers-reduced-motion: reduce)');
+		const syncMotion = () => {
+			systemReducesMotion = media.matches;
+			reducedMotion = root.hasAttribute('data-reduced-motion');
+		};
+		syncMotion();
+		const observer = new MutationObserver(syncMotion);
+		observer.observe(root, { attributes: true, attributeFilter: ['data-reduced-motion'] });
+		media.addEventListener('change', syncMotion);
+		return () => {
+			observer.disconnect();
+			media.removeEventListener('change', syncMotion);
+		};
 	});
+
+	function toggleMotion() {
+		reducedMotion = !reducedMotion;
+		document.documentElement.toggleAttribute('data-reduced-motion', reducedMotion);
+		try {
+			localStorage.setItem('reduce-motion', String(reducedMotion));
+		} catch {
+			// Le choix s’applique sur la page courante même sans stockage.
+		}
+	}
 
 	function applyTheme(next: 'light' | 'dark') {
 		theme = next;
@@ -54,7 +67,7 @@
 		const root = document.documentElement;
 		window.clearTimeout(themeTimer);
 
-		if (prefersReducedMotion.current) {
+		if (prefersReducedMotion.current || reducedMotion) {
 			root.classList.remove('theme-transition');
 			root.dataset.theme = next;
 			return;
@@ -74,37 +87,47 @@
 	}
 </script>
 
-<svelte:window onscroll={onWindowScroll} onhashchange={() => (hashChanged = true)} />
-
-<header class={['header', { visible }]}>
+<header class="header">
 	<div class="inner">
 		<button
-			class="theme"
+			class="settings-button"
 			type="button"
-			onclick={toggleTheme}
-			aria-label={theme === 'dark' ? 'Activer le thème clair' : 'Activer le thème sombre'}
+			popovertarget="portfolio-settings"
+			aria-label="Paramètres"
+			aria-expanded={settingsOpen}
+			aria-controls="portfolio-settings"
+			title="Paramètres"
 		>
-			{#if theme === 'dark'}
-				<svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-					<circle cx="12" cy="12" r="3.25" stroke="currentColor" stroke-width="1.75" />
-					<path
-						d="M12 5V3.25M12 20.75V19M5 12H3.25M20.75 12H19M6.9 6.9 5.7 5.7M18.3 18.3 17.1 17.1M6.9 17.1 5.7 18.3M18.3 5.7 17.1 6.9"
-						stroke="currentColor"
-						stroke-width="1.75"
-						stroke-linecap="round"
-					/>
-				</svg>
-			{:else}
-				<svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-					<path
-						d="M15.5 13.5A6.25 6.25 0 0 1 10.5 4.4 7.25 7.25 0 1 0 19.6 13.5 6.25 6.25 0 0 1 15.5 13.5Z"
-						stroke="currentColor"
-						stroke-width="1.75"
-						stroke-linejoin="round"
-					/>
-				</svg>
-			{/if}
+			<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true">
+				<path d="m10 3-.5 2.5-2 .9-2.2-.9-2 3.4L5 10.6v2.8l-1.7 1.7 2 3.4 2.2-.9 2 .9.5 2.5h4l.5-2.5 2-.9 2.2.9 2-3.4-1.7-1.7v-2.8l1.7-1.7-2-3.4-2.2.9-2-.9L14 3z" />
+				<circle cx="12" cy="12" r="3" />
+			</svg>
 		</button>
+		<div
+			id="portfolio-settings"
+			class="settings-panel"
+			popover="auto"
+			ontoggle={(event) => (settingsOpen = event.newState === 'open')}
+		>
+			<button class="setting" type="button" onclick={toggleTheme} aria-pressed={theme === 'dark'}>
+				<span>Thème sombre</span>
+				<span aria-hidden="true" class="setting-state">{theme === 'dark' ? '✓' : ''}</span>
+			</button>
+			<button
+				class="setting"
+				type="button"
+				onclick={toggleMotion}
+				aria-pressed={reducedMotion}
+				disabled={systemReducesMotion}
+				aria-describedby={systemReducesMotion ? 'motion-system' : undefined}
+			>
+				<span>Réduire les animations</span>
+				<span aria-hidden="true" class="setting-state">{reducedMotion ? '✓' : ''}</span>
+			</button>
+			{#if systemReducesMotion}
+				<p id="motion-system">Activé dans les réglages du système.</p>
+			{/if}
+		</div>
 	</div>
 </header>
 
@@ -120,18 +143,16 @@
 	}
 
 	.inner {
+		--settings-top: var(--spacing-3);
+		--settings-right: var(--spacing-3);
 		display: flex;
 		justify-content: flex-end;
-		padding: var(--spacing-3);
+		padding: var(--settings-top) var(--settings-right);
 	}
 
-	.theme {
-		pointer-events: auto;
-		min-width: 44px;
+	.settings-button,
+	.setting {
 		min-height: 44px;
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
 		padding: var(--spacing-2);
 		border: 1px solid var(--border-default);
 		border-radius: var(--radius-md);
@@ -140,35 +161,67 @@
 		cursor: pointer;
 	}
 
+	.settings-button {
+		pointer-events: auto;
+		width: 44px;
+		display: grid;
+		place-items: center;
+	}
+
+	.settings-panel {
+		position: fixed;
+		inset: calc(var(--settings-top) + 44px + var(--spacing-2)) var(--settings-right) auto auto;
+		width: min(18rem, calc(100% - 2 * var(--settings-right)));
+		max-height: calc(100% - var(--settings-top) - 44px - 2 * var(--spacing-2));
+		margin: 0;
+		padding: var(--spacing-2);
+		border: 1px solid var(--border-strong);
+		border-radius: var(--radius-lg);
+		background: var(--surface-elevated);
+		color: var(--text-primary);
+		pointer-events: auto;
+	}
+
+	.setting {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--spacing-2);
+		width: 100%;
+		font: 500 var(--text-label-m-size) / var(--text-label-m-line) var(--font-sans);
+		text-align: left;
+	}
+
+	.setting + .setting { margin-top: var(--spacing-2); }
+
+	.setting-state {
+		flex: 0 0 1em;
+		color: var(--action-primary);
+	}
+
+	.setting:disabled { cursor: default; }
+
+	.settings-panel p {
+		margin: var(--spacing-2);
+		color: var(--text-secondary);
+		font: 400 var(--text-body-s-size) / var(--text-body-s-line) var(--font-sans);
+	}
+
 	.icon {
-		display: block;
 		width: 1.25rem;
 		height: 1.25rem;
 	}
 
-	.theme:hover {
+	.settings-button:hover,
+	.setting:hover:not(:disabled) {
 		background: var(--surface-subtle);
 		border-color: var(--border-strong);
 	}
 
-	.theme:focus-visible {
-		outline: 2px solid var(--action-focus);
-		outline-offset: 2px;
-	}
-
-	@media (max-width: 39.99rem) {
-		.theme {
-			transition: transform 0.2s;
-		}
-
-		.header:not(.visible) .theme:not(:focus-visible) {
-			transform: translateY(calc(-100% - var(--spacing-4)));
-		}
-	}
-
 	@media (min-width: 64rem) {
 		.inner {
-			padding: var(--spacing-4) var(--spacing-5);
+			--settings-top: var(--spacing-4);
+			--settings-right: var(--spacing-5);
 		}
 	}
 </style>

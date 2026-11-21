@@ -31,7 +31,8 @@ function getScrollPadding() {
 }
 
 function prefersReducedMotion() {
-	return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	return document.documentElement.hasAttribute('data-reduced-motion') ||
+		window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
 function canUseWheelSnap() {
@@ -196,6 +197,10 @@ export const snapBlocks: Attachment<HTMLElement> = (root) => {
 		settling = false;
 
 		const step = (time: number) => {
+			if (prefersReducedMotion()) {
+				release();
+				return;
+			}
 			if (Math.abs(window.scrollY - expectedY) > takeoverTolerance) {
 				release();
 				return;
@@ -318,7 +323,8 @@ export const snapBlocks: Attachment<HTMLElement> = (root) => {
 /**
  * Empilement : chaque bloc reste collé en haut de l'écran pendant que le suivant glisse
  * par-dessus, et s'efface avant que leurs contenus se superposent (opacité exposée en
- * `--stack-opacity`). Sous un bloc suivant opaque, qui le masque de toute façon, ou sous un
+ * `--stack-opacity`). Sous un bloc suivant opaque, sous une carte opaque dans un bloc
+ * `data-stack-cover` ou sous un
  * bloc `data-stack-empty` (rien à afficher pendant sa glissade, son contenu n'apparaît qu'à
  * l'arrivée), le fondu s'étale sur la première moitié de sa course, pour ne pas disparaître
  * d'un coup. Un bloc
@@ -366,7 +372,8 @@ export const stackBlocks: Attachment<HTMLElement> = (root) => {
 				parseLength(current.borderBottomWidth) +
 				parseLength(next.paddingTop) +
 				parseLength(next.borderTopWidth);
-			const covers = hasOpaqueBackground(next) || blocks[i + 1].hasAttribute('data-stack-empty');
+			const covers =
+				hasOpaqueBackground(next) || blocks[i + 1].matches('[data-stack-cover], [data-stack-empty]');
 			const halfTravel = covers ? (stuckAt[i + 1] - stuckAt[i]) / 2 : 0;
 			// Effacé au plus tard quand le suivant est en place (court trajet vers le dernier bloc).
 			const travel = stuckAt[i + 1] - stuckAt[i];
@@ -401,14 +408,35 @@ export const stackBlocks: Attachment<HTMLElement> = (root) => {
 		}
 	}
 
-	// Le focus clavier sur un bloc effacé ramène ce bloc à l'écran.
+	// Le navigateur peut défiler après focusin pour révéler le lien. Corriger sa position
+	// après ce défilement, même si la section commençait seulement à s’effacer.
+	let focusFrame = 0;
 	function onFocusIn(event: FocusEvent) {
-		const block = blocks.find(
-			(item) => item.hasAttribute('data-covered') && event.target instanceof Node && item.contains(event.target)
-		);
-		if (block) {
-			window.scrollTo({ top: block === blocks[0] ? 0 : blockScrollTop(block) });
-		}
+		cancelAnimationFrame(focusFrame);
+		const target = event.target;
+		if (prefersReducedMotion() || !(target instanceof HTMLElement) || !target.matches(':focus-visible')) return;
+		const block = blocks.find(item => item.contains(target));
+		if (!block) return;
+
+		focusFrame = requestAnimationFrame(() => {
+			if (document.activeElement !== target) return;
+			const { top, bottom } = getScrollPadding();
+			const visibleBottom = window.innerHeight - bottom;
+			const blockRect = block.getBoundingClientRect();
+			const targetRect = target.getBoundingClientRect();
+			const start = flowTop(block);
+			const first = block === blocks[0] ? 0 : Math.min(maxScrollY(), Math.max(0, start - top));
+			const last = Math.max(first, Math.min(maxScrollY(), start + blockRect.height - visibleBottom));
+			const targetTop = start + targetRect.top - blockRect.top;
+			const targetBottom = targetTop + targetRect.height;
+			const inset = 4; // Laisser aussi de la place au contour de focus.
+			const earliest = Math.max(first, Math.min(last, targetBottom - visibleBottom + inset));
+			const latest = Math.max(earliest, Math.min(last, targetTop - top - inset));
+			const scroll = Math.min(latest, Math.max(earliest, window.scrollY));
+			if (Math.abs(scroll - window.scrollY) > 1) {
+				window.scrollTo({ top: scroll, behavior: 'instant' });
+			}
+		});
 	}
 
 	layout();
@@ -426,6 +454,7 @@ export const stackBlocks: Attachment<HTMLElement> = (root) => {
 	return () => {
 		observer.disconnect();
 		cancelAnimationFrame(frame);
+		cancelAnimationFrame(focusFrame);
 		for (const off of offs) {
 			off();
 		}

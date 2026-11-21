@@ -10,9 +10,10 @@ import Header from '#lib/components/Header.svelte';
 type Props = {
 	title: string;
 	description: string;
+	skipTarget?: string;
 };
 
-const { title, description } = Astro.props;
+const { title, description, skipTarget = 'contenu' } = Astro.props;
 ---
 
 <!doctype html>
@@ -41,6 +42,21 @@ const { title, description } = Astro.props;
 						}
 						meta.setAttribute('content', themeColor);
 					} catch (e) {}
+
+					var motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+					function syncMotion() {
+						var reduced = motionQuery.matches;
+						try {
+							reduced = reduced || localStorage.getItem('reduce-motion') === 'true';
+						} catch (e) {}
+						document.documentElement.toggleAttribute('data-reduced-motion', reduced);
+					}
+					syncMotion();
+					motionQuery.addEventListener('change', syncMotion);
+					window.addEventListener('pageshow', syncMotion);
+					window.addEventListener('storage', function (event) {
+						if (event.key === 'reduce-motion' || event.key === null) syncMotion();
+					});
 
 					// Défilement fluide activé après le chargement (voir global.css).
 					window.addEventListener('load', function () {
@@ -76,6 +92,10 @@ const { title, description } = Astro.props;
 				}
 
 				window.addEventListener('pageswap', function (event) {
+					if (document.documentElement.hasAttribute('data-reduced-motion')) {
+						event.viewTransition?.skipTransition();
+						return;
+					}
 					var target = event.activation && event.activation.entry && event.activation.entry.url;
 					if (
 						event.viewTransition &&
@@ -92,6 +112,9 @@ const { title, description } = Astro.props;
 						return;
 					}
 
+					if (document.documentElement.hasAttribute('data-reduced-motion')) {
+						event.viewTransition.skipTransition();
+					}
 					var from = navigation.activation.from && navigation.activation.from.url;
 					var match = from && new URL(from).pathname.match(projectPath);
 					var toProject = projectPath.test(location.pathname);
@@ -101,7 +124,9 @@ const { title, description } = Astro.props;
 					if (event.viewTransition.types && (match || toProject)) {
 						event.viewTransition.types.add(match && toProject ? 'project-next' : 'project');
 						// Retour d'une étude de cas vers l'accueil : la fenêtre redevient une carte.
-						if (match && !toProject) {
+						if (!match && toProject) {
+							event.viewTransition.types.add('project-open');
+						} else if (match && !toProject) {
 							event.viewTransition.types.add('project-close');
 						}
 					}
@@ -147,7 +172,7 @@ const { title, description } = Astro.props;
 		<slot name="head" />
 	</head>
 	<body>
-		<a class="skip-link" href="#contenu">Aller au contenu</a>
+		<a class="skip-link" href={`#${skipTarget}`}>Aller au contenu</a>
 		<a class="skip-link" href="#menu">Aller au menu</a>
 		<div class="app">
 			<Header client:load />
@@ -186,6 +211,12 @@ const { title, description } = Astro.props;
 
 	main:focus {
 		outline: none;
+	}
+
+	main:focus-visible :global(h1),
+	main :global(h1[tabindex="-1"]:focus-visible) {
+		text-decoration: underline 2px var(--action-focus);
+		text-underline-offset: 0.2em;
 	}
 
 	@media (min-width: 40rem) {

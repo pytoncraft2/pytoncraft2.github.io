@@ -78,18 +78,6 @@
 	const previousLabel = $derived(visibleCount > 1 ? 'Projets précédents' : 'Projet précédent');
 	const nextLabel = $derived(visibleCount > 1 ? 'Projets suivants' : 'Projet suivant');
 
-	function pageLabel(page: number) {
-		const start = page * visibleCount;
-		const end = Math.min(projectCount, start + visibleCount);
-		const titles = projects.slice(start, end).map((project) => project.title);
-		if (titles.length <= 1) {
-			return `Aller au projet ${titles[0] ?? ''}`;
-		}
-
-		const last = titles[titles.length - 1];
-		return `Afficher ${titles.slice(0, -1).join(', ')} et ${last}`;
-	}
-
 	function syncProjectIndex() {
 		if (projectScrollLock) {
 			return;
@@ -171,7 +159,7 @@
 		window.clearTimeout(projectScrollTimer);
 		root.scrollTo({
 			left: item.offsetLeft,
-			behavior: prefersReducedMotion.current ? 'auto' : 'smooth'
+			behavior: (prefersReducedMotion.current || document.documentElement.hasAttribute('data-reduced-motion')) ? 'instant' : 'smooth'
 		});
 		projectScrollTimer = window.setTimeout(unlockProjectScroll, 450);
 	}
@@ -274,25 +262,9 @@
 				/>
 			</svg>
 		</button>
-		<div class="carousel-indicator">
-			<p class="carousel-status" aria-live="polite">
-				{pageIndex + 1} / {pageCount}
-			</p>
-			<div class="carousel-dots" style:--dot-count={pageCount}>
-				{#each { length: pageCount }, i (i)}
-					<button
-						class={['carousel-dot', i === pageIndex && 'active']}
-						type="button"
-						onclick={() => scrollToPage(i)}
-						aria-label={pageLabel(i)}
-						aria-current={i === pageIndex ? 'true' : undefined}
-						aria-controls="projets-carousel"
-					>
-						<span></span>
-					</button>
-				{/each}
-			</div>
-		</div>
+		<p class="carousel-status" aria-live="polite" aria-atomic="true">
+			{pageIndex + 1} / {pageCount}
+		</p>
 		<button
 			class="carousel-btn"
 			type="button"
@@ -395,74 +367,11 @@
 		outline-offset: 2px;
 	}
 
-	.carousel-indicator {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: var(--spacing-1);
-		min-width: 0;
-	}
-
 	.carousel-status {
 		margin: 0;
 		max-width: none;
 		color: var(--text-secondary);
 		font: 500 var(--text-label-m-size) / var(--text-label-m-line) var(--font-sans);
-	}
-
-	.carousel-dots {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.carousel-dot {
-		flex: 0 0 clamp(24px, (100vw - 10rem) / var(--dot-count), 44px);
-		min-width: 0;
-		min-height: 32px;
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		padding: 0;
-		border: 0;
-		background: transparent;
-		cursor: pointer;
-	}
-
-	.carousel-dot span {
-		position: relative;
-		display: block;
-		width: 1.25rem;
-		height: 0.5rem;
-		background: transparent;
-	}
-
-	.carousel-dot span::after {
-		content: '';
-		position: absolute;
-		inset-block: 0;
-		inset-inline: 50%;
-		width: 0.5rem;
-		height: 0.5rem;
-		margin-inline-start: -0.25rem;
-		border-radius: var(--radius-full);
-		background: var(--border-strong);
-		transition:
-			width 180ms ease,
-			margin-inline-start 180ms ease,
-			background-color 180ms ease;
-	}
-
-	.carousel-dot.active span::after {
-		width: 1.25rem;
-		margin-inline-start: -0.625rem;
-		background: var(--action-primary);
-	}
-
-	.carousel-dot:focus-visible {
-		outline: 2px solid var(--action-focus);
-		outline-offset: 2px;
-		border-radius: var(--radius-sm);
 	}
 
 	@media (min-width: 40rem) {
@@ -486,8 +395,7 @@
 			scroll-behavior: auto;
 		}
 
-		.carousel-btn,
-		.carousel-dot span::after {
+		.carousel-btn {
 			transition: none;
 		}
 	}

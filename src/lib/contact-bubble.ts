@@ -3,9 +3,8 @@ import type { Attachment } from 'svelte/attachments';
 
 // Pied du vélo arrêté dans le dessin du paysage (repère du SVG `.land`, 1440 × 320) et
 // hauteur du cycliste au-dessus de ce point, casque compris.
-const bikeX = 370;
-const bikeY = 289;
 const riderHeight = 70;
+const helmetOffsetX = 10;
 // Agrandissement du décor en bas de page (`--zoom-scale`, lu par HeroScene).
 const zoomScale = 1.6;
 // Écart entre le haut de la tête du cycliste et la pointe de la bulle.
@@ -27,10 +26,19 @@ export const contactBubble: Attachment<HTMLElement> = (section) => {
 	const scene = hero?.querySelector<HTMLElement>('.scene');
 	const zoomLayer = scene?.querySelector<HTMLElement>('.zoom');
 	let frame = 0;
+	let positioned = false;
 
 	function place() {
 		frame = 0;
-		const matrix = land?.getScreenCTM();
+		// Garder l’ancrage de la bulle pendant son fondu de sortie.
+		if (positioned && document.documentElement.dataset.section !== 'contact') {
+			return;
+		}
+		const rider = land?.querySelector<SVGGElement>('.rider');
+		const html = document.documentElement;
+		const fromCareer = html.dataset.section === 'contact' &&
+			(html.hasAttribute('data-career-started') || html.hasAttribute('data-career-finished'));
+		const matrix = fromCareer ? land?.getScreenCTM() : rider?.getScreenCTM();
 		if (!hero || !land || !scene || !zoomLayer || !matrix) {
 			return;
 		}
@@ -41,7 +49,14 @@ export const contactBubble: Attachment<HTMLElement> = (section) => {
 		const zoom = getComputedStyle(zoomLayer);
 		const currentScale = parseFloat(zoom.scale) || 1;
 		const [originX = 0, originY = 0] = zoom.transformOrigin.split(' ').map(parseFloat);
-		const zoomed = new DOMPoint(bikeX, bikeY).matrixTransform(matrix);
+		// Pendant le fondu, la caméra vise déjà la position finale du vélo.
+		const destination = fromCareer
+			? new DOMPoint(
+				parseFloat(getComputedStyle(hero).getPropertyValue('--contact-arrival')) || 360,
+				Number(land.dataset.horizonY)
+			)
+			: new DOMPoint();
+		const zoomed = destination.matrixTransform(matrix);
 		const point = {
 			x: sceneRect.left + originX + (zoomed.x - sceneRect.left - originX) / currentScale,
 			y: sceneRect.top + originY + (zoomed.y - sceneRect.top - originY) / currentScale
@@ -54,8 +69,10 @@ export const contactBubble: Attachment<HTMLElement> = (section) => {
 		// Tête du cycliste une fois le zoom fini, dans le repère de la section.
 		const sectionRect = section.getBoundingClientRect();
 		const headY = point.y - riderHeight * drawingScale * zoomScale;
-		section.style.setProperty('--bubble-x', `${point.x - sectionRect.left}px`);
+		const headX = point.x + helmetOffsetX * drawingScale * zoomScale;
+		section.style.setProperty('--bubble-x', `${headX - sectionRect.left}px`);
 		section.style.setProperty('--bubble-y', `${headY - bubbleGap - sectionRect.top}px`);
+		positioned = true;
 	}
 
 	function requestPlace() {
@@ -70,11 +87,14 @@ export const contactBubble: Attachment<HTMLElement> = (section) => {
 	if (hero) {
 		observer.observe(hero);
 	}
+	const sectionChanges = new MutationObserver(requestPlace);
+	sectionChanges.observe(document.documentElement, { attributes: true, attributeFilter: ['data-section', 'data-career-finished'] });
 	const offs = [on(window, 'resize', requestPlace), on(window, 'scroll', requestPlace, { passive: true })];
 
 	return () => {
 		cancelAnimationFrame(frame);
 		observer.disconnect();
+		sectionChanges.disconnect();
 		for (const off of offs) {
 			off();
 		}

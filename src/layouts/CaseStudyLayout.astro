@@ -16,7 +16,7 @@ const { project, next } = Astro.props;
 const { id: slug, data } = project;
 ---
 
-<BaseLayout title={`${data.title} • Case study`} description={data.description}>
+<BaseLayout title={`${data.title} • Étude de cas`} description={data.description} skipTarget="titre-projet">
 	<WindowFrame
 		title={data.title}
 		parent={{ href: `${withBase('/')}#projets`, label: 'Projets' }}
@@ -30,6 +30,8 @@ const { id: slug, data } = project;
 					transitionName={`project-${slug}-media`}
 				/>
 				<h1
+					id="titre-projet"
+					tabindex="-1"
 					class="ds-h1"
 					style={`view-transition-name: project-${slug}-title; view-transition-class: project-text;`}
 				>
@@ -56,7 +58,7 @@ const { id: slug, data } = project;
 							<p class="next-label ds-label-m">Projet suivant</p>
 							<p class="next-title ds-h3">{next.data.title}</p>
 						</div>
-						<Button href={projectPath(next.id)} variant="secondary">
+						<Button href={projectPath(next.id)} variant="secondary" ariaLabel={`Voir le projet ${next.data.title}`}>
 							Voir le projet →
 						</Button>
 					</nav>
@@ -67,6 +69,12 @@ const { id: slug, data } = project;
 </BaseLayout>
 
 <style>
+	.case-body :global(a) {
+		color: var(--action-primary);
+		text-decoration: underline;
+		text-underline-offset: 0.15em;
+	}
+
 	.hero {
 		display: flex;
 		flex-direction: column;

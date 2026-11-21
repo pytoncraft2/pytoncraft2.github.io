@@ -27,29 +27,15 @@ const careerSteps = [
 	}
 ];
 ---
+<script is:inline>
+	document.documentElement.setAttribute('data-career-waiting', '');
+</script>
+
 <section class="career" aria-labelledby="parcours-title">
 	<h3 id="parcours-title">Parcours</h3>
-	<div class="landscape" aria-hidden="true">
-		<svg class="hills" viewBox="0 0 1200 90" preserveAspectRatio="none">
-			<path fill="var(--scene-far)" d="M0 72 110 51 170 63 315 15 350 26 382 18 500 57 651 37 718 46 861 14 930 32 1005 25 1200 57V90H0Z"/>
-			<path fill="var(--scene-mid)" d="M0 66Q148 28 310 62T642 58T958 60T1200 46V90H0Z"/>
-			<path fill="var(--scene-near)" d="M0 76Q210 54 423 77T805 71T1200 75V90H0Z"/>
-		</svg>
-		<div class="road">
-			<div class="trail"></div>
-			{careerSteps.map((_, i) => <i style={`left:${i * 100 / (careerSteps.length - 1)}%`}></i>)}
-			<svg class="bike" viewBox="-34 -71 68 74">
-				<g fill="none" stroke="var(--scene-bike)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-					{[-20, 20].map(x => <g transform={`translate(${x} -11)`}>
-						<circle r="11" /><path class="spokes" stroke-width="0.9" d="M-10 0H10 M0 -10V10 M-7 -7 7 7 M-7 7 7 -7" />
-					</g>)}
-					<path d="M-20 -11 -8 -30 -2 -12Z M-8 -30 14 -31 -2 -12 M20 -11 14 -31 17 -37H22 M-12 -32H-4"/>
-				</g>
-				<path fill="none" stroke="var(--scene-rider)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" d="m-1 -12 3 -12 -10 -11 14 -17 6 11 7 4"/>
-				<circle cx="10" cy="-60" r="6.5" fill="var(--scene-rider)"/>
-				<path d="M2 -61a8 8 0 0 1 16 0l2 1Z" fill="var(--scene-helmet)"/>
-			</svg>
-		</div>
+	<div class="road" aria-hidden="true">
+		<div class="trail"></div>
+		{careerSteps.map((_, i) => <i style={`left:${i * 100 / (careerSteps.length - 1)}%`}></i>)}
 	</div>
 	<ol>
 		{careerSteps.map((step, i) => (
@@ -63,49 +49,155 @@ const careerSteps = [
 </section>
 
 <script>
-	const route = document.querySelector('.career');
-	const landscape = route?.querySelector('.landscape');
-	if (route && landscape && 'IntersectionObserver' in window) {
-		route.setAttribute('data-waiting', '');
-		const observer = new IntersectionObserver(([entry]) => {
-			if (entry.isIntersecting || entry.boundingClientRect.bottom <= 0) {
-				route.removeAttribute('data-waiting');
-				route.setAttribute('data-started', '');
-				observer.disconnect();
+	const route = document.querySelector<HTMLElement>('.career');
+	const road = route?.querySelector<HTMLElement>('.road');
+	const hero = document.querySelector<HTMLElement>('.hero');
+	const land = hero?.querySelector<SVGSVGElement>('svg[data-horizon-y]');
+	const zoom = hero?.querySelector<HTMLElement>('.scene .zoom');
+	const profile = route?.closest<HTMLElement>('.profil');
+	const title = route?.querySelector('h3');
+	if (route && road && hero && land && zoom && profile && title) {
+		const html = document.documentElement;
+		let frame = 0;
+		const clearShortcut = () => html.removeAttribute('data-contact-shortcut');
+		hero.querySelector('a[href="#contact"]')?.addEventListener('click', (event) => {
+			if (html.hasAttribute('data-reduced-motion')) return;
+			if (!(event instanceof MouseEvent) || event.defaultPrevented || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+			const matrix = land.getScreenCTM();
+			if (!matrix) return;
+			const bounds = land.getBoundingClientRect();
+			hero.style.setProperty('--contact-arrival', `${(bounds.left + bounds.width / 4 - matrix.e) / matrix.a}px`);
+			const ground = new DOMPoint(0, Number(land.dataset.horizonY)).matrixTransform(matrix);
+			const scene = zoom.getBoundingClientRect();
+			hero.style.setProperty('--zoom-origin', `${bounds.left + bounds.width / 4 - scene.left}px ${ground.y - scene.top}px`);
+			html.setAttribute('data-contact-shortcut', '');
+		});
+		// Si le défilement est interrompu avant Contact, rendre la main au parcours.
+		window.addEventListener('scrollend', () => {
+			if (html.dataset.section !== 'contact') {
+				clearShortcut();
+				schedule();
 			}
-		}, { threshold: 0 });
-		observer.observe(landscape);
+		});
+		const align = () => {
+			frame = 0;
+			if (html.hasAttribute('data-contact-shortcut') || html.hasAttribute('data-reduced-motion')) return;
+			if (html.dataset.section !== 'profil') {
+				if (html.hasAttribute('data-career-started')) {
+					const rider = land.querySelector<SVGGElement>('.rider');
+					if (rider && html.dataset.section === 'contact') {
+						// Le groupe parent porte le déplacement en cours, figé à l’entrée de Contact.
+						const movement = getComputedStyle(rider.parentElement!);
+						const offset = parseFloat(movement.translate) || 0;
+						hero.style.setProperty('--contact-start-opacity', movement.opacity);
+						const end = parseFloat(getComputedStyle(rider).translate);
+						hero.style.setProperty('--contact-stop', `${end + offset}px`);
+					}
+					html.removeAttribute('data-career-started');
+					html.setAttribute('data-career-finished', '');
+				}
+				return;
+			}
+			// Au retour de Contact, attendre la fin du dézoom avant de mesurer
+			// le paysage et de lancer ensemble le tracé et le cycliste.
+			if ((parseFloat(getComputedStyle(zoom).scale) || 1) !== 1) {
+				schedule();
+				return;
+			}
+			hero.style.removeProperty('--contact-stop');
+			const matrix = land.getScreenCTM();
+			if (!matrix) return;
+			const stops = road.getBoundingClientRect();
+			const horizon = new DOMPoint(0, Number(land.dataset.horizonY)).matrixTransform(matrix);
+			// À l’arrivée sur #profil, la carte s’aligne sur la marge de défilement.
+			// Seule la frise réserve l’espace entre son titre et le sol du paysage.
+			const inset = parseFloat(getComputedStyle(html).scrollPaddingTop) || 0;
+			const titleBottom = title.getBoundingClientRect().bottom - profile.getBoundingClientRect().top;
+			route.style.setProperty('--road-gap', `${Math.max(0, horizon.y - inset - titleBottom)}px`);
+			const bounds = land.getBoundingClientRect();
+			hero.style.setProperty('--contact-arrival', `${(bounds.left + bounds.width / 4 - matrix.e) / matrix.a}px`);
+			hero.style.setProperty('--career-start', `${(stops.left - matrix.e) / matrix.a}px`);
+			hero.style.setProperty('--career-end', `${(stops.right - matrix.e) / matrix.a}px`);
+			if (!html.hasAttribute('data-career-finished') && stops.top <= horizon.y + 8 && stops.bottom >= 0) {
+				html.setAttribute('data-career-started', '');
+				html.removeAttribute('data-career-waiting');
+			}
+		};
+		function schedule() {
+			if (!frame) frame = requestAnimationFrame(align);
+		}
+		const resize = new ResizeObserver(schedule);
+		resize.observe(profile);
+		resize.observe(land);
+		resize.observe(hero);
+		let previousSection = html.dataset.section;
+		function onSectionChange() {
+			if (previousSection === 'contact' && html.dataset.section !== 'contact') clearShortcut();
+			previousSection = html.dataset.section;
+			if (html.dataset.section !== 'accueil') {
+				html.setAttribute('data-career-left-home', '');
+			}
+			schedule();
+		}
+		new MutationObserver(onSectionChange).observe(html, { attributes: true, attributeFilter: ['data-section'] });
+		onSectionChange();
+		window.addEventListener('scroll', schedule, { passive: true });
+		align();
 	}
 </script>
 
 <style>
 	.career {
-		margin: var(--spacing-8) calc(-1 * var(--spacing-8)) calc(-1 * var(--spacing-8));
-		border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-		overflow: hidden;
-		background: var(--surface-subtle);
 		color: var(--text-primary);
+		padding-top: var(--spacing-5);
 	}
 	h3 {
+		width: fit-content;
 		margin: 0;
-		padding: var(--spacing-5) var(--spacing-8) 0;
+		padding: var(--spacing-1) var(--spacing-3);
+		background: var(--surface-subtle);
+		border-radius: var(--radius-md);
 		font: 600 var(--text-body-m-size) / var(--text-body-m-line) var(--font-sans);
 	}
-	.landscape {
-		height: 5rem;
+	.road {
 		position: relative;
-		background: linear-gradient(var(--surface-subtle), var(--scene-sky-horizon));
+		height: 2px;
+		margin: var(--road-gap, var(--spacing-8)) 12.5% 0;
+		background: var(--border-strong);
 	}
-	.hills { width: 100%; height: 100%; display: block; }
-	.road { position: absolute; inset: auto 12.5% 0; height: 2px; background: var(--border-strong); }
 	.trail { height: 100%; background: var(--action-primary); transform-origin: left; }
+	:global(html:is([data-section='profil'], [data-section='contact']:is([data-career-started], [data-career-finished])) .hero .rider) {
+		/* L’entrée du hero poursuit sa propre animation pendant le parcours. */
+		transform: none !important;
+		translate: var(--career-start, 360px) 0;
+	}
+	:global(html:is([data-section='profil'], [data-section='contact']):is([data-career-started], [data-career-finished]) .hero .rider) {
+		translate: var(--career-end, 360px) 0;
+	}
+	:global(html[data-section='contact'][data-career-finished] .hero .rider) {
+		translate: var(--contact-arrival, 360px) 0;
+	}
+	:global(html[data-contact-shortcut]:not([data-section='contact']) .hero .scene .rider) {
+		opacity: 0;
+	}
+	:global(html[data-contact-shortcut][data-section='profil'] .hero .scene .rider) {
+		transition: none;
+	}
+	:global(html[data-contact-shortcut][data-section='contact'] .hero .land .rider) {
+		transform: none !important;
+		translate: var(--contact-arrival, 360px) 0;
+	}
+	:global(html[data-contact-shortcut][data-section] .hero .scene .land g:has(> .rider)) {
+		animation: none;
+		opacity: 1;
+	}
+
 	.road i {
 		position: absolute; top: 50%; translate: -50% -50%;
 		width: .6rem; height: .6rem; border-radius: 50%;
 		background: var(--action-primary); border: 2px solid var(--surface-subtle);
 	}
-	.bike { position: absolute; bottom: 0; left: 100%; translate: -50% 0; width: 3.25rem; }
-	ol { list-style: none; margin: 0; padding: var(--spacing-5) var(--spacing-8) var(--spacing-8); display: grid; gap: var(--spacing-5); }
+	ol { background: var(--scene-ground); list-style: none; margin: 0; padding: var(--spacing-5) var(--spacing-8) var(--spacing-8); display: grid; gap: var(--spacing-5); }
 	p { margin: 0; color: var(--text-secondary); font: 400 var(--text-body-s-size) / var(--text-body-s-line) var(--font-sans); }
 	.date { font-weight: 600; color: var(--action-primary); }
 	.name { margin: var(--spacing-1) 0; font-weight: 600; font-size: var(--text-body-m-size); color: var(--text-primary); }
@@ -114,16 +206,63 @@ const careerSteps = [
 		li { padding-inline: var(--spacing-4); text-align: center; }
 	}
 	@media (prefers-reduced-motion: no-preference) {
-		[data-waiting] li { opacity: 0; }
-		[data-waiting] .bike { left: 0; }
-		[data-waiting] .trail { transform: scaleX(0); }
-		[data-started] li { animation: reveal 300ms ease-out var(--delay) backwards; }
-		[data-started] .bike { animation: ride 3.6s linear; }
-		[data-started] .trail { animation: draw 3.6s linear; }
-		[data-started] .spokes { animation: spin .45s linear 8; }
+		:global(html[data-career-waiting]:not([data-reduced-motion])) li { opacity: 0; }
+		:global(html[data-career-waiting]:not([data-reduced-motion])) .trail { transform: scaleX(0); }
+		:global(html[data-section='profil'][data-career-started]) li { animation: reveal 300ms ease-out var(--delay) backwards; }
+		:global(html[data-section='profil'][data-career-started]) .trail { animation: draw 3.6s linear; }
+		:global(html[data-career-started] .hero .land g:has(> .rider)) { animation: career-ride 3.6s linear, career-exit 600ms ease-out 3.6s forwards; }
+		:global(html[data-section='contact'][data-career-started] .hero .land g:has(> .rider)) { animation-play-state: paused; }
+		:global(html[data-section='contact'][data-career-finished] .hero .land g:has(> .rider)) {
+			animation: contact-fade 750ms linear both;
+		}
+		:global(html[data-section='profil'][data-career-finished] .hero .land g:has(> .rider)) {
+			opacity: 0;
+		}
+		:global(html[data-section='profil'][data-career-started] .hero .rider .spokes) { animation: spin .45s linear 9; }
+		:global(html:is([data-section='accueil'][data-career-left-home], [data-section='projets'], [data-section='contact'], [data-section='profil']:not([data-career-started])) .hero .rider .spokes) {
+			animation: none;
+		}
 	}
-	@keyframes ride { from { left: 0; } to { left: 100%; } }
-	@keyframes draw { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+	@keyframes career-exit {
+		from { translate: 0 0; opacity: 1; }
+		to { translate: 64px 0; opacity: 0; }
+	}
+	@keyframes contact-fade {
+		from {
+			translate: calc(var(--contact-stop, var(--career-end)) - var(--contact-arrival)) 0;
+			opacity: var(--contact-start-opacity, 0);
+		}
+		32% {
+			translate: calc(var(--contact-stop, var(--career-end)) - var(--contact-arrival)) 0;
+			opacity: 0;
+			animation-timing-function: step-end;
+		}
+		33.333% { translate: 0 0; opacity: 0; }
+		to { translate: 0 0; opacity: 1; }
+	}
+	@media (prefers-reduced-motion: no-preference) {
+		:global(html[data-section='contact'][data-career-finished] .hero .wave-arm),
+		:global(html[data-section='contact'][data-career-finished] .hero .wave-forearm) {
+			animation-delay: 1.35s, 1.8s, 3.6s;
+		}
+	}
+	/* Même départ progressif et même passage au deuxième repère pour le vélo et le tracé. */
+	@keyframes career-ride {
+		from {
+			translate: calc(var(--career-start) - var(--career-end)) 0;
+			animation-timing-function: cubic-bezier(.3, 0, .65, .65);
+		}
+		33.333333% { translate: calc((var(--career-start) - var(--career-end)) * 2 / 3) 0; }
+		to { translate: 0 0; }
+	}
+	@keyframes draw {
+		from {
+			transform: scaleX(0);
+			animation-timing-function: cubic-bezier(.3, 0, .65, .65);
+		}
+		33.333333% { transform: scaleX(calc(1 / 3)); }
+		to { transform: scaleX(1); }
+	}
 	@keyframes spin { to { transform: rotate(1turn); } }
 	@keyframes reveal { from { opacity: 0; transform: translateY(.4rem); } }
 </style>

@@ -30,7 +30,8 @@
 			history.replaceState(history.state, '', window.location.pathname + window.location.search);
 			hash = '';
 		}
-		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		const reduceMotion = document.documentElement.hasAttribute('data-reduced-motion') ||
+			window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 		window.scrollTo({ top: 0, behavior: reduceMotion ? 'instant' : 'smooth' });
 	}
 
