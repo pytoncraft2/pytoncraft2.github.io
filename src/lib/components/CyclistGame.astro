@@ -65,10 +65,29 @@
 		hazard.append(lettering);
 		let wordWidth = 0;
 		const droppedBags: { element: SVGRectElement; startDistance: number }[] = [];
+		let looseWheel: { element: SVGGElement; releasedAt: number; initialAngle: number } | undefined;
 
-		const clearDroppedBags = () => {
+		const clearDroppedParts = () => {
 			for (const { element } of droppedBags) element.remove();
 			droppedBags.length = 0;
+			looseWheel?.element.remove();
+			looseWheel = undefined;
+		};
+
+		const releaseWheel = () => {
+			const rim = land.querySelector('.bike-frame > circle[cx="20"]');
+			const spokes = land.querySelector('.bike-frame > .spokes:has(circle[cx="20"])');
+			if (!rim || !spokes) return;
+			const element = document.createElementNS(svg, 'g');
+			element.setAttribute('data-loose-wheel', '');
+			element.setAttribute('fill', 'none');
+			element.setAttribute('stroke', 'var(--scene-bike)');
+			element.setAttribute('stroke-width', '2.5');
+			const spinningSpokes = spokes.cloneNode(true) as SVGGElement;
+			spinningSpokes.removeAttribute('class');
+			element.append(rim.cloneNode(), spinningSpokes);
+			hazard.before(element);
+			looseWheel = { element, releasedAt: performance.now(), initialAngle: distance / wheelRadius };
 		};
 
 		const dropBag = (bag: SVGRectElement | null) => {
@@ -94,6 +113,19 @@
 			hero.style.setProperty('--game-wheel-angle', `${distance / wheelRadius}rad`);
 			hazard.setAttribute('transform', `translate(${obstacleX} ${land.dataset.horizonY})`);
 			const groundY = Number(land.dataset.horizonY);
+			if (looseWheel) {
+				const { element, releasedAt, initialAngle } = looseWheel;
+				const elapsed = reduced ? 0 : Math.max(0, performance.now() - releasedAt);
+				const x = riderX - elapsed * 0.12;
+				if (matrix.e + (x + 20 + wheelRadius) * matrix.a < bounds.left) {
+					element.remove();
+					looseWheel = undefined;
+				} else {
+					// La roue tourne encore vers l’avant, mais moins vite que le cycliste.
+					const angle = (initialAngle + elapsed * 0.06 / wheelRadius) * 180 / Math.PI;
+					element.setAttribute('transform', `translate(${x} ${groundY}) rotate(${angle} 20 -11)`);
+				}
+			}
 			for (const { element, startDistance } of droppedBags) {
 				const travelled = distance - startDistance;
 				const settled = reduced || round.hidden;
@@ -108,7 +140,7 @@
 			cancelAnimationFrame(frame);
 			index = 0;
 			distance = 0;
-			clearDroppedBags();
+			clearDroppedParts();
 			landscape.reset();
 			missed = 0;
 			hero.dataset.gameMissed = '0';
@@ -126,6 +158,8 @@
 				if (missed < 2) {
 					const bag = missed === 0 ? '.game-bag-one' : '.game-bag-two';
 					dropBag(land.querySelector<SVGRectElement>(bag));
+				} else if (missed === 2) {
+					releaseWheel();
 				}
 				missed += 1;
 			}
@@ -142,6 +176,7 @@
 				resultTitle.textContent = `${score} obstacle${score === 1 ? '' : 's'} franchi${score === 1 ? '' : 's'} sur ${obstacles.length}, arrivée ${arrival} !`;
 				announcement.textContent = '';
 				resultTitle.focus({ preventScroll: true });
+				if (looseWheel) frame = requestAnimationFrame(tick);
 				return;
 			}
 
@@ -153,6 +188,11 @@
 
 		const tick = (now: number) => {
 			const reduced = document.documentElement.hasAttribute('data-reduced-motion') || motionPreference.matches;
+			if (round.hidden) {
+				draw(0);
+				if (looseWheel && !reduced) frame = requestAnimationFrame(tick);
+				return;
+			}
 			if (!reduced) distance += Math.min(now - previousTime, 64) * 0.18;
 			previousTime = now;
 			const elapsed = Math.min(1, Math.max(0, 1 - (deadline - now) / roundDuration));
@@ -190,7 +230,7 @@
 			hero.removeAttribute('data-playing');
 			hero.removeAttribute('data-game-missed');
 			lettering.replaceChildren();
-			clearDroppedBags();
+			clearDroppedParts();
 			hero.style.removeProperty('--game-rider-x');
 			landscape.reset();
 			hero.style.removeProperty('--game-wheel-angle');
