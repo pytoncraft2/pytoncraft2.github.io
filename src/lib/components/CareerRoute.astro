@@ -123,8 +123,13 @@ const careerSteps = [
 			route.style.setProperty('--road-gap', `${Math.max(0, horizon.y - inset - titleBottom)}px`);
 			const bounds = land.getBoundingClientRect();
 			hero.style.setProperty('--contact-arrival', `${(bounds.left + bounds.width / 4 - matrix.e) / matrix.a}px`);
-			hero.style.setProperty('--career-start', `${(stops.left - matrix.e) / matrix.a}px`);
-			hero.style.setProperty('--career-end', `${(stops.right - matrix.e) / matrix.a}px`);
+			// Les repères correspondent au passage de la roue avant (x = 20 dans le SVG).
+			const frontWheel = 20;
+			const wheelbase = 2 * frontWheel;
+			hero.style.setProperty('--career-start', `${(stops.left - matrix.e) / matrix.a - frontWheel}px`);
+			hero.style.setProperty('--career-end', `${(stops.right - matrix.e) / matrix.a - frontWheel}px`);
+			route.style.setProperty('--wheelbase', `${wheelbase * matrix.a}px`);
+			route.style.setProperty('--career-exit-distance', `${64 * matrix.a}px`);
 			if (!html.hasAttribute('data-career-finished') && stops.top <= horizon.y + 8 && stops.bottom >= 0) {
 				html.setAttribute('data-career-started', '');
 				html.removeAttribute('data-career-waiting');
@@ -305,7 +310,7 @@ const careerSteps = [
 		:global(html[data-section='profil'][data-career-started]) li { animation: reveal 300ms ease-out var(--delay) backwards; }
 	}
 	@media (prefers-reduced-motion: no-preference) {
-		:global(html[data-section='profil'][data-career-started]) .trail { animation: draw 3.6s linear; }
+		:global(html[data-section='profil'][data-career-started]) .trail { animation: draw 3.6s linear forwards, draw-exit 600ms ease-out 3.6s forwards; }
 		:global(html[data-career-started] .hero .land g:has(> .rider)) { animation: career-ride 3.6s linear, career-exit 600ms ease-out 3.6s forwards; }
 		:global(html[data-section='contact'][data-career-started] .hero .land g:has(> .rider)) { animation-play-state: paused; }
 		:global(html[data-section='contact'][data-career-finished] .hero .land g:has(> .rider)) {
@@ -351,13 +356,18 @@ const careerSteps = [
 		33.333333% { translate: calc((var(--career-start) - var(--career-end)) * 2 / 3) 0; }
 		to { translate: 0 0; }
 	}
+	/* Le tracé suit le point de contact de la roue arrière, un empattement derrière les repères. */
 	@keyframes draw {
 		from {
-			transform: scaleX(0);
+			clip-path: inset(0 calc(100% + var(--wheelbase)) 0 0);
 			animation-timing-function: cubic-bezier(.3, 0, .65, .65);
 		}
-		33.333333% { transform: scaleX(calc(1 / 3)); }
-		to { transform: scaleX(1); }
+		33.333333% { clip-path: inset(0 calc(200% / 3 + var(--wheelbase)) 0 0); }
+		to { clip-path: inset(0 var(--wheelbase) 0 0); }
+	}
+	@keyframes draw-exit {
+		from { clip-path: inset(0 var(--wheelbase) 0 0); }
+		to { clip-path: inset(0 calc(var(--wheelbase) - var(--career-exit-distance)) 0 0); }
 	}
 	@keyframes spin { to { transform: rotate(1turn); } }
 	@keyframes reveal { from { opacity: 0; transform: translateY(.4rem); } }
