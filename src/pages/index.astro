@@ -1,5 +1,6 @@
 ---
 import CareerRoute from '../lib/components/CareerRoute.astro';
+import CyclistGame from '../lib/components/CyclistGame.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Button from '#lib/components/Button.svelte';
 import HeroScene from '#lib/components/HeroScene.svelte';
@@ -79,6 +80,7 @@ const cards: CarouselProject[] = (await getFeaturedProjects()).map(({ id, data }
 					<Button href="#projets">Voir mes projets</Button>
 					<Button href="#contact" variant="secondary">Me contacter</Button>
 				</div>
+				<CyclistGame />
 			</div>
 
 			<aside class="proofs" aria-label="Points clés">
@@ -401,7 +403,20 @@ const cards: CarouselProject[] = (await getFeaturedProjects()).map(({ id, data }
 		}
 	}
 
+	/* Keep the home layout in flow so the landscape stays anchored to the same ground line. */
+	.hero[data-playing] .hero-copy > :not(:global([data-cyclist-game])),
+	.hero[data-playing] .proofs {
+		visibility: hidden;
+	}
+
+	.hero-copy > :global([data-cyclist-game]) {
+		position: absolute;
+		inset-block-start: 0;
+		inset-inline-start: 0;
+	}
+
 	.hero-copy {
+		position: relative;
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;

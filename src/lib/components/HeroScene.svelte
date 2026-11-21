@@ -137,7 +137,7 @@
 			</defs>
 
 			<!-- Astre : le soleil se couche et la lune se lève quand le thème passe en sombre. -->
-			<g class="layer astre-rise" style:--depth-offset="16px">
+			<g class="layer astre-rise" style:--depth-offset="16px" style:--game-pan="22px" style:--game-overscan=".08">
 				<g class="astre sun">
 					<circle cx="1010" cy="92" r="62" fill="var(--scene-sun-glow)" />
 					<circle cx="1010" cy="92" r="38" fill="var(--scene-sun)" />
@@ -148,7 +148,7 @@
 				</g>
 			</g>
 
-			<g class="layer" style:--i="1" style:--depth-offset="12px">
+			<g class="layer" style:--i="1" style:--depth-offset="12px" style:--game-pan="30px" style:--game-overscan=".09">
 				<path
 					fill="var(--scene-far)"
 					d="M0 210 L120 150 L210 185 L330 110 L440 170 L560 122 L690 180 L800 136 L930 175 L1050 105 L1180 165 L1300 130 L1440 172 L1440 320 L0 320 Z"
@@ -170,14 +170,14 @@
 				</g>
 			</g>
 
-			<g class="layer" style:--i="2" style:--depth-offset="7px">
+			<g class="layer" style:--i="2" style:--depth-offset="7px" style:--game-pan="42px" style:--game-overscan=".1">
 				<path
 					fill="var(--scene-mid)"
 					d="M0 230 C160 190 300 200 420 220 C560 245 700 195 860 200 C1010 205 1120 240 1260 225 C1350 215 1400 205 1440 210 L1440 320 L0 320 Z"
 				/>
 			</g>
 
-			<g class="layer" style:--i="3" style:--depth-offset="3px">
+			<g class="layer" style:--i="3" style:--depth-offset="3px" style:--game-pan="54px" style:--game-overscan=".12">
 				<path
 					fill="var(--scene-near)"
 					d="M0 250 C120 222 250 214 370 236 C450 251 520 266 620 270 C760 274 840 262 960 248 C1080 234 1200 230 1300 242 C1370 250 1410 256 1440 258 L1440 320 L0 320 Z"
@@ -200,11 +200,20 @@
 				<path fill="var(--scene-ground)" d="M0 292 C300 286 600 288 720 288 C900 288 1200 286 1440 290 L1440 320 L0 320 Z" />
 			</g>
 
+			<g class="game-obstacle" data-game-obstacle transform="translate(1240 289)" fill="none"
+				stroke="var(--scene-bike)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+				<path class="game-rock" d="M-13 0-5-16l8 1L13 0Z" />
+				<path class="game-fence" d="M-12 0v-10h24V0m-18-10v10m12-10v10" />
+				<path class="game-puddle" d="M-16-2q6-6 12 0t12 0t12 0m-31-6q6-5 12 0t12 0" />
+				<path class="game-cones" d="M-15 0-7-18 1 0m-12-5H9m-5 5 6-14 6 14" />
+				<path class="game-gate" d="M-15 0v-22h30V0m-30-15h30" />
+			</g>
+
 			<g transform="translate(0 289)">
 				<g class="rider">
 					<!-- Faisceau du phare avant, dont la pointe part de la lampe. -->
 					<polygon class="night beam" points="19,-33 100,-17 100,0" fill="url(#hero-scene-beam)" />
-					<g fill="none" stroke="var(--scene-bike)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+					<g class="bike-frame" fill="none" stroke="var(--scene-bike)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
 						<circle cx="-20" cy="-11" r="11" />
 						<circle cx="20" cy="-11" r="11" />
 						<!-- Rayons : 12 par roue (6 diamètres tous les 30°), moyeu au centre. -->
@@ -222,6 +231,14 @@
 						<polyline points="14,-31 17,-37 22,-37" />
 						<line x1="-12" y1="-32" x2="-4" y2="-32" />
 					</g>
+					<g class="game-unicycle" fill="none" stroke="var(--scene-bike)" stroke-width="2.5" stroke-linecap="round">
+						<circle cx="0" cy="-11" r="11" />
+						<path d="M0-11-5-32m-5 0h9" />
+						<path class="spokes" stroke-width="0.8" d="M-10-11H10M0-21V-1M-7-18 7-4M-7-4 7-18" />
+					</g>
+					<rect class="game-bag game-bag-one" x="-24" y="-32" width="9" height="9" rx="2" fill="var(--scene-lamp)" />
+					<rect class="game-bag game-bag-two" x="-15" y="-27" width="9" height="8" rx="2" fill="var(--scene-lamp)" />
+
 					<!-- Phare avant, sur le tube de direction (allumé la nuit). -->
 					<rect x="15.5" y="-35" width="4" height="3.4" rx="1.2" fill="var(--scene-bike)" />
 					<circle class="night" cx="19" cy="-33.3" r="1.7" fill="var(--scene-lamp)" />
@@ -418,6 +435,48 @@
 	/* Position d’arrivée du cycliste, au quart du paysage (aussi le décor fixe). */
 	.rider {
 		transform: translateX(360px);
+	}
+
+	.game-obstacle, .game-obstacle path, .game-bag, .game-unicycle {
+		display: none;
+	}
+
+	:global(.hero[data-playing]) .rider {
+		animation: none;
+		transform: translateX(var(--game-rider-x, 360px));
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.sky-layer { --game-pan: 16px; --game-overscan: 0.08; }
+
+		:global(html:not([data-reduced-motion]) .hero[data-playing]) :is(.sky-layer, .layer) {
+			/* Élargir les plans à mesure qu’ils glissent pour garder les bords couverts. */
+			transform-origin: center;
+			translate: calc(-1 * var(--game-pan, 0px) * var(--game-pan-progress, 0)) 0;
+			scale: calc(1 + var(--game-overscan, 0) * var(--game-pan-progress, 0)) 1;
+			transition: none;
+		}
+	}
+
+	:global(.hero[data-playing]) .spokes {
+		animation: none;
+		rotate: var(--game-wheel-angle, 0rad);
+	}
+
+	:global(.hero[data-playing]) .game-obstacle,
+	:global(.hero[data-playing][data-game-missed='0']) .game-bag-one,
+	:global(.hero[data-playing]:is([data-game-missed='0'], [data-game-missed='1'])) .game-bag-two,
+	:global(.hero[data-playing][data-game-obstacle='0']) .game-rock,
+	:global(.hero[data-playing][data-game-obstacle='1']) .game-fence,
+	:global(.hero[data-playing][data-game-obstacle='2']) .game-puddle,
+	:global(.hero[data-playing][data-game-obstacle='3']) .game-cones,
+	:global(.hero[data-playing][data-game-obstacle='4']) .game-gate,
+	:global(.hero[data-playing]:is([data-game-missed='3'], [data-game-missed='4'], [data-game-missed='5'])) .game-unicycle {
+		display: inline;
+	}
+
+	:global(.hero[data-playing]:is([data-game-missed='3'], [data-game-missed='4'], [data-game-missed='5'])) .bike-frame {
+		display: none;
 	}
 
 	.spokes,
