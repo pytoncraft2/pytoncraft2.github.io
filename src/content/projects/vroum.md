@@ -11,7 +11,7 @@ stack: ["SvelteKit", "FastAPI", "PostgreSQL"]
 role: "Développement web et participation aux décisions produit"
 year: "2023-present"
 featured: true
-image: "vroum.png"
+image: "vroum.webp"
 imageAlt: "Interface de l’outil de covoiturage Vroum"
 ---
 
@@ -29,7 +29,7 @@ D'autres événements ont ensuite fait apparaître des besoins plus complexes, a
 
 ## Mon rôle
 
-Je suis le principal contributeur technique et le mainteneur de Vroum : environ 2 400 des quelque 2 600 commits du dépôt sont les miens, d'autres bénévoles ayant contribué ponctuellement. Je conçois et développe la majorité des évolutions du produit, du front-end SvelteKit au backend FastAPI, tout en participant aux choix produit et UX avec l'équipe de LaToileScoute.
+Je suis le principal contributeur technique et le mainteneur de Vroum : environ 2 700 des quelque 2 900 commits du dépôt sont les miens, d'autres bénévoles ayant contribué ponctuellement. Je conçois et développe la majorité des évolutions du produit, du front-end SvelteKit au backend FastAPI, tout en participant aux choix produit et UX avec l'équipe de LaToileScoute.
 
 Je peux proposer une évolution, en concevoir et tester une première solution, puis la présenter à l'équipe. Les choix importants sont discutés collectivement avant validation et déploiement en production.
 
@@ -46,6 +46,9 @@ Les besoins sont discutés collectivement et les solutions peuvent être pré-te
 Lors du rassemblement Clameurs, le nombre important de véhicules rendait la liste difficile à parcourir. J'ai d'abord conçu une évolution permettant d'associer lieux et dates aux participants et véhicules sous forme de tags filtrables.
 
 Un événement ultérieur réunissant à Paris des véhicules venant de toute la France sur plusieurs jours a montré les limites de cette première réponse. J'ai alors conçu un mode multi-trajets avec notamment des regroupements par ville ou par date et une interface adaptée à cette complexité.
+
+![Événement en mode multi-trajets : à l'aller, les dates du 31 juillet au 4 août sont repliées avec leur nombre de véhicules. Au retour, la date du 8 août est dépliée et liste ses villes de destination, avec un interrupteur Par ville / Par date au-dessus de chaque trajet](./vroum/multi-trajets.webp)
+*Mode multi-trajets : chaque trajet se parcourt par date ou par ville, et une date ne s'ouvre que si l'on en a besoin. Instance locale de démonstration, données fictives.*
 
 La solution a été discutée avec l'équipe avant son déploiement, puis ajustée en fonction des usages.
 
@@ -67,25 +70,31 @@ FastAPI permettait notamment d'utiliser les WebSockets nativement et de supprime
 
 Vroum repose aujourd'hui sur SvelteKit, FastAPI et PostgreSQL. L'application permet d'organiser participants, véhicules et matériel pour des covoiturages simples comme pour des événements impliquant plusieurs villes ou dates.
 
+![Date du 31 juillet ouverte sur la ville de Lyon : six véhicules affichent leur nom, leur nombre de places occupées, leur heure de départ, les moyens de contacter le conducteur et leurs passagers. Au retour, les dates restent groupées par ville](./vroum/date-ville.webp)
+*Une date ouverte sur une ville : chaque véhicule indique ses places, son heure de départ et ses passagers. Instance locale de démonstration, données fictives.*
+
 Au fil des évolutions, l'interface a également été adaptée aux usages mobiles et à l'accessibilité, avec notamment une navigation au clavier et au lecteur d'écran, une meilleure gestion du focus et des interactions adaptées aux petits écrans. Les participants peuvent par exemple être sélectionnés et déplacés au clavier, et le focus revient au bon endroit après la fermeture d'une fenêtre.
+
+![Deux écrans de téléphone : un participant sélectionné dans la liste ouvre en bas un menu d'actions (aller au retour, réduire, désélectionner, ne participe pas, pas besoin de covoiturage, modifier). Sur le second écran, le même menu est réduit à une ligne](./vroum/mobile-selection.webp)
+*Sur téléphone, la sélection d'un participant ouvre un menu d'actions en bas de l'écran, que l'on peut réduire à une ligne pour garder la liste visible. Instance locale de démonstration, données fictives.*
 
 ## Qualité et maintenabilité
 
 Un outil associatif doit pouvoir être maintenu sur plusieurs années, par des bénévoles qui changent. Une partie importante de mon travail porte donc sur ce qui ne se voit pas à l'écran.
 
-### Tester avant de livrer
+### Tests automatisés
 
-Les parcours principaux sont couverts par 59 scénarios de tests de bout en bout avec Playwright, qui pilotent l'application comme un utilisateur : création d'un covoiturage, mode multi-trajets, recherche, administration d'un événement, envoi des e-mails de notification… Côté serveur, 13 modules de tests unitaires vérifient la logique de l'API.
+Les parcours principaux sont couverts par plus de 60 scénarios de tests de bout en bout avec Playwright, qui pilotent l'application comme un utilisateur : création d'un covoiturage, mode multi-trajets, recherche, administration d'un événement, envoi des e-mails de notification… Côté serveur, plus de 15 modules de tests unitaires vérifient la logique de l'API.
 
-### Automatiser la livraison
+### Intégration et déploiement continus
 
 Chaque modification passe par une chaîne d'intégration continue GitLab : construction, tests, publication d'une version, puis déploiement sur un environnement de préproduction avant la production. Les mises à jour des dépendances sont proposées automatiquement par Renovate, puis vérifiées par cette même chaîne.
 
-### Rendre les évolutions lisibles
+### Versions et journal des modifications
 
-Depuis la première version de décembre 2023, 37 versions ont été publiées, avec un numéro de version sémantique et un journal des modifications qui décrit chaque changement pour les utilisateurs comme pour les contributeurs.
+Depuis la première version de décembre 2023, 40 versions ont été publiées, avec un numéro de version sémantique et un journal des modifications qui décrit chaque changement pour les utilisateurs comme pour les contributeurs.
 
-### Permettre à d'autres de reprendre l'outil
+### Documentation et réutilisation
 
 Le dépôt comprend un guide pour les développeurs (environnement Docker, tests, contribution) et un guide pour les administrateurs. Ce dernier permet à une autre association d'installer sa propre instance de Vroum, avec son nom, ses couleurs et sa feuille de style. Le code est publié sous licence MIT.
 

@@ -20,7 +20,7 @@ const projects = defineCollection({
 		role: z.string(),
 		year: z.string(),
 		featured: z.boolean().default(true),
-		/** Fichier de public/, sans base (ex. vroum.png). */
+		/** Fichier de public/, sans base (ex. vroum.webp). */
 		image: z.string(),
 		imageAlt: z.string()
 	})
