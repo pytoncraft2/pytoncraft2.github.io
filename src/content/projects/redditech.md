@@ -3,7 +3,7 @@ title: "Redditech"
 order: 8
 meta: "Pré-MSc Epitech · React Native, OAuth2, API Reddit"
 tags: ["2023", "Projet académique", "Application mobile"]
-description: "Client mobile Android pour Reddit développé à trois : connexion OAuth2, fil filtrable, abonnements aux communautés et réglages du compte."
+description: "Client Reddit pour Android développé à trois en React Native, avec connexion OAuth2, fil filtrable et abonnements."
 summary: >-
   Redditech permet de retrouver son fil Reddit et de suivre des communautés depuis une application Android.
   Dans une équipe de trois, j’ai intégré la connexion au compte Reddit et développé le fil filtrable à partir des données de l’API.

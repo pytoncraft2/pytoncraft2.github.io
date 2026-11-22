@@ -3,7 +3,7 @@ title: "SportSee"
 order: 12
 meta: "Formation Product Design · Figma · Zeroheight"
 tags: ["2026", "Formation", "UI Design", "Design System"]
-description: "Conception des écrans de connexion, dashboard et profil sur trois formats, avec un Design System réutilisable documenté dans Zeroheight."
+description: "Tableau de bord sportif conçu pour ordinateur, tablette et mobile, avec un design system documenté pour être réutilisé."
 summary: >-
   Les maquettes de SportSee montrent comment suivre ses performances sportives sur ordinateur, tablette et mobile.
   J’ai organisé le tableau de bord pour que les chiffres clés se lisent avant les graphiques, puis documenté les composants pour qu’une équipe puisse les réutiliser.

@@ -3,7 +3,7 @@ title: "Sensor Sensei"
 order: 14
 meta: "Projet Epitech MSc · ESP32-S3, LoRa, C++"
 tags: ["2025", "Projet académique", "IoT", "Systèmes embarqués"]
-description: "Station de mesure environnementale : un capteur transmet température, humidité, pression et poussières en LoRa à une passerelle qui les affiche sur une page web locale."
+description: "Station de mesure environnementale réalisée à quatre : un capteur envoie ses mesures en LoRa à une passerelle qui les affiche sur une page web."
 summary: >-
   Sensor Sensei est une station qui mesure notamment la température et l’humidité et les affiche sur une page web locale.
   J’ai programmé la lecture des capteurs, la transmission radio en LoRa et le serveur qui rend les mesures consultables dans un navigateur.

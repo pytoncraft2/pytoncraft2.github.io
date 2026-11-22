@@ -3,7 +3,7 @@ title: "Convoyeur de tri RFID"
 order: 15
 meta: "Projet Epitech MSc · M5Stack, RFID, Dolibarr"
 tags: ["2024", "Projet académique", "IoT", "Systèmes embarqués"]
-description: "Convoyeur qui lit le badge RFID d’un colis, interroge un ERP et l’aiguille vers le bon entrepôt."
+description: "Convoyeur qui lit le badge RFID de chaque colis, interroge l’ERP Dolibarr et l’oriente vers le bon entrepôt."
 summary: >-
   Ce convoyeur trie des colis : il lit leur badge RFID, demande à l’ERP Dolibarr leur entrepôt de destination et oriente chaque colis avec un servomoteur.
   J’ai programmé, avec l’aide d’un coéquipier, la carte qui pilote l’ensemble, de la lecture RFID aux appels à l’API, en passant par le moteur du tapis et la gestion des erreurs.

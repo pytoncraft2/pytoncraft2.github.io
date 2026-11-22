@@ -3,7 +3,7 @@ title: "EasySAV"
 order: 2
 meta: "Startup · Symfony, Twig, EasyAdmin"
 tags: ["2021–2025", "Expérience pro", "Développement web"]
-description: "Formulaires métiers et interface d’administration."
+description: "Application Symfony qui aide les techniciens de maintenance à remplir leurs attestations d’entretien sur le terrain, développée en alternance."
 summary: >-
   EasySAV aide les techniciens de maintenance à remplir leurs attestations d’entretien sur le terrain.
   Pendant mon alternance, j’ai ajouté le préremplissage à partir de l’attestation précédente et du QR code des analyseurs Testo, et j’ai développé avec un autre développeur un mode brouillon pour reprendre une saisie interrompue.
