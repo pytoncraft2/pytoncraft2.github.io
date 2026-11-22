@@ -27,10 +27,10 @@ Une application qui agit sur le compte de l'utilisateur ne peut pas lui demander
 
 J'ai réalisé la majorité du projet (44 commits sur 60) :
 
-- la création du projet React Native et la navigation entre les écrans ;
-- la connexion OAuth2 et la conservation du jeton de renouvellement sur le téléphone ;
-- le fil d'actualité et ses filtres ;
-- l'abonnement et le désabonnement aux communautés, côté API ;
+- la création du projet React Native et la navigation entre les écrans
+- la connexion OAuth2 et la conservation du jeton de renouvellement sur le téléphone
+- le fil d'actualité et ses filtres
+- l'abonnement et le désabonnement aux communautés, côté API
 - la documentation du dépôt, le test Jest et la publication de la version 1.0.0.
 
 Mes deux coéquipiers ont pris en charge l'intégration de l'interface (connexion, accueil, profil, recherche), la récupération du profil et l'écran des réglages.
@@ -69,10 +69,10 @@ La version 1.0.0 couvre les fonctionnalités prévues : connexion, fil filtrable
 
 Plusieurs points montrent le manque de recul de l'époque :
 
-- les trois listes sont chargées à l'ouverture du fil, au lieu de l'être à la demande ;
-- la recherche se limite à la liste des communautés populaires, sans champ de recherche ;
-- la date de création du compte s'affiche en secondes brutes, sans mise en forme ;
-- l'interface mélange anglais et français ;
+- les trois listes sont chargées à l'ouverture du fil, au lieu de l'être à la demande
+- la recherche se limite à la liste des communautés populaires, sans champ de recherche
+- la date de création du compte s'affiche en secondes brutes, sans mise en forme
+- l'interface mélange anglais et français
 - l'identifiant de l'application Reddit est écrit dans le code au lieu d'être fourni par la configuration.
 
 ## Apprentissages

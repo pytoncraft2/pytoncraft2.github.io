@@ -29,9 +29,9 @@ Tout l'intérêt du jeu repose sur la simultanéité. Chaque trait doit apparaî
 
 J'ai réalisé l'essentiel du projet : 126 des 139 commits du dépôt. Je me suis concentré sur l'interface de jeu et sur le déroulement de la partie :
 
-- la création d'un salon et le lien à copier pour inviter d'autres joueurs ;
-- le canevas de dessin partagé et son effacement ;
-- les étapes de la partie, déclenchées par des messages WebSocket ;
+- la création d'un salon et le lien à copier pour inviter d'autres joueurs
+- le canevas de dessin partagé et son effacement
+- les étapes de la partie, déclenchées par des messages WebSocket
 - le chat, le chronomètre, le mot masqué et l'annonce du joueur qui a trouvé.
 
 Les deux autres membres de l'équipe ont travaillé avec moi sur le serveur Go, notamment sur la conservation des informations de chaque salon et sur le chat.
@@ -76,9 +76,9 @@ Le prototype permet de créer un salon, d'y inviter des joueurs et de jouer une 
 
 Il reste cependant un prototype :
 
-- les rôles d'administrateur et de dessinateur sont attribués à des pseudos écrits dans le code, sans rotation entre les joueurs ;
-- la liste des joueurs n'est pas la même d'un écran à l'autre, car chaque navigateur la reconstruit à partir des messages qu'il a reçus ;
-- les messages sont lus côté serveur en découpant le texte, au lieu d'être décodés comme du JSON, ce qui les rend fragiles ;
+- les rôles d'administrateur et de dessinateur sont attribués à des pseudos écrits dans le code, sans rotation entre les joueurs
+- la liste des joueurs n'est pas la même d'un écran à l'autre, car chaque navigateur la reconstruit à partir des messages qu'il a reçus
+- les messages sont lus côté serveur en découpant le texte, au lieu d'être décodés comme du JSON, ce qui les rend fragiles
 - les boutons de test (« STOP », « ETAPE 1 ») sont restés dans l'interface, et il n'y a ni score ni fin de partie.
 
 ## Apprentissages

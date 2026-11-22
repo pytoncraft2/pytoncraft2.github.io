@@ -41,7 +41,7 @@ Le moodboard associe une identité sportive à des surfaces claires et aérées.
 
 ### Construire et appliquer le système
 
-J’ai traduit cette direction en couleurs, typographies, espacements et composants réutilisables. Les wireframes ont servi de base à la structure ; Figma Make m’a aidé à explorer une direction visuelle, ensuite adaptée manuellement au Design System et aux contraintes responsive. Les maquettes finales constituent le livrable de référence.
+J’ai traduit cette direction en couleurs, typographies, espacements et composants réutilisables. Les wireframes ont servi de base à la structure. Figma Make m’a aidé à explorer une direction visuelle, ensuite adaptée manuellement au Design System et aux contraintes responsive. Les maquettes finales constituent le livrable de référence.
 
 ## Décisions & arbitrages
 
@@ -63,7 +63,7 @@ J’ai contrôlé les principales associations de couleurs pour préserver la li
 
 Les graphiques associent couleurs, titres, unités et informations textuelles. J’ai également vérifié les neuf maquettes pour repérer les débordements, les problèmes d’espacement et les incohérences entre composants.
 
-Ces contrôles portent sur la conception. La navigation au clavier, les technologies d’assistance et le comportement réel devront être vérifiés lors du développement ; ils ne constituent pas une validation de l’accessibilité d’une application en production.
+Ces contrôles portent sur la conception. La navigation au clavier, les technologies d’assistance et le comportement réel devront être vérifiés lors du développement. Ils ne constituent pas une validation de l’accessibilité d’une application en production.
 
 ## Résultats et livrables
 

@@ -29,9 +29,9 @@ Deux publics utilisent la même plateforme avec des besoins opposés : le candid
 
 J'ai réalisé la plus grande partie du dépôt, côté serveur comme côté interface :
 
-- la mise en place de l'API avec Symfony et API Platform, les entités (utilisateurs, entreprises, offres, CV, messages) et leurs relations ;
-- l'authentification par jeton JWT : inscription, connexion et route renvoyant le profil de l'utilisateur connecté ;
-- l'interface d'administration des données, générée avec EasyAdmin ;
+- la mise en place de l'API avec Symfony et API Platform, les entités (utilisateurs, entreprises, offres, CV, messages) et leurs relations
+- l'authentification par jeton JWT : inscription, connexion et route renvoyant le profil de l'utilisateur connecté
+- l'interface d'administration des données, générée avec EasyAdmin
 - côté React, la liste et le détail des offres, et l'espace recruteur : modification du profil et du mot de passe, création d'entreprises et d'offres, lecture des messages reçus.
 
 Mon binôme a développé la page d'accueil, la page des entreprises et les premières versions du profil et des formulaires.
@@ -73,9 +73,9 @@ L'application livrée permet de s'inscrire comme candidat ou recruteur, de se co
 
 Plusieurs points restaient inachevés :
 
-- la recherche et le filtrage des offres étaient en cours de développement à la fin du projet ;
-- les dates s'affichent dans leur format technique, sans mise en forme ;
-- l'interface conserve des libellés en anglais (« Learn more », « Apply ») et une mise en page très simple, sans travail de conception visuelle ;
+- la recherche et le filtrage des offres étaient en cours de développement à la fin du projet
+- les dates s'affichent dans leur format technique, sans mise en forme
+- l'interface conserve des libellés en anglais (« Learn more », « Apply ») et une mise en page très simple, sans travail de conception visuelle
 - seules les données des utilisateurs exigent d'être connecté : les offres, entreprises, CV et messages peuvent être lus et modifiés sans authentification, et le tableau de bord d'administration n'est pas protégé. Le jeton JWT était en place, mais les règles d'accès n'avaient pas été écrites.
 
 ## Apprentissages

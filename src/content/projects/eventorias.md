@@ -63,7 +63,7 @@ Un retour indiquait que l’entrée dans Eventorias n’était pas suffisamment 
 
 ## Décisions UX/UI et règles métier
 
-La consultation des événements reste accessible sans compte ; une authentification est demandée lorsque l’utilisateur souhaite enregistrer un événement. Le formulaire organisateur signale les champs obligatoires et les erreurs de validation. Les actions importantes doivent produire un retour compréhensible.
+La consultation des événements reste accessible sans compte. Une authentification est demandée lorsque l’utilisateur souhaite enregistrer un événement. Le formulaire organisateur signale les champs obligatoires et les erreurs de validation. Les actions importantes doivent produire un retour compréhensible.
 
 La séparation des rôles est essentielle : un organisateur doit pouvoir modifier ou annuler uniquement ses propres événements. Les permissions devront être vérifiées côté serveur lors de l’implémentation.
 

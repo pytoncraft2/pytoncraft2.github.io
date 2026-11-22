@@ -29,9 +29,9 @@ Nous avons choisi LoRa, une technologie radio à longue portée et faible débit
 
 J'ai développé l'essentiel du code embarqué du prototype :
 
-- la lecture des capteurs sur la carte émettrice ;
-- l'envoi et la réception des mesures en LoRa ;
-- l'affichage sur les écrans OLED des deux cartes ;
+- la lecture des capteurs sur la carte émettrice
+- l'envoi et la réception des mesures en LoRa
+- l'affichage sur les écrans OLED des deux cartes
 - le serveur web de la passerelle et la première version de sa page.
 
 Les autres membres de l'équipe ont notamment retravaillé cette page, rédigé la documentation des composants et préparé la présentation finale.
@@ -51,7 +51,7 @@ Une liaison LoRa transmet peu de données à la fois. Plutôt qu'un format struc
 
 ### Lisser la mesure des poussières
 
-Le capteur de poussières renvoie une tension analogique qui varie d'une lecture à l'autre. À chaque lecture, la LED infrarouge du capteur est allumée brièvement, puis une moyenne glissante sur les dix dernières lectures est appliquée avant la conversion en µg/m³. La conversion repose sur les valeurs de référence du fabricant ; le capteur n'a pas été étalonné.
+Le capteur de poussières renvoie une tension analogique qui varie d'une lecture à l'autre. À chaque lecture, la LED infrarouge du capteur est allumée brièvement, puis une moyenne glissante sur les dix dernières lectures est appliquée avant la conversion en µg/m³. La conversion repose sur les valeurs de référence du fabricant. Le capteur n'a pas été étalonné.
 
 ### Une page servie par la passerelle
 
@@ -70,13 +70,13 @@ Le prototype livré mesure la température, l'humidité, la pression et la conce
 
 Plusieurs fonctions prévues n'ont pas été réalisées dans cette version :
 
-- la mise en veille profonde entre deux mesures : l'émetteur mesure et transmet en continu, ce qui limite son autonomie ;
-- la publication des données sur la plateforme ouverte sensor.community ;
+- la mise en veille profonde entre deux mesures : l'émetteur mesure et transmet en continu, ce qui limite son autonomie
+- la publication des données sur la plateforme ouverte sensor.community
 - la conservation d'un historique des mesures.
 
 La portée de la liaison et l'autonomie du capteur n'ont pas été mesurées sur le prototype : les distances citées dans notre présentation finale correspondaient aux capacités annoncées pour LoRa, pas à des essais.
 
-Le capteur de poussières fournit une concentration globale, sans distinguer les tailles de particules. Enfin, les identifiants Wi-Fi sont écrits dans le code ; un déploiement réel demanderait une étape de configuration.
+Le capteur de poussières fournit une concentration globale, sans distinguer les tailles de particules. Enfin, les identifiants Wi-Fi sont écrits dans le code. Un déploiement réel demanderait une étape de configuration.
 
 ## Apprentissages
 

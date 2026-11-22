@@ -30,9 +30,9 @@ La première version fonctionnait, mais elle avait été conçue sans réfléchi
 
 En 2021, j'ai été le principal contributeur du dépôt et je me suis concentré sur le front-end :
 
-- le panier, conservé dans le navigateur, avec les quantités, les doublons et le calcul du total ;
-- l'accueil (catégories et carrousel des promotions) et les pages produit ;
-- l'espace d'administration pour créer, modifier et supprimer articles, catégories et sous-catégories ;
+- le panier, conservé dans le navigateur, avec les quantités, les doublons et le calcul du total
+- l'accueil (catégories et carrousel des promotions) et les pages produit
+- l'espace d'administration pour créer, modifier et supprimer articles, catégories et sous-catégories
 - la liaison entre le front React et l'API Symfony.
 
 Mes coéquipiers ont pris en charge le paiement PayPal, les frais de livraison, les commandes, les adresses, l'authentification et la recherche.
@@ -83,11 +83,11 @@ Le front livré en 2022 propose un thème sombre, trois tailles de texte, une in
 
 Avec le recul, plusieurs choix ne tiennent pas face aux règles d'accessibilité que j'applique aujourd'hui :
 
-- l'inversion des couleurs touche aussi les photos des produits ; il aurait fallu les exclure du filtre ;
-- les boutons « 1 », « 2 », « 3 » et l'interrupteur de thème n'ont pas de nom accessible : un lecteur d'écran ne peut pas dire à quoi ils servent ;
-- les photos des produits partagent le même texte alternatif générique, et le bouton qui diminue une quantité est annoncé comme « supprimer » ;
-- la navigation au clavier n'a pas abouti : l'invite prévue, rédigée en anglais sur un site en français, n'est jamais affichée ;
-- la lecture vocale a été développée par un coéquipier, mais le composant n'a jamais été ajouté au dépôt ; les sous-titres n'ont pas été réalisés.
+- l'inversion des couleurs touche aussi les photos des produits, alors qu'il aurait fallu les exclure du filtre
+- les boutons « 1 », « 2 », « 3 » et l'interrupteur de thème n'ont pas de nom accessible : un lecteur d'écran ne peut pas dire à quoi ils servent
+- les photos des produits partagent le même texte alternatif générique, et le bouton qui diminue une quantité est annoncé comme « supprimer »
+- la navigation au clavier n'a pas abouti : l'invite prévue, rédigée en anglais sur un site en français, n'est jamais affichée
+- la lecture vocale a été développée par un coéquipier, mais le composant n'a jamais été ajouté au dépôt. Les sous-titres n'ont pas été réalisés.
 
 Le site n'a pas été mis en ligne, et les tickets consacrés aux performances et au bilan carbone sont restés au stade d'intention : aucune mesure n'a été réalisée.
 

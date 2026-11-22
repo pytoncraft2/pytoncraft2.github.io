@@ -21,16 +21,16 @@ Time Manager est une application de gestion du temps de travail réalisée à qu
 
 ## Problème
 
-Les mêmes données de pointage intéressent trois publics : l'employé, qui veut voir ses propres heures ; le manager, qui suit son équipe ; la direction, qui organise les équipes et les rôles. Il fallait une API commune et une interface qui montre à chacun ce qui le concerne.
+Les mêmes données de pointage intéressent trois publics : l'employé veut voir ses propres heures, le manager suit son équipe et la direction organise les équipes et les rôles. Il fallait une API commune et une interface qui montre à chacun ce qui le concerne.
 
 ## Mon rôle
 
-L'API en Elixir (Phoenix) a été développée surtout par mes coéquipiers ; j'y ai contribué ponctuellement, pour les équipes et la liste des utilisateurs. Mes 30 commits sur 72 portent surtout sur l'interface SvelteKit :
+L'API en Elixir (Phoenix) a été développée surtout par mes coéquipiers. J'y ai contribué ponctuellement, pour les équipes et la liste des utilisateurs. Mes 30 commits sur 72 portent surtout sur l'interface SvelteKit :
 
-- les pages de connexion, d'inscription et de profil, et la redirection des visiteurs non connectés ;
-- le système d'équipes côté interface et la liste de tous les utilisateurs ;
-- le menu de navigation ;
-- les graphiques des heures travaillées ;
+- les pages de connexion, d'inscription et de profil, et la redirection des visiteurs non connectés
+- le système d'équipes côté interface et la liste de tous les utilisateurs
+- le menu de navigation
+- les graphiques des heures travaillées
 - les réglages de communication entre le front et l'API (CORS, ports).
 
 J'ai aussi testé l'empaquetage de l'interface en application Android avec Capacitor.
@@ -71,10 +71,10 @@ Les captures de cette page ont été réalisées en 2026, en relançant le proje
 
 Le prototype couvre le pointage, les temps de travail, les équipes, les trois rôles et les graphiques. Ses limites sont importantes :
 
-- jusqu'au dernier jour, la connexion comparait le mot de passe dans le navigateur, après l'avoir reçu en clair de l'API ;
-- un coéquipier a ajouté une authentification par jeton côté API le dernier jour, mais l'interface n'a pas été adaptée à temps : dans la version finale, la connexion et le chargement des graphiques ne fonctionnent plus ;
-- les droits de chaque rôle ne sont vérifiés que dans l'interface, pas par l'API ;
-- le graphique a gardé le titre et l'axe de l'exemple FusionCharts (« Daily Visitors… »), ainsi que le filigrane de la version d'essai ;
+- jusqu'au dernier jour, la connexion comparait le mot de passe dans le navigateur, après l'avoir reçu en clair de l'API
+- un coéquipier a ajouté une authentification par jeton côté API le dernier jour, mais l'interface n'a pas été adaptée à temps : dans la version finale, la connexion et le chargement des graphiques ne fonctionnent plus
+- les droits de chaque rôle ne sont vérifiés que dans l'interface, pas par l'API
+- le graphique a gardé le titre et l'axe de l'exemple FusionCharts (« Daily Visitors… »), ainsi que le filigrane de la version d'essai
 - l'interface mélange anglais et français, et l'application Android est restée au stade de l'essai.
 
 ## Apprentissages

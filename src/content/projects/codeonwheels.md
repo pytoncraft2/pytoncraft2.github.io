@@ -33,7 +33,7 @@ J'ai pris en charge les trois aspects du projet : la conception UX/UI et les maq
 
 Les maquettes présentent un parcours de défis autour de la programmation Arduino : afficher un premier résultat, activer une caméra, utiliser un capteur de distance et faire avancer la voiture.
 
-L'utilisateur place des éléments de code dans les emplacements prévus, puis valide sa réponse. En cas d'erreur, l'interface l'invite à corriger son code ; en cas de réussite, elle lui propose de passer au défi suivant.
+L'utilisateur place des éléments de code dans les emplacements prévus, puis valide sa réponse. En cas d'erreur, l'interface l'invite à corriger son code. En cas de réussite, elle lui propose de passer au défi suivant.
 
 ![Maquette de l'accueil CodeOnWheels présentant les défis Arduino](./codeonwheels/accueil.webp)
 *Accueil et progression par défis — maquette originale.*
@@ -64,7 +64,7 @@ La validation des réponses faisait partie intégrante de l'expérience : un ret
 
 Le projet a abouti à une application et à un véhicule robotisé réellement fonctionnels. Il m'a permis de concevoir et développer une expérience complète, de l'interface utilisateur à la programmation du matériel.
 
-Le code source n'est plus disponible. Les captures présentées ici proviennent des maquettes originales du projet ; elles illustrent le parcours conçu, sans constituer une démonstration actuelle de l'application.
+Le code source n'est plus disponible. Les captures présentées ici proviennent des maquettes originales du projet. Elles illustrent le parcours conçu, sans constituer une démonstration actuelle de l'application.
 
 ## Apprentissages
 
