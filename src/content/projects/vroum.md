@@ -5,7 +5,7 @@ meta: "Production · SvelteKit, FastAPI, PostgreSQL"
 tags: ["2023–Aujourd’hui", "Production", "Développement web", "Produit"]
 description: "Outil de covoiturage en production pour des événements scouts, associatifs ou sportifs, que je développe et maintiens depuis 2023."
 summary: >-
-  Vroum aide les groupes scouts à répartir les participants et le matériel entre les véhicules d’un rassemblement.
+  Vroum aide les organisateurs d’événements scouts, associatifs ou sportifs à répartir les participants et le matériel entre les véhicules.
   Principal développeur et mainteneur de l’outil, j’ai conçu un mode multi-trajets pour les événements où les véhicules partent de plusieurs villes à des dates différentes.
 stack: ["SvelteKit", "FastAPI", "PostgreSQL"]
 role: "Développement web et participation aux décisions produit"
@@ -17,13 +17,13 @@ imageAlt: "Interface de l’outil de covoiturage Vroum"
 
 ## Contexte
 
-Vroum est un outil collaboratif de covoiturage développé au sein de l'association LaToileScoute. Il aide les organisateurs scouts à répartir participants, véhicules et matériel pour les trajets aller et retour d'un événement.
+Vroum est un outil collaboratif de covoiturage développé au sein de l'association LaToileScoute. Il aide les organisateurs d'un événement à répartir participants, véhicules et matériel pour les trajets aller et retour.
 
 Le produit est utilisé en conditions réelles et évolue depuis 2023 en fonction des usages et des besoins rencontrés sur différents événements.
 
 ## Problème
 
-La complexité d'un covoiturage varie fortement selon la taille et l'organisation d'un événement. Lors du rassemblement Clameurs, le grand nombre de véhicules a montré les limites d'une simple liste : l'information devenait difficile à parcourir et à organiser.
+La complexité d'un covoiturage varie fortement selon la taille et l'organisation d'un événement. Lors d'un grand rassemblement scout, le nombre de véhicules a montré les limites d'une simple liste : l'information devenait difficile à parcourir et à organiser.
 
 D'autres événements ont ensuite fait apparaître des besoins plus complexes, avec des véhicules venant de différentes villes et circulant sur plusieurs jours. Il fallait prendre en charge ces usages sans complexifier inutilement les covoiturages plus simples.
 
@@ -43,7 +43,7 @@ Les besoins sont discutés collectivement et les solutions peuvent être pré-te
 
 ### Faire évoluer Vroum vers le multi-trajets
 
-Lors du rassemblement Clameurs, le nombre important de véhicules rendait la liste difficile à parcourir. J'ai d'abord conçu une évolution permettant d'associer lieux et dates aux participants et véhicules sous forme de tags filtrables.
+Lors de ce grand rassemblement scout, le nombre important de véhicules rendait la liste difficile à parcourir. J'ai d'abord conçu une évolution permettant d'associer lieux et dates aux participants et véhicules sous forme de tags filtrables.
 
 Un événement ultérieur réunissant à Paris des véhicules venant de toute la France sur plusieurs jours a montré les limites de cette première réponse. J'ai alors conçu un mode multi-trajets avec notamment des regroupements par ville ou par date et une interface adaptée à cette complexité.
 
@@ -100,7 +100,7 @@ Le dépôt comprend un guide pour les développeurs (environnement Docker, tests
 
 ## Résultats
 
-Vroum est utilisé en production pour organiser des covoiturages scouts et a dépassé 90 000 visites en 2025.
+Vroum est utilisé en production pour organiser les covoiturages d'événements scouts, associatifs ou sportifs, et a dépassé 90 000 visites en 2025.
 
 Les retours d'utilisation ont directement alimenté plusieurs évolutions du produit, notamment le multi-trajets et les notifications par e-mail. Le produit continue d'évoluer à partir de situations rencontrées sur des événements réels.
 
