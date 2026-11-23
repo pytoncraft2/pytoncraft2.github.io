@@ -12,7 +12,7 @@ role: "Développement embarqué : lecture RFID, pilotage des moteurs, appels à 
 year: "2024"
 featured: true
 image: "convoyeur-rfid.webp"
-imageAlt: "Page de configuration du convoyeur : champs réseau Wi-Fi, mot de passe, adresse IP, adresse et clé de l’API"
+imageAlt: "Schéma de principe du convoyeur : colis sur un tapis, lecteur RFID, carte M5GO reliée en Wi-Fi à l’ERP Dolibarr, et servomoteur qui oriente vers l’entrepôt 1, l’entrepôt 2 ou le rebut"
 ---
 
 ## Contexte
