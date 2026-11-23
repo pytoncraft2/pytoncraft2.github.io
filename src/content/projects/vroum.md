@@ -35,7 +35,7 @@ Je peux proposer une évolution, en concevoir et tester une première solution, 
 
 ## Démarche
 
-Vroum évolue de manière itérative à partir de sondages, de retours directs des utilisateurs, de bugs constatés et de propositions de l'équipe.
+Vroum évolue de manière itérative à partir d'un sondage proposé aux utilisateurs, de retours directs, de bugs constatés et de propositions de l'équipe. Entre juin 2024 et octobre 2026, 73 personnes ont répondu au sondage.
 
 Les besoins sont discutés collectivement et les solutions peuvent être pré-testées avant d'être retenues. L'objectif n'est pas d'ajouter systématiquement chaque fonctionnalité demandée, mais de trouver une réponse adaptée au besoin, à l'usage et à la maintenabilité du projet.
 
