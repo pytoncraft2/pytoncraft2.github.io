@@ -230,14 +230,19 @@
 						<polyline points="14,-31 20,-11" />
 						<polyline points="14,-31 17,-37 22,-37" />
 						<line x1="-12" y1="-32" x2="-4" y2="-32" />
+						<!-- Porte-bagages arrière, au-dessus de la roue : affiché seulement pendant le jeu. -->
+						<g class="rack" stroke-width="1.8">
+							<polyline points="-32,-25 -11,-25" />
+							<line x1="-28" y1="-25" x2="-20" y2="-11" />
+						</g>
 					</g>
 					<g class="game-unicycle" fill="none" stroke="var(--scene-bike)" stroke-width="2.5" stroke-linecap="round">
 						<circle cx="0" cy="-11" r="11" />
 						<path d="M0-11-5-32m-5 0h9" />
 						<path class="spokes" stroke-width="0.8" d="M-10-11H10M0-21V-1M-7-18 7-4M-7-4 7-18" />
 					</g>
-					<rect class="game-bag game-bag-one" x="-24" y="-32" width="9" height="9" rx="2" fill="var(--scene-lamp)" />
-					<rect class="game-bag game-bag-two" x="-15" y="-27" width="9" height="8" rx="2" fill="var(--scene-lamp)" />
+					<rect class="game-bag game-bag-one" x="-30" y="-32.5" width="15.5" height="6.5" rx="2" fill="var(--scene-lamp)" />
+					<rect class="game-bag game-bag-two" x="-29.5" y="-23" width="15" height="10.5" rx="2" fill="var(--scene-lamp)" />
 
 					<!-- Phare avant, sur le tube de direction (allumé la nuit). -->
 					<rect x="15.5" y="-35" width="4" height="3.4" rx="1.2" fill="var(--scene-bike)" />
@@ -437,7 +442,7 @@
 		transform: translateX(360px);
 	}
 
-	.game-obstacle, .game-obstacle path, .game-bag, .game-unicycle {
+	.game-obstacle, .game-obstacle path, .game-bag, .game-unicycle, .rack {
 		display: none;
 	}
 
@@ -464,6 +469,7 @@
 	}
 
 	:global(.hero[data-playing]) .game-obstacle,
+	:global(.hero[data-playing]) .rack,
 	:global(.hero[data-playing][data-game-missed='0']) .game-bag-one,
 	:global(.hero[data-playing]:is([data-game-missed='0'], [data-game-missed='1'])) .game-bag-two,
 	:global(.hero[data-playing][data-game-obstacle='0']) .game-rock,
