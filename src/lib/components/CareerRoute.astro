@@ -111,7 +111,10 @@ const careerSteps = [
 				schedule();
 				return;
 			}
+			// Positions et opacité figées à une arrivée sur Contact pendant le parcours : la
+			// suivante, parcours fini, doit repartir d’un vélo caché.
 			hero.style.removeProperty('--contact-stop');
+			hero.style.removeProperty('--contact-start-opacity');
 			const matrix = land.getScreenCTM();
 			if (!matrix) return;
 			const stops = road.getBoundingClientRect();
