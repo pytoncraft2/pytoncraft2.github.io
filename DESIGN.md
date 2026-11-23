@@ -67,7 +67,7 @@ L’introduction présente le nom, le positionnement et une phrase concrète sur
 
 La scène d’accueil accompagne cette introduction sans la remplacer : le nom, le positionnement et les actions restent lisibles et utilisables même si la scène ne s’affiche pas.
 
-Les projets sélectionnés constituent la preuve principale. Chaque carte présente un titre, ses technologies principales (champ `stack`, quatre au plus, les plus parlantes en premier : un recruteur les repère d’un coup d’œil), des tags utiles, une description courte et un lien explicite vers l’étude de cas. Un visuel sert à identifier le projet et à comprendre sa nature.
+Les projets sélectionnés constituent la preuve principale. Chaque carte présente un titre, ses technologies principales (champ `stack`, quatre en général, davantage pour un projet majeur comme Vroum, les plus parlantes en premier : un recruteur les repère d’un coup d’œil), des tags utiles, une description courte et un lien explicite vers l’étude de cas. Un visuel sert à identifier le projet et à comprendre sa nature.
 
 Les compétences, le parcours et les moyens de contact complètent cette lecture. Ne pas multiplier les sections qui répètent la même information. Toute affirmation chiffrée doit rester vérifiable et correctement contextualisée.
 
