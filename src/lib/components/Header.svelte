@@ -188,6 +188,13 @@
 		pointer-events: auto;
 	}
 
+	/* Voile léger qui détache le panneau des encarts du hero. Il laisse passer les clics :
+	   un clic à côté ferme toujours le panneau et atteint l’élément visé, comme sans voile. */
+	.settings-panel::backdrop {
+		background: var(--overlay-scrim, rgb(32 32 48 / 0.18));
+		pointer-events: none;
+	}
+
 	.setting {
 		display: flex;
 		align-items: center;

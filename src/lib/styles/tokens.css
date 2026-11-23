@@ -28,6 +28,8 @@
   --selection-bg: var(--color-mint);
   --scrollbar-track: var(--surface-subtle);
   --scrollbar-thumb: var(--border-strong);
+  /* Voile posé sur la page derrière un panneau flottant (paramètres). */
+  --overlay-scrim: rgb(32 32 48 / 0.18);
   --scrollbar-thumb-hover: var(--action-primary);
 
   /* Scène d’accueil (jour) : décor uniquement, jamais pour du texte ou une action */
@@ -123,6 +125,7 @@
   --selection-bg: var(--color-frost);
   --scrollbar-track: var(--color-night);
   --scrollbar-thumb: var(--border-strong);
+  --overlay-scrim: rgb(0 0 0 / 0.4);
   --scrollbar-thumb-hover: var(--color-frost);
 
   /* Scène d’accueil (nuit) */
