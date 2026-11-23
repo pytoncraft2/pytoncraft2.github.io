@@ -114,23 +114,25 @@
 		width: fit-content;
 	}
 
-	/* Technologies séparées par un point médian, sans texte de remplacement pour les lecteurs d’écran. */
+	/*
+	 * Technologies : pastilles arrondies à contour, sans fond, pour se distinguer des tags
+	 * (ProjectTags : fond plein, angles peu arrondis) tout en gardant leur taille.
+	 */
 	.stack {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0 var(--spacing-2);
-		margin: calc(-1 * var(--spacing-1)) 0 0;
+		gap: var(--spacing-2);
+		margin: 0;
 		padding: 0;
 		list-style: none;
-		color: var(--text-primary);
-		font: 500 var(--text-body-s-size) / var(--text-body-s-line) var(--font-sans);
 	}
 
-	/* Point après l’élément : un retour à la ligne ne commence jamais par un point. */
-	.stack li:not(:last-child)::after {
-		content: '·' / '';
-		margin-left: var(--spacing-2);
-		color: var(--text-secondary);
+	.stack li {
+		padding: var(--spacing-1) var(--spacing-3);
+		border: 1px solid var(--border-strong);
+		border-radius: var(--radius-full);
+		color: var(--text-primary);
+		font: 500 0.75rem / 1rem var(--font-sans);
 	}
 
 	.description {
