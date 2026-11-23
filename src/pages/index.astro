@@ -394,7 +394,9 @@ const cards: CarouselProject[] = (await getFeaturedProjects()).map(({ id, data }
 	}
 
 
-	:global(html[data-section='projets']) .hero :global(.rider) {
+	/* Caché seulement quand les sections s'empilent sur le hero (même condition que l'empilement) :
+	   en mouvement réduit, elles défilent dans le flux et rien ne recouvre le cycliste. */
+	:global(html[data-section='projets']:not([data-reduced-motion])) .page[data-stacked] .hero :global(.rider) {
 		opacity: 0;
 	}
 
