@@ -2,7 +2,7 @@
 title: "Vroum"
 order: 1
 meta: "Production · SvelteKit, FastAPI, PostgreSQL"
-tags: ["2023–Aujourd’hui", "Production", "Développement web", "Produit"]
+tags: ["2023–Aujourd’hui", "Production", "Produit"]
 description: "Outil de covoiturage en production pour des événements scouts, associatifs ou sportifs, que je développe et maintiens depuis 2023."
 summary: >-
   Vroum aide les organisateurs d’événements scouts, associatifs ou sportifs à répartir les participants et le matériel entre les véhicules.

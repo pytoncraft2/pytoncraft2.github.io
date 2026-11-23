@@ -2,7 +2,7 @@
 title: "CodeOnWheels"
 order: 15
 meta: "Projet Epitech · Svelte, ESP32-CAM, Arduino"
-tags: ["Projet académique", "Développement web", "IoT", "UX/UI"]
+tags: ["Projet académique", "IoT", "UX/UI"]
 description: "Application qui initie les débutants à Arduino : chaque défi réussi débloque une fonction d’un vrai véhicule robotisé."
 summary: >-
   CodeOnWheels initie les débutants à Arduino en leur proposant des défis qui débloquent les fonctions d’un robot.

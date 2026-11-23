@@ -2,7 +2,7 @@
 title: "Lorraine Tech"
 order: 4
 meta: "Web@cadémie · React, Symfony, accessibilité"
-tags: ["2021–2022", "Projet académique", "Développement web", "Accessibilité"]
+tags: ["2021–2022", "Projet académique", "Accessibilité"]
 description: "Boutique en ligne React et Symfony réalisée à quatre, que j’ai ensuite reprise pour la rendre plus accessible."
 summary: >-
   Lorraine Tech est une boutique en ligne développée à quatre.
