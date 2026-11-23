@@ -20,7 +20,7 @@ imageAlt: "Prototype mobile Eventorias"
 
 Dans le cadre de ma formation Product Designer chez OpenClassrooms, j’ai travaillé sur Eventorias, une application mobile de découverte d’événements à Paris. Le projet s’adresse principalement aux touristes anglophones, qui doivent souvent comparer plusieurs sources pour trouver une activité adaptée à leurs dates, leur budget et leur langue.
 
-La mission consistait à concevoir un prototype no-code, à tester les parcours essentiels et à préparer une passation exploitable par une équipe de développement.
+Le projet partait d’un début de maquette fourni sur Figma, qu’il fallait améliorer. La mission consistait ensuite à concevoir un prototype no-code, à tester les parcours essentiels et à préparer une passation exploitable par une équipe de développement.
 
 ## Problème et périmètre
 
