@@ -19,6 +19,7 @@ const projects = defineCollection({
 		stack: z.array(z.string()),
 		role: z.string(),
 		year: z.string(),
+		/** Présent dans le carrousel et « Projet suivant » ; sinon, la page reste publiée. */
 		featured: z.boolean().default(true),
 		/** Fichier de public/, sans base (ex. vroum.webp). */
 		image: z.string(),

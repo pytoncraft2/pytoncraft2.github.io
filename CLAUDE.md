@@ -46,7 +46,7 @@ Astro (site statique multipage), îles Svelte 5 (runes), TypeScript, CSS avec pr
 | --- | --- |
 | `src/content/projects/<slug>.md` | Une étude de cas : métadonnées en en-tête (titre, tags, ordre, image…) et texte en Markdown ; ses captures dans `src/content/projects/<slug>/` |
 | `src/content.config.ts` | Schéma de la collection `projects` (validé au build) |
-| `src/lib/projects.ts` | Lecture de la collection : `getFeaturedProjects` (triés par `order`), `getNextProject` |
+| `src/lib/projects.ts` | Lecture de la collection, triée par `order` : `getProjects` (toutes les études, chacune a sa page), `getFeaturedProjects` (`featured: true` : carrousel et « Projet suivant »), `getNextProject` |
 | `src/layouts/BaseLayout.astro` | Document HTML commun : script du thème avant rendu, script de transition de retour, en-tête, dock, pied de page |
 | `src/layouts/CaseStudyLayout.astro` | Mise en page d’une étude de cas et styles du contenu Markdown |
 | `src/pages/index.astro` | Accueil statique : hero, profil (`#profil`), contact (`#contact`) |

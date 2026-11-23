@@ -1,6 +1,6 @@
 ---
 title: "Redditech"
-order: 7
+order: 11
 meta: "Pré-MSc Epitech · React Native, OAuth2, API Reddit"
 tags: ["2023", "Projet académique", "Application mobile"]
 description: "Client Reddit pour Android développé à trois en React Native, avec connexion OAuth2, fil filtrable et abonnements."
@@ -10,7 +10,7 @@ summary: >-
 stack: ["React Native", "OAuth2", "API Reddit", "Jest"]
 role: "Architecture de l'application, authentification et fil d'actualité, documentation et tests, en équipe de trois"
 year: "2023"
-featured: true
+featured: false
 image: "redditech.webp"
 imageAlt: "Trois écrans de Redditech : fil d'actualité, liste des abonnements et profil"
 ---

@@ -1,13 +1,15 @@
 ---
 import { render } from 'astro:content';
 import CaseStudyLayout from '../../layouts/CaseStudyLayout.astro';
-import { getFeaturedProjects, getNextProject, type ProjectEntry } from '#lib/projects.js';
+import { getFeaturedProjects, getNextProject, getProjects, type ProjectEntry } from '#lib/projects.js';
 
+// Chaque étude de cas garde sa page, même retirée du carrousel (liens déjà partagés).
+// « Projet suivant » n'enchaîne que les projets mis en avant : une étude retirée n'en a pas.
 export async function getStaticPaths() {
-	const projects = await getFeaturedProjects();
-	return projects.map((project) => ({
+	const featured = await getFeaturedProjects();
+	return (await getProjects()).map((project) => ({
 		params: { slug: project.id },
-		props: { project, next: getNextProject(projects, project.id) }
+		props: { project, next: getNextProject(featured, project.id) }
 	}));
 }
 

@@ -1,6 +1,6 @@
 ---
 title: "MyGo"
-order: 5
+order: 10
 meta: "Web@cadémie · Go, Gin, WebSocket"
 tags: ["2022", "Projet académique", "Développement web", "Temps réel"]
 description: "Jeu de dessin multijoueur dans le navigateur : un joueur dessine, les autres devinent, et le dessin est partagé en temps réel."
@@ -10,7 +10,7 @@ summary: >-
 stack: ["Go", "Gin", "WebSocket", "JavaScript", "Canvas"]
 role: "Développement de l'interface de jeu et du déroulement de la partie, participation au serveur, en équipe de trois"
 year: "2022"
-featured: true
+featured: false
 image: "mygo.webp"
 imageAlt: "Partie MyGo vue par un joueur qui devine : maison dessinée sur le canevas, mot masqué et chat"
 ---

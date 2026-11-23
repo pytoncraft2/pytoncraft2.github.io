@@ -1,6 +1,6 @@
 ---
 title: "Les Bambinets"
-order: 12
+order: 13
 meta: "Formation UX/UI · Figma"
 tags: ["2026", "Formation", "UX/UI Design"]
 description: "Prototype éducatif pour apprendre la langue des signes : on découvre un signe en vidéo, puis on le retrouve dans un quiz."
@@ -10,7 +10,7 @@ summary: >-
 stack: ["Figma"]
 role: "UX/UI Design"
 year: "2026-2027"
-featured: true
+featured: false
 image: "bambinet.png"
 imageAlt: "Prototype de l’application Les Bambinets"
 ---

@@ -10,7 +10,7 @@ summary: >-
 stack: ["ESP32-S3 (Heltec LoRa 32 V3)", "LoRa", "C++ / Arduino", "BME280", "HTML/CSS"]
 role: "Développement embarqué : capteurs, liaison LoRa, écran et serveur web de la passerelle"
 year: "2025"
-featured: true
+featured: false
 image: "sensor-sensei.webp"
 imageAlt: "Page web de la passerelle Sensor Sensei : état de la liaison LoRa et cartes de température, humidité et pression"
 ---
