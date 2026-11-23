@@ -212,7 +212,7 @@
 			<g transform="translate(0 289)">
 				<g class="rider">
 					<!-- Faisceau du phare avant, dont la pointe part de la lampe. -->
-					<polygon class="night beam" points="19,-33 100,-17 100,0" fill="url(#hero-scene-beam)" />
+					<polygon class="night beam unicycle-pose" points="19,-33 100,-17 100,0" fill="url(#hero-scene-beam)" style:--unicycle-pose="matrix(1, 0, 0, 1, -5, -4.5)" />
 					<g class="bike-frame" fill="none" stroke="var(--scene-bike)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
 						<circle cx="-20" cy="-11" r="11" />
 						<circle cx="20" cy="-11" r="11" />
@@ -245,19 +245,19 @@
 					<rect class="game-bag game-bag-two" x="-29.5" y="-23" width="15" height="10.5" rx="2" fill="var(--scene-lamp)" />
 
 					<!-- Phare avant, sur le tube de direction (allumé la nuit). -->
-					<rect x="15.5" y="-35" width="4" height="3.4" rx="1.2" fill="var(--scene-bike)" />
-					<circle class="night" cx="19" cy="-33.3" r="1.7" fill="var(--scene-lamp)" />
-					<!-- Feu arrière, sur le hauban : visible seulement la nuit. -->
-					<circle class="night" cx="-11" cy="-25.3" r="3.8" fill="var(--scene-rear-glow)" />
-					<rect class="night" x="-12.3" y="-26.5" width="2.6" height="2.4" rx="0.8" fill="var(--scene-rear)" />
+					<rect class="unicycle-pose" x="15.5" y="-35" width="4" height="3.4" rx="1.2" fill="var(--scene-bike)" style:--unicycle-pose="matrix(1, 0, 0, 1, -5, -4.5)" />
+					<circle class="night unicycle-pose" cx="19" cy="-33.3" r="1.7" fill="var(--scene-lamp)" style:--unicycle-pose="matrix(1, 0, 0, 1, -5, -4.5)" />
+					<!-- Feu arrière, sur le hauban (contre la selle en monocycle) : visible seulement la nuit. -->
+					<circle class="night unicycle-pose" cx="-11" cy="-25.3" r="3.8" fill="var(--scene-rear-glow)" style:--unicycle-pose="matrix(1, 0, 0, 1, -1.5, -6.7)" />
+					<rect class="night unicycle-pose" x="-12.3" y="-26.5" width="2.6" height="2.4" rx="0.8" fill="var(--scene-rear)" style:--unicycle-pose="matrix(1, 0, 0, 1, -1.5, -6.7)" />
 					<g fill="none" stroke="var(--scene-rider)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
 						<!-- Bras qui reste sur le guidon (épaule, coude, main), derrière le buste. -->
-						<polyline points="6,-50 11,-41 19,-37" />
+						<polyline class="unicycle-pose" points="6,-50 11,-41 19,-37" style:--unicycle-pose="matrix(0.9562, 0.2923, -0.2923, 0.9562, -21.492, -9.659)" />
 						<polyline points="-8,-35 2,-24 -1,-12" />
-						<polyline points="-8,-35 6,-52" />
+						<polyline class="unicycle-pose" points="-8,-35 6,-52" style:--unicycle-pose="matrix(0.9204, -0.3908, 0.3908, 0.9204, 13.253, -5.58)" />
 					</g>
-					<circle cx="10" cy="-60" r="6.5" fill="var(--scene-rider)" />
-					<path d="M2.4,-61 A7.7,7.7 0 0 1 17.8,-61.6 L19.5,-60.4 Z" fill="var(--scene-helmet)" />
+					<circle class="unicycle-pose" cx="10" cy="-60" r="6.5" fill="var(--scene-rider)" style:--unicycle-pose="matrix(0.9993, -0.035, 0.035, 0.9993, -9.092, -4.16)" />
+					<path class="unicycle-pose" d="M2.4,-61 A7.7,7.7 0 0 1 17.8,-61.6 L19.5,-60.4 Z" fill="var(--scene-helmet)" style:--unicycle-pose="matrix(0.9993, -0.035, 0.035, 0.9993, -9.092, -4.16)" />
 					<!--
 						Bras qui fait coucou : même forme que le bras du guidon, avec lequel il se confond au
 						repos. Il tourne à l'épaule (.wave-arm) et l'avant-bras se déplie au coude
@@ -265,9 +265,9 @@
 					-->
 					<g fill="none" stroke="var(--scene-rider)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(6 -50)">
 						<g class="wave-arm">
-							<polyline points="0,0 5,9" />
+							<polyline class="unicycle-pose" points="0,0 5,9" style:--unicycle-pose="matrix(0.9876, 0.1563, -0.1563, 0.9876, -7.694, -3.793)" />
 							<g transform="translate(5 9)">
-								<polyline class="wave-forearm" points="0,0 8,4" />
+								<polyline class="wave-forearm unicycle-pose" points="0,0 8,4" style:--unicycle-pose="matrix(0.9876, 0.1563, -0.1563, 0.9876, -8.429, -2.198)" />
 							</g>
 						</g>
 					</g>
@@ -483,6 +483,16 @@
 
 	:global(.hero[data-playing]:is([data-game-missed='3'], [data-game-missed='4'], [data-game-missed='5'])) .bike-frame {
 		display: none;
+	}
+
+	/*
+	 * Pose sur le monocycle : cycliste redressé, phare remonté. Chaque pièce porte sa matrice,
+	 * exprimée dans le repère de son groupe parent, dans --unicycle-pose.
+	 */
+	:global(.hero[data-playing]:is([data-game-missed='3'], [data-game-missed='4'], [data-game-missed='5'])) .unicycle-pose {
+		transform: var(--unicycle-pose);
+		transform-box: view-box;
+		transform-origin: 0 0;
 	}
 
 	.spokes,
