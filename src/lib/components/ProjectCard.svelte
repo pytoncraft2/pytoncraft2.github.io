@@ -135,18 +135,27 @@
 		view-transition-class: project-text;
 	}
 
+	/* Bouton contouré, identique dans le carrousel et sur la page « Tous les projets ». */
 	.link {
+		align-self: flex-start;
 		min-height: 44px;
 		margin-top: auto;
 		display: inline-flex;
 		align-items: center;
+		padding-inline: var(--spacing-4);
+		border: 1px solid color-mix(in srgb, var(--action-primary) 65%, transparent);
+		border-radius: var(--radius-md);
 		color: var(--action-primary);
 		font: 500 var(--text-label-m-size) / var(--text-label-m-line) var(--font-sans);
 		text-decoration: none;
+		/* Le carrousel affiche une main « saisir » : le lien garde la sienne. */
+		cursor: pointer;
 	}
 
-	.link:hover {
-		text-decoration: underline;
+	.link:hover,
+	.link:focus-visible {
+		border-color: var(--action-primary);
+		background: color-mix(in srgb, var(--action-primary) 10%, transparent);
 	}
 
 	.link:focus-visible {

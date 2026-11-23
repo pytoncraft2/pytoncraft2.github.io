@@ -326,23 +326,6 @@ const projectCount = (await getProjects()).length;
 	}
 
 
-	:global(#projets-carousel .link) {
-		align-self: flex-start;
-		min-height: 44px;
-		padding-inline: var(--spacing-4);
-		border: 1px solid color-mix(in srgb, var(--action-primary) 65%, transparent);
-		border-radius: var(--radius-md);
-		cursor: pointer;
-	}
-
-	:global(#projets-carousel .link:hover),
-	:global(#projets-carousel .link:focus-visible) {
-		border-color: var(--action-primary);
-		background: color-mix(in srgb, var(--action-primary) 10%, transparent);
-		text-decoration: none;
-	}
-
-
 	:global(#projets-carousel:is([data-dragging], [data-settling])) {
 		scroll-snap-type: none;
 	}
