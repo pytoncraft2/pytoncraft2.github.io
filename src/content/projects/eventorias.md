@@ -1,6 +1,6 @@
 ---
 title: "Eventorias"
-order: 4
+order: 7
 category: "design"
 meta: "Formation Product Design · Prototype no-code · Recherche UX"
 tags: ["2026", "Formation", "Product Design", "Tests utilisateurs"]

@@ -1,6 +1,6 @@
 ---
 title: "Convoyeur de tri RFID"
-order: 6
+order: 8
 category: "iot"
 meta: "Projet Epitech MSc · M5Stack, RFID, Dolibarr"
 tags: ["2024", "Projet académique", "IoT", "Systèmes embarqués"]

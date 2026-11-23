@@ -1,6 +1,6 @@
 ---
 title: "SportSee"
-order: 5
+order: 10
 category: "design"
 meta: "Formation Product Design · Figma · Zeroheight"
 tags: ["2026", "Formation", "UI Design", "Design System"]
@@ -11,7 +11,7 @@ summary: >-
 stack: ["Figma", "Zeroheight"]
 role: "Conception UI, responsive et documentation du Design System"
 year: "2026"
-featured: true
+featured: false
 image: "sportsee.png"
 imageAlt: "Projet de conception d’interface SportSee"
 ---

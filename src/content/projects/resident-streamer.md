@@ -1,6 +1,6 @@
 ---
 title: "Resident Streamer"
-order: 7
+order: 3
 category: "web"
 meta: "Web@cadémie · Phaser 3, TypeScript, Colyseus"
 tags: ["2022", "Projet académique", "Développement web", "Temps réel"]

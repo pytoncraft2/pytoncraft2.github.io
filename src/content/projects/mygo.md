@@ -1,6 +1,6 @@
 ---
 title: "MyGo"
-order: 10
+order: 11
 category: "web"
 meta: "Web@cadémie · Go, Gin, WebSocket"
 tags: ["2022", "Projet académique", "Développement web", "Temps réel"]
