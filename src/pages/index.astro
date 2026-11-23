@@ -29,8 +29,8 @@ const cards: CarouselProject[] = (await getFeaturedProjects()).map(({ id, data }
 ---
 
 <BaseLayout
-	title={`${name} • Développeur web & UX/UI Designer`}
-	description={`Portfolio de ${name}, développeur web & UX/UI Designer : développement web, conception d’interfaces, prototypage et accessibilité.`}
+	title={`${name} • Développeur web full-stack, formé à l’UX/UI`}
+	description={`Portfolio de ${name}, développeur web full-stack : applications en production, études de cas en développement et en conception d’interfaces.`}
 >
 	<!-- Le script de retour (BaseLayout) a besoin du carrousel dès le premier rendu. -->
 	<link slot="head" rel="expect" href="#projets-carousel" blocking="render" />
@@ -72,9 +72,9 @@ const cards: CarouselProject[] = (await getFeaturedProjects()).map(({ id, data }
 			<div class="hero-copy">
 				<p class="eyebrow ds-label-m">Portfolio</p>
 				<h1 id="hero-title" class="ds-h1">{name}</h1>
-				<p class="role ds-body-l">Développeur web & UX/UI Designer</p>
+				<p class="role ds-body-l">Développeur web full-stack, formé&nbsp;à&nbsp;l’UX/UI</p>
 				<p class="intro ds-body-m">
-					Je conçois et développe des applications web en intégrant les besoins utilisateurs et les contraintes techniques dès la conception.
+					Je développe des applications web de bout en bout, du besoin à la mise en production.
 				</p>
 				<div class="actions">
 					<Button href="#projets">Voir mes projets</Button>
@@ -87,14 +87,14 @@ const cards: CarouselProject[] = (await getFeaturedProjects()).map(({ id, data }
 				<dl class="proofs-list">
 					<div class="proof-note">
 						<dt>Développement web</dt>
-						<dd>Expérience professionnelle</dd>
+						<dd>Titre niveau 7 Epitech, 4 ans d’alternance</dd>
 					</div>
 					<div class="proof-note">
 						<dt>UX/UI Design</dt>
 						<dd>Certification niveau 6 en cours</dd>
 					</div>
 					<div class="proof-note">
-						<dt>Produit en production</dt>
+						<dt>En production</dt>
 						<dd>Vroum · +90 000 visites en 2025</dd>
 					</div>
 				</dl>
@@ -114,8 +114,9 @@ const cards: CarouselProject[] = (await getFeaturedProjects()).map(({ id, data }
 			<div class="profil-card">
 				<h2 id="profil-title" class="ds-h2">Profil</h2>
 				<p class="ds-body-m">
-					Développeur web, j’interviens aujourd’hui sur la réalisation d’applications et sur la conception UX/UI, de
-					l’analyse des besoins jusqu’à l’interface.
+					Développeur web depuis 2021, j’ai appris le métier sur une application métier en production chez EasySAV, puis
+					sur Vroum, que je développe et maintiens bénévolement. Ma formation en Product Design me donne les méthodes pour
+					partir des utilisateurs : entretiens, prototypes, tests et accessibilité.
 				</p>
 				<h3 id="tech-title" class="subhead">Technologies</h3>
 				<ul class="tech-grid" aria-labelledby="tech-title">
@@ -142,7 +143,7 @@ const cards: CarouselProject[] = (await getFeaturedProjects()).map(({ id, data }
 			<div class="bubble">
 				<h2 id="contact-title" class="ds-h2">Contactez-moi&nbsp;!</h2>
 				<p class="contact-intro ds-body-m">
-					Pour un échange autour d’un poste, d’un projet ou d’une collaboration, vous pouvez me contacter directement.
+					Je recherche un CDI de développeur web full-stack, partout en France. Pour en parler, ou pour un projet, écrivez-moi.
 				</p>
 				<div class="contact-actions">
 					<Button href={`mailto:${email}`}>M’écrire</Button>
