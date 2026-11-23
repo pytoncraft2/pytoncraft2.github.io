@@ -6,7 +6,8 @@ tags: ["2023–Aujourd’hui", "Production", "Produit"]
 description: "Outil de covoiturage en production pour des événements scouts, associatifs ou sportifs, que je développe et maintiens depuis 2023."
 summary: >-
   Vroum aide les organisateurs d’événements scouts, associatifs ou sportifs à répartir les participants et le matériel entre les véhicules.
-  Principal développeur et mainteneur de l’outil, j’ai conçu un mode multi-trajets pour les événements où les véhicules partent de plusieurs villes à des dates différentes.
+  J’en suis le principal développeur et le mainteneur depuis 2023, de l’interface SvelteKit à l’API FastAPI.
+  En 2026, la version 2 a ajouté un mode multi-trajets pour les événements où les véhicules partent de plusieurs villes à des dates différentes.
 stack: ["SvelteKit", "FastAPI", "PostgreSQL", "WebSocket", "Docker", "Playwright"]
 role: "Développement web et participation aux décisions produit"
 year: "2023-present"
