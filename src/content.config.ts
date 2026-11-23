@@ -1,7 +1,6 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
-import { projectCategories } from './lib/data/project-categories.js';
 
 /**
  * Études de cas : une par fichier Markdown dans src/content/projects/.
@@ -13,8 +12,6 @@ const projects = defineCollection({
 		title: z.string(),
 		/** Ordre d’affichage dans le carrousel et pour « Projet suivant ». */
 		order: z.number().int(),
-		/** Famille du projet : regroupement de la page « Tous les projets ». */
-		category: z.enum(projectCategories),
 		meta: z.string(),
 		tags: z.array(z.string()),
 		description: z.string(),
@@ -22,7 +19,7 @@ const projects = defineCollection({
 		stack: z.array(z.string()),
 		role: z.string(),
 		year: z.string(),
-		/** Présent dans le carrousel et « Projet suivant » ; sinon, la page reste publiée. */
+		/** Présent dans le carrousel et « Projet suivant » ; sinon, seule sa page est publiée. */
 		featured: z.boolean().default(true),
 		/** Fichier de public/, sans base (ex. vroum.webp). */
 		image: z.string(),

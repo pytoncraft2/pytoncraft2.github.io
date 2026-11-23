@@ -1,7 +1,6 @@
 ---
 title: "Resident Streamer"
 order: 3
-category: "web"
 meta: "Web@cadémie · Phaser 3, TypeScript, Colyseus"
 tags: ["2022", "Projet académique", "Développement web", "Temps réel"]
 description: "Jeu de plateforme coopératif contre la montre pour 2 à 4 joueurs, développé en binôme, avec une synchronisation multijoueur en temps réel."

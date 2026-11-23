@@ -62,8 +62,7 @@
 	let hash = $state('');
 	let section = $state<string | null>(null);
 	const isHome = $derived(pathname === homeHref || pathname === homeHref.replace(/\/$/, '') || pathname.endsWith('/index.html'));
-	// Une étude de cas (/projets/<slug>) ou la page « Tous les projets » (/projets).
-	const isProject = $derived(pathname.includes('/projets/') || /\/projets(\.html)?$/.test(pathname));
+	const isProject = $derived(pathname.includes('/projets/'));
 
 	/** Sur l'accueil, la section affichée ; sinon (ou sans suivi), l'ancre de l'adresse. */
 	function isActiveSection(id: string, fromHash: boolean) {

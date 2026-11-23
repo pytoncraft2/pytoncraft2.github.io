@@ -19,9 +19,7 @@ const { id: slug, data } = project;
 <BaseLayout title={`${data.title} • Étude de cas`} description={data.description} skipTarget="titre-projet">
 	<WindowFrame
 		title={data.title}
-		parent={data.featured
-			? { href: `${withBase('/')}#projets`, label: 'Projets' }
-			: { href: withBase('/projets'), label: 'Tous les projets' }}
+		parent={{ href: `${withBase('/')}#projets`, label: 'Projets' }}
 		transitionName={`project-${slug}-card`}
 	>
 		<article>
@@ -70,26 +68,6 @@ const { id: slug, data } = project;
 		</article>
 	</WindowFrame>
 </BaseLayout>
-
-<script>
-	import { withBase } from '#lib/paths.js';
-
-	// Étude ouverte depuis « Tous les projets » : le lien de retour y ramène (par défaut, il
-	// mène au carrousel pour une étude mise en avant).
-	const listPath = withBase('/projets');
-	try {
-		const from = document.referrer ? new URL(document.referrer) : null;
-		const back = document.querySelector<HTMLAnchorElement>('.titlebar a');
-		if (from && back && from.origin === location.origin && from.pathname.replace(/\.html$/, '') === listPath) {
-			back.href = listPath;
-			// Libellé : dernier nœud texte du lien, après l’icône.
-			const label = back.lastChild;
-			if (label?.nodeType === Node.TEXT_NODE) label.textContent = ' Tous les projets ';
-		}
-	} catch {
-		// Adresse de provenance illisible : on garde le lien par défaut.
-	}
-</script>
 
 <style>
 	.case-body :global(a) {

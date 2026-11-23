@@ -1,7 +1,6 @@
 ---
 title: "Sensor Sensei"
-order: 15
-category: "iot"
+order: 14
 meta: "Projet Epitech MSc · ESP32-S3, LoRa, C++"
 tags: ["2025", "Projet académique", "IoT", "Systèmes embarqués"]
 description: "Station de mesure environnementale réalisée à quatre : un capteur envoie ses mesures en LoRa à une passerelle qui les affiche sur une page web."
@@ -11,7 +10,7 @@ summary: >-
 stack: ["C++ / Arduino", "ESP32", "LoRa", "BME280"]
 role: "Développement embarqué : capteurs, liaison LoRa, écran et serveur web de la passerelle"
 year: "2025"
-featured: false
+featured: true
 image: "sensor-sensei.webp"
 imageAlt: "Page web de la passerelle Sensor Sensei : état de la liaison LoRa et cartes de température, humidité et pression"
 ---
