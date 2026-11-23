@@ -8,7 +8,7 @@ description: "Client Reddit pour Android développé à trois en React Native, a
 summary: >-
   Redditech permet de retrouver son fil Reddit et de suivre des communautés depuis une application Android.
   Dans une équipe de trois, j’ai intégré la connexion au compte Reddit et développé le fil filtrable à partir des données de l’API.
-stack: ["React Native", "OAuth2", "API Reddit", "Jest"]
+stack: ["React Native", "OAuth2", "Jest"]
 role: "Architecture de l'application, authentification et fil d'actualité, documentation et tests, en équipe de trois"
 year: "2023"
 featured: true

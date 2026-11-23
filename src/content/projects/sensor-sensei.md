@@ -8,7 +8,7 @@ description: "Station de mesure environnementale réalisée à quatre : un capte
 summary: >-
   Sensor Sensei est une station qui mesure notamment la température et l’humidité et les affiche sur une page web locale.
   J’ai programmé la lecture des capteurs, la transmission radio en LoRa et le serveur qui rend les mesures consultables dans un navigateur.
-stack: ["ESP32-S3 (Heltec LoRa 32 V3)", "LoRa", "C++ / Arduino", "BME280", "HTML/CSS"]
+stack: ["C++ / Arduino", "ESP32", "LoRa", "BME280"]
 role: "Développement embarqué : capteurs, liaison LoRa, écran et serveur web de la passerelle"
 year: "2025"
 featured: false

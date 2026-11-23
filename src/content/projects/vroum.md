@@ -8,7 +8,7 @@ description: "Outil de covoiturage en production pour des événements scouts, a
 summary: >-
   Vroum aide les organisateurs d’événements scouts, associatifs ou sportifs à répartir les participants et le matériel entre les véhicules.
   Principal développeur et mainteneur de l’outil, j’ai conçu un mode multi-trajets pour les événements où les véhicules partent de plusieurs villes à des dates différentes.
-stack: ["SvelteKit", "FastAPI", "PostgreSQL"]
+stack: ["SvelteKit", "FastAPI", "PostgreSQL", "Playwright"]
 role: "Développement web et participation aux décisions produit"
 year: "2023-present"
 featured: true

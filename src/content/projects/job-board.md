@@ -8,7 +8,7 @@ description: "Plateforme d’offres d’emploi développée en binôme, avec une
 summary: >-
   Job Board permet aux candidats de postuler à une offre et aux recruteurs de lire les candidatures reçues.
   Dans ce projet en binôme, j’ai conçu l’API et l’authentification, puis développé l’espace où les recruteurs publient leurs offres et consultent les réponses.
-stack: ["React", "Chakra UI", "Symfony", "API Platform", "JWT"]
+stack: ["React", "Symfony", "API Platform", "JWT"]
 role: "Conception de l'API et de l'authentification, développement de l'espace recruteur, en binôme"
 year: "2022"
 featured: true

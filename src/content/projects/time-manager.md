@@ -8,7 +8,7 @@ description: "Application de pointage développée à quatre, avec des vues adap
 summary: >-
   Time Manager permet aux employés de pointer et aux responsables de suivre les heures travaillées par leur équipe.
   J’ai développé les vues de gestion des équipes et les graphiques qui rendent les heures enregistrées lisibles en un coup d’œil.
-stack: ["SvelteKit", "Elixir / Phoenix", "PostgreSQL", "FusionCharts", "Docker"]
+stack: ["SvelteKit", "Elixir / Phoenix", "PostgreSQL", "Docker"]
 role: "Développement du front SvelteKit : connexion, profil, équipes et graphiques des heures travaillées"
 year: "2023"
 featured: false

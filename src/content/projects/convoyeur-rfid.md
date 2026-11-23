@@ -8,7 +8,7 @@ description: "Convoyeur qui lit le badge RFID de chaque colis, interroge l’ERP
 summary: >-
   Ce convoyeur trie des colis : il lit leur badge RFID, demande à l’ERP Dolibarr leur entrepôt de destination et oriente chaque colis avec un servomoteur.
   J’ai programmé, avec l’aide d’un coéquipier, la carte qui pilote l’ensemble, de la lecture RFID aux appels à l’API, en passant par le moteur du tapis et la gestion des erreurs.
-stack: ["M5Stack M5GO (ESP32)", "C++ / Arduino", "FreeRTOS", "RFID MFRC522", "Dolibarr (API REST)"]
+stack: ["C++ / Arduino", "ESP32", "FreeRTOS", "API REST Dolibarr"]
 role: "Développement embarqué : lecture RFID, pilotage des moteurs, appels à l’API Dolibarr et configuration de la carte"
 year: "2024"
 featured: true

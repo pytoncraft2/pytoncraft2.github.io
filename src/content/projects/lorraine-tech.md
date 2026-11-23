@@ -8,7 +8,7 @@ description: "Boutique en ligne React et Symfony réalisée à quatre, que j’a
 summary: >-
   Lorraine Tech est une boutique en ligne développée à quatre.
   J’ai créé le panier et les pages produit, puis repris l’interface pour que chacun puisse ajuster la taille du texte ou inverser les couleurs.
-stack: ["React", "Symfony", "Bootstrap", "PWA"]
+stack: ["React", "Symfony", "PWA"]
 role: "Développement front-end (panier, catalogue, administration), puis options d'accessibilité et PWA"
 year: "2021-2022"
 featured: true

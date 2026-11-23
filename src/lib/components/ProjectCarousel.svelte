@@ -5,6 +5,7 @@
 		href: string;
 		title: string;
 		tags: string[];
+		stack: string[];
 		description: string;
 		imageSrc?: string;
 		imageAlt: string;
@@ -236,6 +237,7 @@
 					href={project.href}
 					title={project.title}
 					tags={project.tags}
+					stack={project.stack}
 					description={project.description}
 					imageSrc={project.imageSrc}
 					imageAlt={project.imageAlt}

@@ -8,7 +8,7 @@ description: "Prototype mobile pour découvrir et publier des événements, ajus
 summary: >-
   Eventorias est un prototype mobile pour découvrir des événements à Paris ou en publier un.
   Lors des tests, une personne a hésité après avoir ajouté un événement à son calendrier. J’ai modifié la fiche pour que la confirmation y reste visible.
-stack: ["Lovable", "Maze", "Notion", "Canva"]
+stack: ["Figma", "Lovable", "Maze", "Notion"]
 role: "Recherche UX, prototypage, tests et passation"
 year: "2026"
 featured: true

@@ -6,6 +6,7 @@
 		href,
 		title,
 		tags,
+		stack = [],
 		description,
 		linkLabel = 'Voir le projet →',
 		imageSrc,
@@ -16,6 +17,8 @@
 		href: string;
 		title: string;
 		tags: string[];
+		/** Technologies principales, affichées sous le titre (champ `stack`). */
+		stack?: string[];
 		description: string;
 		linkLabel?: string;
 		imageSrc?: string;
@@ -59,6 +62,13 @@
 		{/if}
 	</div>
 	<h3 class="title">{title}</h3>
+	{#if stack.length > 0}
+		<ul class="stack" aria-label="Technologies">
+			{#each stack as tech (tech)}
+				<li>{tech}</li>
+			{/each}
+		</ul>
+	{/if}
 	<ProjectTags {tags} />
 	<p class="description">{description}</p>
 	<a class="link" {href} onclick={arm}>{linkLabel}</a>
@@ -102,6 +112,25 @@
 	.title,
 	.card :global(.tags) {
 		width: fit-content;
+	}
+
+	/* Technologies séparées par un point médian, sans texte de remplacement pour les lecteurs d’écran. */
+	.stack {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0 var(--spacing-2);
+		margin: calc(-1 * var(--spacing-1)) 0 0;
+		padding: 0;
+		list-style: none;
+		color: var(--text-primary);
+		font: 500 var(--text-body-s-size) / var(--text-body-s-line) var(--font-sans);
+	}
+
+	/* Point après l’élément : un retour à la ligne ne commence jamais par un point. */
+	.stack li:not(:last-child)::after {
+		content: '·' / '';
+		margin-left: var(--spacing-2);
+		color: var(--text-secondary);
 	}
 
 	.description {

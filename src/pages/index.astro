@@ -20,6 +20,7 @@ const cards: CarouselProject[] = (await getFeaturedProjects()).map(({ id, data }
 	href: projectPath(id),
 	title: data.title,
 	tags: data.tags,
+	stack: data.stack,
 	description: data.description,
 	imageSrc: withBase(data.image),
 	imageAlt: data.imageAlt

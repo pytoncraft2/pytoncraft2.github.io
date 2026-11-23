@@ -8,7 +8,7 @@ description: "Jeu de plateforme coopératif contre la montre pour 2 à 4 joueurs
 summary: >-
   Dans ce prototype de jeu coopératif, deux à quatre joueurs combinent les capacités de leurs personnages pour terminer un parcours contre la montre.
   En binôme avec un designer de personnages, j’ai piloté le projet et développé la synchronisation des actions entre joueurs.
-stack: ["Phaser 3", "TypeScript", "Colyseus", "Node.js"]
+stack: ["TypeScript", "Phaser 3", "Colyseus", "Node.js"]
 role: "Chef de projet et développeur, en binôme avec un designer de personnages"
 year: "2022"
 featured: true
