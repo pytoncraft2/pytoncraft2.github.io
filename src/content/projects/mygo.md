@@ -1,6 +1,7 @@
 ---
 title: "MyGo"
 order: 10
+category: "web"
 meta: "Web@cadémie · Go, Gin, WebSocket"
 tags: ["2022", "Projet académique", "Développement web", "Temps réel"]
 description: "Jeu de dessin multijoueur dans le navigateur : un joueur dessine, les autres devinent, et le dessin est partagé en temps réel."

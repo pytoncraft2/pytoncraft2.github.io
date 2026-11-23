@@ -46,11 +46,13 @@ Astro (site statique multipage), îles Svelte 5 (runes), TypeScript, CSS avec pr
 | --- | --- |
 | `src/content/projects/<slug>.md` | Une étude de cas : métadonnées en en-tête (titre, tags, ordre, image…) et texte en Markdown ; ses captures dans `src/content/projects/<slug>/` |
 | `src/content.config.ts` | Schéma de la collection `projects` (validé au build) |
+| `src/lib/data/project-categories.ts` | Familles de projets (`category` : web, design, iot) et leurs titres sur la page « Tous les projets » |
 | `src/lib/projects.ts` | Lecture de la collection, triée par `order` : `getProjects` (toutes les études, chacune a sa page), `getFeaturedProjects` (`featured: true` : carrousel et « Projet suivant »), `getNextProject` |
 | `src/layouts/BaseLayout.astro` | Document HTML commun : script du thème avant rendu, script de transition de retour, en-tête, dock, pied de page |
 | `src/layouts/CaseStudyLayout.astro` | Mise en page d’une étude de cas et styles du contenu Markdown |
 | `src/pages/index.astro` | Accueil statique : hero, profil (`#profil`), contact (`#contact`) |
 | `src/pages/projets/[slug].astro` | Génère une page par fichier de la collection |
+| `src/pages/projets/index.astro` | Page « Tous les projets » (`/projets`) : toutes les études, regroupées par `category`, liée depuis le carrousel |
 | `src/lib/components/` | Composants Svelte : rendus en HTML statique, ou îles hydratées avec `client:*` |
 | `src/lib/components/ProjectCarousel.svelte` | Île du carrousel des projets |
 | `src/lib/components/HeroScene.svelte` | Île du paysage jour/nuit derrière le hero (règles dans `DESIGN.md`, « Scène d’accueil ») ; couleurs `--scene-*` dans `tokens.css` |
@@ -116,7 +118,7 @@ Contenu public en français, à la première personne pour les études de cas, t
 ## Ajouter ou modifier un projet
 
 1. Examiner un projet comparable et vérifier les informations disponibles.
-2. Créer `src/content/projects/<slug>.md` en copiant l’en-tête d’un projet existant : le nom du fichier donne l’URL, `order` la place dans le carrousel, `image` (couverture) un fichier de `public/` (sans `/`). Le schéma de `src/content.config.ts` refuse un en-tête incomplet au build.
+2. Créer `src/content/projects/<slug>.md` en copiant l’en-tête d’un projet existant : le nom du fichier donne l’URL, `order` la place dans le carrousel, `featured` sa présence dans le carrousel (sinon, seulement sur la page « Tous les projets »), `category` sa famille, `image` (couverture) un fichier de `public/` (sans `/`). Le schéma de `src/content.config.ts` refuse un en-tête incomplet au build.
 3. Placer la couverture dans `public/` et les captures de l’étude dans `src/content/projects/<slug>/` (Astro les optimise au build).
 4. Écrire le contenu en Markdown : `##` pour chaque section, `###` pour un intertitre, `![Texte alternatif](./<slug>/image.webp)` suivi de `*Légende*` à la ligne pour une image légendée. Pas de HTML dans le contenu.
 5. Sélectionner les sections utiles : contexte, problème, rôle, démarche, décisions, solution, résultats, limites, apprentissages. Adapter leur longueur au projet.
