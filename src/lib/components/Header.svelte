@@ -51,7 +51,14 @@
 
 	function toggleMotion() {
 		reducedMotion = !reducedMotion;
-		document.documentElement.toggleAttribute('data-reduced-motion', reducedMotion);
+		const root = document.documentElement;
+		// Le changement de mode s'applique sans transition (`data-motion-switching`, voir
+		// index.astro) : sinon la bulle Contact, remise en place au-dessus du paysage, s'efface
+		// à l'écran. La lecture de `offsetWidth` applique le nouveau style avant le retrait.
+		root.setAttribute('data-motion-switching', '');
+		root.toggleAttribute('data-reduced-motion', reducedMotion);
+		void root.offsetWidth;
+		root.removeAttribute('data-motion-switching');
 		try {
 			localStorage.setItem('reduce-motion', String(reducedMotion));
 		} catch {
