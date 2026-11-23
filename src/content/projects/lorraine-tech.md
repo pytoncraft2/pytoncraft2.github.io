@@ -1,6 +1,6 @@
 ---
 title: "Lorraine Tech"
-order: 5
+order: 4
 meta: "Web@cadémie · React, Symfony, accessibilité"
 tags: ["2021–2022", "Projet académique", "Développement web", "Accessibilité"]
 description: "Boutique en ligne React et Symfony réalisée à quatre, que j’ai ensuite reprise pour la rendre plus accessible."

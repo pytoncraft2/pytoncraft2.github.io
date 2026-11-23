@@ -1,6 +1,6 @@
 ---
 title: "Eventorias"
-order: 11
+order: 10
 meta: "Formation Product Design · Prototype no-code · Recherche UX"
 tags: ["2026", "Formation", "Product Design", "Tests utilisateurs"]
 description: "Prototype mobile pour découvrir et publier des événements, ajusté après des micro-tests puis documenté pour les développeurs."

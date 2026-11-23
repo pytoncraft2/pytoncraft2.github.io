@@ -1,6 +1,6 @@
 ---
 title: "SportSee"
-order: 12
+order: 11
 meta: "Formation Product Design · Figma · Zeroheight"
 tags: ["2026", "Formation", "UI Design", "Design System"]
 description: "Tableau de bord sportif conçu pour ordinateur, tablette et mobile, avec un design system documenté pour être réutilisé."
