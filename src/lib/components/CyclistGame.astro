@@ -4,7 +4,7 @@
 		<button type="button" class="close" data-close aria-label="Fermer le jeu"><span aria-hidden="true">×</span></button>
 	</header>
 
-	<p id="cyclist-game-intro">Tape les lettres du mot posé sur la route pour le franchir. Échap permet de quitter la partie. Deux mots réussis d’affilée font passer du vélo au longboard, puis au hoverboard ; chaque obstacle manqué fait redescendre d’un cran. À vélo, il coûte une sacoche, puis le vélo devient un monocycle.</p>
+	<p id="cyclist-game-intro">Tape les lettres du mot posé sur la route pour le franchir. Échap permet de quitter la partie. Deux mots réussis d’affilée font passer du vélo au longboard, puis au hoverboard ; chaque obstacle manqué fait redescendre d’un cran. À vélo, il coûte une sacoche, puis le vélo devient un monocycle. Une fois par partie, un train propose le mot : flèche droite pour l’accepter, mais relis-le, il peut se tromper.</p>
 
 	<div class="start" data-game-start>
 		<button type="button" data-start="timed">Jouer · 5 s par mot</button>
@@ -16,6 +16,7 @@
 		<label class="visually-hidden" for="cyclist-game-input">Tape le mot sur la route</label>
 		<input class="visually-hidden" id="cyclist-game-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="cyclist-game-word" />
 		<button type="button" data-skip>Passer le mot</button>
+		<button type="button" data-accept hidden>Accepter la suggestion (→)</button>
 	</div>
 
 	<p class="announcement" role="status"></p>
@@ -41,6 +42,23 @@
 	} as const;
 	const climbStreak = 2; // Mots réussis d’affilée pour monter d’un niveau.
 	const mountOf = (level: number) => level === levels.longboard ? 'longboard' : level === levels.hoverboard ? 'hoverboard' : undefined;
+
+	/*
+	 * Train-suggestion : une fois par partie, un train passe sur le plan du milieu et propose le mot
+	 * en cours. Une fois sur deux, la proposition contient une faute de frappe : l’accepter sans
+	 * relire compte comme un obstacle manqué.
+	 */
+	const suggestionErrorRate = 0.5;
+	const suggestionDelay = 0.12; // Part du mot écoulée avant que le train n’affiche sa suggestion.
+	// Un mot du milieu de partie : ni le premier (le joueur découvre le jeu), ni le dernier.
+	const pickSuggestionRound = (count: number) => 1 + Math.floor(Math.random() * Math.max(1, count - 2));
+	// Inverse deux lettres voisines différentes, hors première lettre : « prototype » → « prototpye ».
+	const misspell = (word: string) => {
+		const positions = Array.from({ length: word.length - 2 }, (_, i) => i + 1).filter(i => word[i] !== word[i + 1]);
+		if (!positions.length) return word;
+		const i = positions[Math.floor(Math.random() * positions.length)];
+		return word.slice(0, i) + word[i + 1] + word[i] + word.slice(i + 2);
+	};
 	const roundDuration = 5000;
 	const wheelRadius = 11; // Rayon des roues dans le repère du SVG.
 	const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
@@ -59,8 +77,14 @@
 	const input = game?.querySelector('input');
 	const prompt = game?.querySelector<HTMLElement>('[data-prompt]');
 	const announcement = game?.querySelector<HTMLElement>('.announcement');
-	if (launch && game && hero && land && hazard && start && round && result && resultTitle && input && prompt && announcement) {
+	const acceptButton = game?.querySelector<HTMLButtonElement>('[data-accept]');
+	const train = land?.querySelector<SVGGElement>('[data-game-train]');
+	const trainLabel = train?.querySelector<SVGTextElement>('.train-suggestion');
+	if (launch && game && hero && land && hazard && start && round && result && resultTitle && input && prompt && announcement && acceptButton && train && trainLabel) {
 		let index = 0;
+		let suggestionRound = -1;
+		// Suggestion du mot en cours : texte proposé, et s’il est déjà affiché.
+		let suggestion: { text: string; correct: boolean; shown: boolean } | undefined;
 		let missed = 0;
 		let level: number = levels.bike;
 		let streak = 0;
@@ -113,6 +137,23 @@
 			droppedBags.push({ element, startDistance: distance });
 		};
 
+		// Affiche la suggestion au-dessus du train. Dès l’apparition du mot, elle complète son annonce.
+		const revealSuggestion = (withWord: boolean) => {
+			if (!suggestion) return;
+			suggestion.shown = true;
+			trainLabel.textContent = `${suggestion.text} ?`;
+			acceptButton.hidden = false;
+			const message = `Le train propose : ${suggestion.text}. Flèche droite pour accepter.`;
+			announcement.textContent = withWord && announcement.textContent ? `${announcement.textContent} ${message}` : message;
+		};
+
+		const clearSuggestion = () => {
+			suggestion = undefined;
+			hero.removeAttribute('data-game-train');
+			trainLabel.textContent = '';
+			acceptButton.hidden = true;
+		};
+
 		const draw = (progress: number) => {
 			renderedProgress = progress;
 			const reduced = document.documentElement.hasAttribute('data-reduced-motion') || motionPreference.matches;
@@ -126,6 +167,12 @@
 			if (!reduced && distance > 0) landscape.draw(distance);
 			hero.style.setProperty('--game-wheel-angle', `${distance / wheelRadius}rad`);
 			hazard.setAttribute('transform', `translate(${obstacleX} ${land.dataset.horizonY})`);
+			if (suggestion) {
+				// Le train entre par la droite et traverse le plan du milieu pendant le mot ; immobile en mouvement réduit.
+				const share = reduced ? 0.55 : 1 - 0.75 * progress;
+				train.setAttribute('transform', `translate(${(bounds.left + bounds.width * share - matrix.e) / matrix.a} 228)`);
+				if (!suggestion.shown && (reduced || progress >= suggestionDelay)) revealSuggestion(progress === 0);
+			}
 			const groundY = Number(land.dataset.horizonY);
 			if (looseWheel) {
 				const { element, releasedAt, initialAngle } = looseWheel;
@@ -160,6 +207,8 @@
 			level = levels.bike;
 			streak = 0;
 			showLevel();
+			suggestionRound = pickSuggestionRound(obstacles.length);
+			clearSuggestion();
 			lettering.replaceChildren();
 			start.hidden = false;
 			round.hidden = true;
@@ -188,8 +237,9 @@
 			return 'Obstacle manqué.';
 		};
 
-		const finishObstacle = (success: boolean) => {
+		const finishObstacle = (success: boolean, note = '') => {
 			cancelAnimationFrame(frame);
+			clearSuggestion();
 			const previous = level;
 			if (success) {
 				streak += 1;
@@ -225,7 +275,7 @@
 				return;
 			}
 
-			showObstacle(describeChange(success, previous));
+			showObstacle(note ? `${note} ${describeChange(success, previous)}` : describeChange(success, previous));
 		};
 
 		const tick = (now: number) => {
@@ -261,6 +311,12 @@
 				announcement.textContent = feedback;
 				input.focus({ preventScroll: true });
 			}
+			if (index === suggestionRound) {
+				const text = Math.random() < suggestionErrorRate ? misspell(obstacle) : obstacle;
+				suggestion = { text, correct: text === obstacle, shown: false };
+				hero.dataset.gameTrain = '';
+				draw(0);
+			}
 			previousTime = performance.now();
 			deadline = previousTime + roundDuration;
 			frame = requestAnimationFrame(tick);
@@ -272,6 +328,7 @@
 			hero.removeAttribute('data-playing');
 			hero.removeAttribute('data-game-missed');
 			hero.removeAttribute('data-game-mount');
+			clearSuggestion();
 			lettering.replaceChildren();
 			clearDroppedParts();
 			hero.style.removeProperty('--game-rider-x');
@@ -325,6 +382,19 @@
 			start.querySelector('button')?.focus({ preventScroll: true });
 		});
 		game.querySelector('[data-skip]')?.addEventListener('click', () => finishObstacle(false));
+		// Accepter la suggestion du train : juste, le mot est franchi ; fautive, c’est un obstacle manqué.
+		const acceptSuggestion = () => {
+			if (!suggestion?.shown) return;
+			const { text, correct } = suggestion;
+			finishObstacle(correct, correct ? 'Suggestion du train acceptée.' : `Suggestion fautive acceptée : ${text}.`);
+		};
+		acceptButton.addEventListener('click', acceptSuggestion);
+		input.addEventListener('keydown', event => {
+			if (event.key === 'ArrowRight' && suggestion?.shown) {
+				event.preventDefault();
+				acceptSuggestion();
+			}
+		});
 		const updateLetters = () => {
 			const word = obstacles[index];
 			if (!word || round.hidden) return;
@@ -410,6 +480,13 @@
 	:global(.road-word) {
 		font: 800 25px var(--font-sans);
 		letter-spacing: 1px;
+		fill: var(--text-primary);
+		stroke: var(--surface-elevated);
+		stroke-width: 3px;
+		paint-order: stroke fill;
+	}
+	:global(.train-suggestion) {
+		font: 700 17px var(--font-sans);
 		fill: var(--text-primary);
 		stroke: var(--surface-elevated);
 		stroke-width: 3px;

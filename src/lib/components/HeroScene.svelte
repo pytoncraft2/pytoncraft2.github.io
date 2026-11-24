@@ -177,6 +177,22 @@
 				/>
 			</g>
 
+			<!--
+				Train du jeu, sur le plan du milieu : rails pendant la partie, train pendant le mot où il
+				propose une suggestion (position et texte posés par CyclistGame.astro). Générique, sans nom.
+			-->
+			<line class="game-rails" x1="0" y1="229" x2="1440" y2="229" stroke="var(--scene-bike)" stroke-width="1.5" opacity="0.35" />
+			<g class="game-train" data-game-train transform="translate(1440 228)">
+				<g fill="var(--scene-snow)" stroke="var(--scene-bike)" stroke-width="1" stroke-linejoin="round">
+					<path d="M0 0 L5 -6 Q9 -10 18 -10 H40 V0 Z" />
+					<rect x="42" y="-10" width="36" height="10" rx="2" />
+					<rect x="80" y="-10" width="36" height="10" rx="2" />
+				</g>
+				<path d="M10 -6.5 H38 M45 -6.5 H75 M83 -6.5 H113" stroke="var(--scene-bike)" stroke-width="2" stroke-dasharray="4 2" opacity="0.6" />
+				<path class="night" d="M10 -6.5 H38 M45 -6.5 H75 M83 -6.5 H113" stroke="var(--scene-lamp)" stroke-width="2" stroke-dasharray="4 2" />
+				<text class="train-suggestion" x="58" y="-16" text-anchor="middle"></text>
+			</g>
+
 			<g class="layer" style:--i="3" style:--depth-offset="3px" style:--game-pan="54px" style:--game-overscan=".12">
 				<path
 					fill="var(--scene-near)"
@@ -464,7 +480,7 @@
 		transform: translateX(360px);
 	}
 
-	.game-obstacle, .game-obstacle path, .game-bag, .game-unicycle, .rack, .game-longboard, .game-hoverboard, .board-legs {
+	.game-obstacle, .game-obstacle path, .game-bag, .game-unicycle, .rack, .game-longboard, .game-hoverboard, .board-legs, .game-rails, .game-train {
 		display: none;
 	}
 
@@ -491,6 +507,8 @@
 	}
 
 	:global(.hero[data-playing]) .game-obstacle,
+	:global(.hero[data-playing]) .game-rails,
+	:global(.hero[data-playing][data-game-train]) .game-train,
 	:global(.hero[data-playing]) .rack,
 	:global(.hero[data-playing][data-game-missed='0']) .game-bag-one,
 	:global(.hero[data-playing]:is([data-game-missed='0'], [data-game-missed='1'])) .game-bag-two,
