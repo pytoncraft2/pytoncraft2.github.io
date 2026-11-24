@@ -258,6 +258,29 @@
 					<!-- Reflets fixes, sans scintillement. -->
 					<path d="M-44-3l1-1M-35-5l1-2M-16-4l1-1.5" fill="none" stroke="var(--scene-lamp)" stroke-width="1" />
 				</g>
+				<g class="game-bear" fill="var(--scene-trunk)" stroke="var(--scene-bike)" stroke-width="0.8">
+					<ellipse cx="-34" cy="-8" rx="18" ry="8" />
+					<circle cx="-17" cy="-15" r="2.6" />
+					<circle class="bear-ear-front" cx="-10" cy="-16" r="2.6" />
+					<circle cx="-12" cy="-9" r="7" />
+					<ellipse cx="-6" cy="-7.5" rx="3" ry="2" fill="var(--scene-snow)" />
+					<line class="bear-eye-closed" x1="-12" y1="-10.5" x2="-9" y2="-10.5" stroke-linecap="round" />
+					<circle class="bear-eye-open" cx="-10.5" cy="-10.5" r="1" fill="var(--scene-bike)" stroke="none" />
+					<text class="bear-zzz" x="-6" y="-21">z Z</text>
+				</g>
+			</g>
+
+			<!-- Ours réveillé qui court derrière le cycliste quelques secondes (position : CyclistGame.astro). -->
+			<g class="game-bear-chase" data-game-bear-chase transform="translate(0 289)">
+				<g class="bear-run" fill="var(--scene-trunk)" stroke="var(--scene-bike)" stroke-width="0.8">
+					<rect x="-24" y="-9" width="5" height="9" rx="2" />
+					<rect x="-7" y="-9" width="5" height="9" rx="2" />
+					<ellipse cx="-14" cy="-14" rx="16" ry="8" />
+					<circle cx="0" cy="-25" r="2.6" />
+					<circle cx="3" cy="-18" r="7" />
+					<ellipse cx="9" cy="-17" rx="3" ry="2" fill="var(--scene-snow)" />
+					<circle cx="4.5" cy="-19.5" r="1" fill="var(--scene-bike)" stroke="none" />
+				</g>
 			</g>
 
 			<g transform="translate(0 289)">
@@ -559,7 +582,7 @@
 	}
 
 	.game-obstacle, .game-obstacle path, .game-bag, .game-unicycle, .rack, .game-longboard, .game-hoverboard, .board-legs, .game-rails, .game-station, .game-train, .game-bonus, .game-ice, .game-bolt,
-	.game-glass, .game-repair {
+	.game-glass, .game-bear, .game-bear-chase, .game-repair {
 		display: none;
 	}
 
@@ -591,6 +614,8 @@
 	:global(.hero[data-playing][data-game-bonus]) .game-bonus,
 	:global(.hero[data-playing][data-game-weather='ice']) .game-ice,
 	:global(.hero[data-playing][data-game-obstacle='glass']) :is(.game-glass, .game-glass path),
+	:global(.hero[data-playing][data-game-obstacle='bear']) .game-bear,
+	:global(.hero[data-playing][data-game-chase]) .game-bear-chase,
 	:global(.hero[data-playing][data-game-flat]) .game-repair,
 	:global(.hero[data-playing][data-game-weather='storm'][data-game-flash]) .game-bolt,
 	:global(.hero[data-playing]) .rack,
@@ -673,11 +698,46 @@
 		}
 	}
 
+	/* Ours endormi : yeux fermés et « z Z » ; une frappe trop rapide le fait remuer (data-game-bear). */
+	.bear-zzz {
+		font: 700 8px var(--font-sans);
+		fill: var(--scene-bike);
+		stroke: none;
+	}
+
+	.bear-eye-open {
+		display: none;
+	}
+
+	:global(.hero[data-game-bear='stirring']) .bear-eye-open {
+		display: inline;
+	}
+
+	:global(.hero[data-game-bear='stirring']) :is(.bear-eye-closed, .bear-zzz) {
+		display: none;
+	}
+
+	:global(.hero[data-game-bear='stirring']) .bear-ear-front {
+		translate: 0 -1.5px;
+	}
+
 	/* Crevaison : la roue arrière (ou celle du monocycle) s’écrase sur le sol. */
 	:global(.hero[data-playing][data-game-flat]) :is(.bike-frame > circle:first-child, .game-unicycle > circle:first-child) {
 		scale: 1 0.8;
 		transform-box: fill-box;
 		transform-origin: 50% 100%;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		:global(html:not([data-reduced-motion]) .hero[data-playing][data-game-chase]) .bear-run {
+			animation: bear-run 280ms ease-in-out infinite alternate;
+		}
+	}
+
+	@keyframes bear-run {
+		to {
+			translate: 0 -2px;
+		}
 	}
 
 	/* Compense la montée du groupe pour rester au sol, et rétrécit un peu. */
