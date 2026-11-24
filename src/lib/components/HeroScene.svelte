@@ -68,8 +68,6 @@
 	<!-- Tout le décor, agrandi vers le vélo en bas de l'accueil (voir contact-bubble.ts). -->
 	<div class="zoom">
 		<div class="sky"></div>
-		<!-- Ciel d’orage du jeu (data-game-weather='storm'), par-dessus le dégradé du ciel. -->
-		<div class="weather-storm"></div>
 
 		<svg class="sky-layer" viewBox="0 0 1440 640" preserveAspectRatio="xMidYMin slice" focusable="false">
 			<defs>
@@ -139,7 +137,7 @@
 			</defs>
 
 			<!-- Astre : le soleil se couche et la lune se lève quand le thème passe en sombre. -->
-			<g class="layer astre-rise" style:--depth-offset="16px" style:--game-pan="22px" style:--game-overscan=".08">
+			<g class="layer astre-rise" style:--depth-offset="16px">
 				<g class="astre sun">
 					<circle cx="1010" cy="92" r="62" fill="var(--scene-sun-glow)" />
 					<circle cx="1010" cy="92" r="38" fill="var(--scene-sun)" />
@@ -150,10 +148,7 @@
 				</g>
 			</g>
 
-			<!-- Éclair lointain de l’orage, derrière les montagnes : position et affichage posés par CyclistGame.astro. -->
-			<path class="game-bolt" data-game-bolt d="M0 20 L-9 62 L-1 62 L-12 112 L10 54 L2 54 L9 20 Z" fill="var(--scene-lamp)" transform="translate(400 0)" />
-
-			<g class="layer" style:--i="1" style:--depth-offset="12px" style:--game-pan="30px" style:--game-overscan=".09">
+			<g class="layer" style:--i="1" style:--depth-offset="12px">
 				<path
 					fill="var(--scene-far)"
 					d="M0 210 L120 150 L210 185 L330 110 L440 170 L560 122 L690 180 L800 136 L930 175 L1050 105 L1180 165 L1300 130 L1440 172 L1440 320 L0 320 Z"
@@ -175,46 +170,14 @@
 				</g>
 			</g>
 
-			<g class="layer" style:--i="2" style:--depth-offset="7px" style:--game-pan="42px" style:--game-overscan=".1">
+			<g class="layer" style:--i="2" style:--depth-offset="7px">
 				<path
 					fill="var(--scene-mid)"
 					d="M0 230 C160 190 300 200 420 220 C560 245 700 195 860 200 C1010 205 1120 240 1260 225 C1350 215 1400 205 1440 210 L1440 320 L0 320 Z"
 				/>
 			</g>
 
-			<!-- Mot bonus du jeu, posé sur les collines du plan du milieu (texte et position : CyclistGame.astro). -->
-			<text class="game-bonus" data-game-bonus x="1440" y="206"></text>
-
-			<!--
-				Train du jeu, sur le plan du milieu : les rails et leur gare entrent par la droite vers la fin du parcours,
-				le train arrive pendant le mot où il propose une suggestion (début des rails, position et texte
-				posés par CyclistGame.astro). Générique, sans nom.
-			-->
-			<line class="game-rails" x1="1440" y1="229" x2="4440" y2="229" stroke="var(--scene-bike)" stroke-width="1.5" opacity="0.35" />
-			<!-- Petite gare au début des rails (origine : début des rails), derrière le train qui s’y arrête. -->
-			<g class="game-station" data-game-station transform="translate(1440 229)">
-				<path d="M-4 0 V-6 H0" fill="none" stroke="var(--scene-bike)" stroke-width="1.5" stroke-linejoin="round" />
-				<rect x="10" y="-29" width="60" height="29" fill="var(--scene-snow)" stroke="var(--scene-bike)" stroke-width="1" />
-				<path d="M5 -28 L40 -41 L75 -28 Z" fill="var(--scene-trunk)" stroke="var(--scene-bike)" stroke-width="1" stroke-linejoin="round" />
-				<circle cx="40" cy="-32.5" r="2.6" fill="var(--scene-snow)" stroke="var(--scene-bike)" stroke-width="0.8" />
-				<path d="M18 -24 h8 v6 h-8 Z M36 -24 h8 v6 h-8 Z M54 -24 h8 v6 h-8 Z" fill="var(--scene-bike)" opacity="0.6" />
-				<path class="night" d="M18 -24 h8 v6 h-8 Z M36 -24 h8 v6 h-8 Z M54 -24 h8 v6 h-8 Z" fill="var(--scene-lamp)" />
-				<line x1="82" y1="0" x2="82" y2="-20" stroke="var(--scene-bike)" stroke-width="1.2" />
-				<circle cx="82" cy="-21" r="1.8" fill="var(--scene-bike)" />
-				<circle class="night" cx="82" cy="-21" r="1.8" fill="var(--scene-lamp)" />
-			</g>
-			<g class="game-train" data-game-train transform="translate(1440 228)">
-				<g fill="var(--scene-snow)" stroke="var(--scene-bike)" stroke-width="1" stroke-linejoin="round">
-					<path d="M0 0 L5 -6 Q9 -10 18 -10 H40 V0 Z" />
-					<rect x="42" y="-10" width="36" height="10" rx="2" />
-					<rect x="80" y="-10" width="36" height="10" rx="2" />
-				</g>
-				<path d="M10 -6.5 H38 M45 -6.5 H75 M83 -6.5 H113" stroke="var(--scene-bike)" stroke-width="2" stroke-dasharray="4 2" opacity="0.6" />
-				<path class="night" d="M10 -6.5 H38 M45 -6.5 H75 M83 -6.5 H113" stroke="var(--scene-lamp)" stroke-width="2" stroke-dasharray="4 2" />
-				<text class="train-suggestion" x="58" y="-47" text-anchor="middle"></text>
-			</g>
-
-			<g class="layer" style:--i="3" style:--depth-offset="3px" style:--game-pan="54px" style:--game-overscan=".12">
+			<g class="layer" style:--i="3" style:--depth-offset="3px">
 				<path
 					fill="var(--scene-near)"
 					d="M0 250 C120 222 250 214 370 236 C450 251 520 266 620 270 C760 274 840 262 960 248 C1080 234 1200 230 1300 242 C1370 250 1410 256 1440 258 L1440 320 L0 320 Z"
@@ -233,76 +196,15 @@
 				</g>
 			</g>
 
-			<!-- Éclair qui frappe un arbre avant l’arbre tombé (orage), devant les collines ; position posée par CyclistGame.astro. -->
-			<path class="game-strike" data-game-strike d="M0 120 L-10 170 L-2 170 L-14 245 L12 160 L3 160 L10 120 Z" fill="var(--scene-lamp)" />
-
 			<g class="layer" style:--i="4">
 				<path fill="var(--scene-ground)" d="M0 292 C300 286 600 288 720 288 C900 288 1200 286 1440 290 L1440 320 L0 320 Z" />
-			</g>
-			<!-- Verglas du jeu : voile glacé sur la route, avec quelques reflets. -->
-			<g class="game-ice">
-				<path fill="var(--scene-ice)" d="M0 292 C300 286 600 288 720 288 C900 288 1200 286 1440 290 L1440 320 L0 320 Z" />
-				<path d="M80 300h46M330 306h30M560 298h52M820 304h36M1060 299h48M1290 305h34" stroke="var(--scene-snow)" stroke-width="1.5" stroke-linecap="round" />
-			</g>
-
-			<g class="game-obstacle" data-game-obstacle transform="translate(1240 289)" fill="none"
-				stroke="var(--scene-bike)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-				<!-- Obstacles ordinaires, un par mot (data-game-obstacle = rang du mot), devant le mot côté cycliste. -->
-				<g transform="translate(-24 0)">
-					<path class="game-rock" d="M-13 0-5-16l8 1L13 0Z" />
-					<path class="game-fence" d="M-12 0v-10h24V0m-18-10v10m12-10v10" />
-					<path class="game-puddle" d="M-16-2q6-6 12 0t12 0t12 0m-31-6q6-5 12 0t12 0" />
-					<path class="game-cones" d="M-15 0-7-18 1 0m-12-5H9m-5 5 6-14 6 14" />
-					<path class="game-gate" d="M-15 0v-22h30V0m-30-15h30" />
-				</g>
-				<!--
-					Obstacles spéciaux (un par partie, data-game-obstacle posé par CyclistGame.astro), dessinés
-					devant le mot, côté cycliste. Contour --scene-bike pour rester visibles de nuit.
-				-->
-				<g class="game-glass" fill="var(--scene-snow)" stroke="var(--scene-bike)" stroke-width="0.8" stroke-linejoin="round">
-					<path d="M-48 0l4-6 3 6ZM-38 0l2-9 4 9ZM-27 0l5-5 1 5ZM-17 0l2-7 3 7Z" />
-					<!-- Reflets fixes, sans scintillement. -->
-					<path d="M-44-3l1-1M-35-5l1-2M-16-4l1-1.5" fill="none" stroke="var(--scene-lamp)" stroke-width="1" />
-				</g>
-				<g class="game-bear" fill="var(--scene-trunk)" stroke="var(--scene-bike)" stroke-width="0.8">
-					<ellipse cx="-34" cy="-8" rx="18" ry="8" />
-					<circle cx="-17" cy="-15" r="2.6" />
-					<circle class="bear-ear-front" cx="-10" cy="-16" r="2.6" />
-					<circle cx="-12" cy="-9" r="7" />
-					<ellipse cx="-6" cy="-7.5" rx="3" ry="2" fill="var(--scene-snow)" />
-					<line class="bear-eye-closed" x1="-12" y1="-10.5" x2="-9" y2="-10.5" stroke-linecap="round" />
-					<circle class="bear-eye-open" cx="-10.5" cy="-10.5" r="1" fill="var(--scene-bike)" stroke="none" />
-					<text class="bear-zzz" x="-6" y="-21">z Z</text>
-				</g>
-				<g class="game-tree" stroke="var(--scene-bike)" stroke-width="0.8">
-					<line x1="-30" y1="-6" x2="-34" y2="-13" stroke="var(--scene-trunk)" stroke-width="2" stroke-linecap="round" />
-					<rect x="-46" y="-7" width="40" height="7" rx="3.5" fill="var(--scene-trunk)" />
-					<circle cx="-58" cy="-5" r="6" fill="var(--scene-tree-shade)" />
-					<circle cx="-51" cy="-9" r="8" fill="var(--scene-tree)" />
-					<circle cx="-46" cy="-16" r="6" fill="var(--scene-tree)" />
-					<!-- Bout cassé du tronc. -->
-					<circle cx="-6" cy="-3.5" r="3" fill="var(--scene-snow)" />
-				</g>
-			</g>
-
-			<!-- Ours réveillé qui court derrière le cycliste quelques secondes (position : CyclistGame.astro). -->
-			<g class="game-bear-chase" data-game-bear-chase transform="translate(0 289)">
-				<g class="bear-run" fill="var(--scene-trunk)" stroke="var(--scene-bike)" stroke-width="0.8">
-					<rect x="-24" y="-9" width="5" height="9" rx="2" />
-					<rect x="-7" y="-9" width="5" height="9" rx="2" />
-					<ellipse cx="-14" cy="-14" rx="16" ry="8" />
-					<circle cx="0" cy="-25" r="2.6" />
-					<circle cx="3" cy="-18" r="7" />
-					<ellipse cx="9" cy="-17" rx="3" ry="2" fill="var(--scene-snow)" />
-					<circle cx="4.5" cy="-19.5" r="1" fill="var(--scene-bike)" stroke="none" />
-				</g>
 			</g>
 
 			<g transform="translate(0 289)">
 				<g class="rider">
 					<!-- Faisceau du phare avant, dont la pointe part de la lampe. -->
-					<polygon class="night beam unicycle-pose longboard-pose hoverboard-hidden" points="19,-33 100,-17 100,0" fill="url(#hero-scene-beam)" style:--unicycle-pose="matrix(1, 0, 0, 1, -5, -4.5)" style:--longboard-pose="matrix(1, 0, 0, 1, -5, -4.5)" />
-					<g class="bike-frame" fill="none" stroke="var(--scene-bike)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+					<polygon class="night beam" points="19,-33 100,-17 100,0" fill="url(#hero-scene-beam)" />
+					<g fill="none" stroke="var(--scene-bike)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
 						<circle cx="-20" cy="-11" r="11" />
 						<circle cx="20" cy="-11" r="11" />
 						<!-- Rayons : 12 par roue (6 diamètres tous les 30°), moyeu au centre. -->
@@ -319,56 +221,21 @@
 						<polyline points="14,-31 20,-11" />
 						<polyline points="14,-31 17,-37 22,-37" />
 						<line x1="-12" y1="-32" x2="-4" y2="-32" />
-						<!-- Porte-bagages arrière, au-dessus de la roue : affiché seulement pendant le jeu. -->
-						<g class="rack" stroke-width="1.8">
-							<polyline points="-32,-25 -11,-25" />
-							<line x1="-28" y1="-25" x2="-20" y2="-11" />
-						</g>
 					</g>
-					<g class="game-unicycle" fill="none" stroke="var(--scene-bike)" stroke-width="2.5" stroke-linecap="round">
-						<circle cx="0" cy="-11" r="11" />
-						<path d="M0-11-5-32m-5 0h9" />
-						<path class="spokes" stroke-width="0.8" d="M-10-11H10M0-21V-1M-7-18 7-4M-7-4 7-18" />
-					</g>
-					<!-- Longboard : planche à kicktails, trucks et roues (deux visibles de profil). -->
-					<g class="game-longboard" fill="var(--scene-bike)">
-						<path d="M-24.5 -8 Q-23 -5.5 -19.5 -5.5 H10.5 Q14 -5.5 15.5 -8" fill="none" stroke="var(--scene-bike)" stroke-width="2.5" stroke-linecap="round" />
-						<path d="M-17 -4.5 h4 l-1 1.5 h-2 Z" />
-						<path d="M4 -4.5 h4 l-1 1.5 h-2 Z" />
-						<circle class="board-wheel" cx="-15" cy="-2" r="2" />
-						<circle class="board-wheel" cx="6" cy="-2" r="2" />
-					</g>
-					<!-- Hoverboard : la même planche, plus haut, avec des réacteurs à la place des roues. -->
-					<g class="game-hoverboard" fill="var(--scene-lamp)">
-						<ellipse class="hover-shadow" cx="-4.5" cy="-0.5" rx="14" ry="1" fill="var(--scene-bike)" opacity="0.2" />
-						<ellipse class="hover-glow" cx="-15" cy="-5" rx="3" ry="4" opacity="0.3" />
-						<ellipse class="hover-glow" cx="6" cy="-5" rx="3" ry="4" opacity="0.3" />
-						<ellipse cx="-15" cy="-8.5" rx="3.5" ry="1.2" />
-						<ellipse cx="6" cy="-8.5" rx="3.5" ry="1.2" />
-						<path d="M-24.5 -13 Q-23 -10.5 -19.5 -10.5 H10.5 Q14 -10.5 15.5 -13" fill="none" stroke="var(--scene-bike)" stroke-width="2.5" stroke-linecap="round" />
-					</g>
-					<rect class="game-bag game-bag-one" x="-30" y="-32.5" width="15.5" height="6.5" rx="2" fill="var(--scene-lamp)" />
-					<rect class="game-bag game-bag-two" x="-29.5" y="-23" width="15" height="10.5" rx="2" fill="var(--scene-lamp)" />
-
-					<!-- Phare avant, sur le tube de direction (allumé la nuit) ; dans la main en monocycle et en longboard. -->
-					<rect class="unicycle-pose longboard-pose hoverboard-hidden" x="15.5" y="-35" width="4" height="3.4" rx="1.2" fill="var(--scene-bike)" style:--unicycle-pose="matrix(1, 0, 0, 1, -5, -4.5)" style:--longboard-pose="matrix(1, 0, 0, 1, -5, -4.5)" />
-					<circle class="night unicycle-pose longboard-pose hoverboard-hidden" cx="19" cy="-33.3" r="1.7" fill="var(--scene-lamp)" style:--unicycle-pose="matrix(1, 0, 0, 1, -5, -4.5)" style:--longboard-pose="matrix(1, 0, 0, 1, -5, -4.5)" />
-					<!-- Feu arrière, sur le hauban (contre la selle en monocycle, sur le casque en longboard) : visible seulement la nuit. -->
-					<circle class="night unicycle-pose longboard-pose hoverboard-hidden" cx="-11" cy="-25.3" r="3.8" fill="var(--scene-rear-glow)" style:--unicycle-pose="matrix(1, 0, 0, 1, -1.5, -6.7)" style:--longboard-pose="matrix(1, 0, 0, 1, 2, -40.2)" />
-					<rect class="night unicycle-pose longboard-pose hoverboard-hidden" x="-12.3" y="-26.5" width="2.6" height="2.4" rx="0.8" fill="var(--scene-rear)" style:--unicycle-pose="matrix(1, 0, 0, 1, -1.5, -6.7)" style:--longboard-pose="matrix(1, 0, 0, 1, 2, -40.2)" />
+					<!-- Phare avant, sur le tube de direction (allumé la nuit). -->
+					<rect x="15.5" y="-35" width="4" height="3.4" rx="1.2" fill="var(--scene-bike)" />
+					<circle class="night" cx="19" cy="-33.3" r="1.7" fill="var(--scene-lamp)" />
+					<!-- Feu arrière, sur le hauban : visible seulement la nuit. -->
+					<circle class="night" cx="-11" cy="-25.3" r="3.8" fill="var(--scene-rear-glow)" />
+					<rect class="night" x="-12.3" y="-26.5" width="2.6" height="2.4" rx="0.8" fill="var(--scene-rear)" />
 					<g fill="none" stroke="var(--scene-rider)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
 						<!-- Bras qui reste sur le guidon (épaule, coude, main), derrière le buste. -->
-						<polyline class="unicycle-pose longboard-pose hoverboard-pose" points="6,-50 11,-41 19,-37" style:--unicycle-pose="matrix(0.9562, 0.2923, -0.2923, 0.9562, -21.492, -9.659)" style:--longboard-pose="matrix(0.9562, 0.2923, -0.2923, 0.9562, -21.492, -9.659)" style:--hoverboard-pose="matrix(0.9562, 0.2923, -0.2923, 0.9562, -21.492, -14.659)" />
-						<polyline class="longboard-hidden hoverboard-hidden" points="-8,-35 2,-24 -1,-12" />
-						<polyline class="unicycle-pose longboard-pose hoverboard-pose" points="-8,-35 6,-52" style:--unicycle-pose="matrix(0.9204, -0.3908, 0.3908, 0.9204, 13.253, -5.58)" style:--longboard-pose="matrix(0.9204, -0.3908, 0.3908, 0.9204, 13.253, -5.58)" style:--hoverboard-pose="matrix(0.9204, -0.3908, 0.3908, 0.9204, 13.253, -10.58)" />
+						<polyline points="6,-50 11,-41 19,-37" />
+						<polyline points="-8,-35 2,-24 -1,-12" />
+						<polyline points="-8,-35 6,-52" />
 					</g>
-					<!-- Jambes debout sur la planche (longboard et hoverboard), à la place de la jambe qui pédale. -->
-					<g class="board-legs hoverboard-pose" fill="none" stroke="var(--scene-rider)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" style:--hoverboard-pose="matrix(1, 0, 0, 1, 0, -5)">
-						<polyline points="-7.8,-34.7 -11,-21 -13,-8.5" />
-						<polyline points="-7.8,-34.7 -1,-21.5 4,-8.5" />
-					</g>
-					<circle class="unicycle-pose longboard-pose hoverboard-pose" cx="10" cy="-60" r="6.5" fill="var(--scene-rider)" style:--unicycle-pose="matrix(0.9993, -0.035, 0.035, 0.9993, -9.092, -4.16)" style:--longboard-pose="matrix(0.9993, -0.035, 0.035, 0.9993, -9.092, -4.16)" style:--hoverboard-pose="matrix(0.9993, -0.035, 0.035, 0.9993, -9.092, -9.16)" />
-					<path class="unicycle-pose longboard-pose hoverboard-pose" d="M2.4,-61 A7.7,7.7 0 0 1 17.8,-61.6 L19.5,-60.4 Z" fill="var(--scene-helmet)" style:--unicycle-pose="matrix(0.9993, -0.035, 0.035, 0.9993, -9.092, -4.16)" style:--longboard-pose="matrix(0.9993, -0.035, 0.035, 0.9993, -9.092, -4.16)" style:--hoverboard-pose="matrix(0.9993, -0.035, 0.035, 0.9993, -9.092, -9.16)" />
+					<circle cx="10" cy="-60" r="6.5" fill="var(--scene-rider)" />
+					<path d="M2.4,-61 A7.7,7.7 0 0 1 17.8,-61.6 L19.5,-60.4 Z" fill="var(--scene-helmet)" />
 					<!--
 						Bras qui fait coucou : même forme que le bras du guidon, avec lequel il se confond au
 						repos. Il tourne à l'épaule (.wave-arm) et l'avant-bras se déplie au coude
@@ -376,20 +243,15 @@
 					-->
 					<g fill="none" stroke="var(--scene-rider)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(6 -50)">
 						<g class="wave-arm">
-							<polyline class="unicycle-pose longboard-pose hoverboard-pose" points="0,0 5,9" style:--unicycle-pose="matrix(0.9876, 0.1563, -0.1563, 0.9876, -7.694, -3.793)" style:--longboard-pose="matrix(0.9876, 0.1563, -0.1563, 0.9876, -7.694, -3.793)" style:--hoverboard-pose="matrix(0.9876, 0.1563, -0.1563, 0.9876, -7.694, -8.793)" />
+							<polyline points="0,0 5,9" />
 							<g transform="translate(5 9)">
-								<polyline class="wave-forearm unicycle-pose longboard-pose hoverboard-pose" points="0,0 8,4" style:--unicycle-pose="matrix(0.9876, 0.1563, -0.1563, 0.9876, -8.429, -2.198)" style:--longboard-pose="matrix(0.9876, 0.1563, -0.1563, 0.9876, -8.429, -2.198)" style:--hoverboard-pose="matrix(0.9876, 0.1563, -0.1563, 0.9876, -8.429, -7.198)" />
+								<polyline class="wave-forearm" points="0,0 8,4" />
 							</g>
 						</g>
 					</g>
 				</g>
 			</g>
-			<!-- Mot de réparation proposé au-dessus du cycliste tant que le pneu est crevé. -->
-			<text class="game-repair" data-game-repair x="360" y="205" text-anchor="middle"></text>
 		</svg>
-
-		<!-- Pluie du jeu (data-game-weather='rain'), par-dessus tout le décor. -->
-		<div class="weather-rain"></div>
 	</div>
 </div>
 
@@ -480,44 +342,6 @@
 		height: 100%;
 	}
 
-	/* Météo du jeu : couches absentes hors partie. */
-	.weather-storm,
-	.weather-rain {
-		position: absolute;
-		inset: 0;
-		display: none;
-		pointer-events: none;
-	}
-
-	.weather-storm {
-		background: var(--scene-storm);
-	}
-
-	/* Gouttes en traits obliques : motif répété en masque, coloré par --scene-rain. */
-	.weather-rain {
-		background: var(--scene-rain);
-		mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cpath d='M12 4l-3 12M44 22l-3 12M70 6l-3 12M26 44l-3 12M58 54l-3 12M76 34l-3 12M8 62l-3 12' stroke='black' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E");
-		mask-size: 80px 80px;
-	}
-
-	:global(.hero[data-playing][data-game-weather='storm']) .weather-storm,
-	:global(.hero[data-playing][data-game-weather='rain']) .weather-rain {
-		display: block;
-	}
-
-	@media (prefers-reduced-motion: no-preference) {
-		:global(html:not([data-reduced-motion]) .hero[data-playing]) .weather-rain {
-			animation: rain-fall 900ms linear infinite;
-		}
-	}
-
-	/* Un motif entier par cycle (80 px en x, 320 px en y), dans le sens des traits : pas de saut. */
-	@keyframes rain-fall {
-		to {
-			mask-position: -80px 320px;
-		}
-	}
-
 	/* Légèrement débordante pour éviter un liseré de ciel sous le sol. */
 	.land {
 		bottom: -2px;
@@ -594,179 +418,6 @@
 	/* Position d’arrivée du cycliste, au quart du paysage (aussi le décor fixe). */
 	.rider {
 		transform: translateX(360px);
-	}
-
-	.game-obstacle, .game-obstacle path, .game-bag, .game-unicycle, .rack, .game-longboard, .game-hoverboard, .board-legs, .game-rails, .game-station, .game-train, .game-bonus, .game-ice, .game-bolt,
-	.game-glass, .game-bear, .game-tree, .game-bear-chase, .game-strike, .game-repair {
-		display: none;
-	}
-
-	:global(.hero[data-playing]) .rider {
-		animation: none;
-		transform: translateX(var(--game-rider-x, 360px));
-	}
-
-	@media (prefers-reduced-motion: no-preference) {
-		.sky-layer { --game-pan: 16px; --game-overscan: 0.08; }
-
-		:global(html:not([data-reduced-motion]) .hero[data-playing]) :is(.sky-layer, .layer) {
-			/* Élargir les plans à mesure qu’ils glissent pour garder les bords couverts. */
-			transform-origin: center;
-			translate: calc(-1 * var(--game-pan, 0px) * var(--game-pan-progress, 0)) 0;
-			scale: calc(1 + var(--game-overscan, 0) * var(--game-pan-progress, 0)) 1;
-			transition: none;
-		}
-	}
-
-	:global(.hero[data-playing]) .spokes {
-		animation: none;
-		rotate: var(--game-wheel-angle, 0rad);
-	}
-
-	:global(.hero[data-playing]) .game-obstacle,
-	:global(.hero[data-playing][data-game-rails]) :is(.game-rails, .game-station),
-	:global(.hero[data-playing][data-game-train]) .game-train,
-	:global(.hero[data-playing][data-game-bonus]) .game-bonus,
-	:global(.hero[data-playing][data-game-weather='ice']) .game-ice,
-	:global(.hero[data-playing][data-game-obstacle='glass']) :is(.game-glass, .game-glass path),
-	:global(.hero[data-playing][data-game-obstacle='bear']) .game-bear,
-	:global(.hero[data-playing][data-game-obstacle='tree']) .game-tree,
-	:global(.hero[data-playing][data-game-chase]) .game-bear-chase,
-	:global(.hero[data-playing][data-game-strike]) .game-strike,
-	:global(.hero[data-playing][data-game-flat]) .game-repair,
-	:global(.hero[data-playing][data-game-weather='storm'][data-game-flash]) .game-bolt,
-	:global(.hero[data-playing]) .rack,
-	:global(.hero[data-playing][data-game-missed='0']) .game-bag-one,
-	:global(.hero[data-playing]:is([data-game-missed='0'], [data-game-missed='1'])) .game-bag-two,
-	:global(.hero[data-playing][data-game-obstacle='0']) .game-rock,
-	:global(.hero[data-playing][data-game-obstacle='1']) .game-fence,
-	:global(.hero[data-playing][data-game-obstacle='2']) .game-puddle,
-	:global(.hero[data-playing][data-game-obstacle='3']) .game-cones,
-	:global(.hero[data-playing][data-game-obstacle='4']) .game-gate,
-	:global(.hero[data-playing]:is([data-game-missed='3'], [data-game-missed='4'], [data-game-missed='5'])) .game-unicycle {
-		display: inline;
-	}
-
-	:global(.hero[data-playing]:is([data-game-missed='3'], [data-game-missed='4'], [data-game-missed='5'])) .bike-frame {
-		display: none;
-	}
-
-	/*
-	 * Pose sur le monocycle : cycliste redressé, phare remonté. Chaque pièce porte sa matrice,
-	 * exprimée dans le repère de son groupe parent, dans --unicycle-pose.
-	 */
-	:global(.hero[data-playing]:is([data-game-missed='3'], [data-game-missed='4'], [data-game-missed='5'])) .unicycle-pose {
-		transform: var(--unicycle-pose);
-		transform-box: view-box;
-		transform-origin: 0 0;
-	}
-
-	/*
-	 * Planches (longboard, puis hoverboard) : data-game-mount remplace le vélo. Chaque pièce du
-	 * cycliste porte sa pose par monture (--longboard-pose, --hoverboard-pose) ; les pièces
-	 * inutiles sur une planche portent la classe <monture>-hidden.
-	 */
-	:global(.hero[data-playing][data-game-mount='longboard']) :is(.game-longboard, .board-legs),
-	:global(.hero[data-playing][data-game-mount='hoverboard']) :is(.game-hoverboard, .board-legs) {
-		display: inline;
-	}
-
-	:global(.hero[data-playing][data-game-mount]) :is(.bike-frame, .game-bag, .game-unicycle),
-	:global(.hero[data-playing][data-game-mount='longboard']) .longboard-hidden,
-	:global(.hero[data-playing][data-game-mount='hoverboard']) .hoverboard-hidden {
-		display: none;
-	}
-
-	:global(.hero[data-playing][data-game-mount='longboard']) .longboard-pose {
-		transform: var(--longboard-pose);
-		transform-box: view-box;
-		transform-origin: 0 0;
-	}
-
-	:global(.hero[data-playing][data-game-mount='hoverboard']) .hoverboard-pose {
-		transform: var(--hoverboard-pose);
-		transform-box: view-box;
-		transform-origin: 0 0;
-	}
-
-	/*
-	 * Flottement du hoverboard : le cycliste et sa planche montent et descendent doucement, l’ombre au
-	 * sol se resserre quand ils montent. Propriétés translate et scale, indépendantes des transform
-	 * qui placent le cycliste et ses poses. Immobile en mouvement réduit.
-	 */
-	@media (prefers-reduced-motion: no-preference) {
-		:global(html:not([data-reduced-motion]) .hero[data-playing][data-game-mount='hoverboard']) .rider {
-			animation: hover-float 1600ms ease-in-out infinite alternate;
-		}
-
-		:global(html:not([data-reduced-motion]) .hero[data-playing][data-game-mount='hoverboard']) .hover-shadow {
-			transform-box: fill-box;
-			transform-origin: center;
-			animation: hover-shadow 1600ms ease-in-out infinite alternate;
-		}
-	}
-
-	@keyframes hover-float {
-		from {
-			translate: 0 0;
-		}
-		to {
-			translate: 0 -2.5px;
-		}
-	}
-
-	/* Ours endormi : yeux fermés et « z Z » ; une frappe trop rapide le fait remuer (data-game-bear). */
-	.bear-zzz {
-		font: 700 8px var(--font-sans);
-		fill: var(--scene-bike);
-		stroke: none;
-	}
-
-	.bear-eye-open {
-		display: none;
-	}
-
-	:global(.hero[data-game-bear='stirring']) .bear-eye-open {
-		display: inline;
-	}
-
-	:global(.hero[data-game-bear='stirring']) :is(.bear-eye-closed, .bear-zzz) {
-		display: none;
-	}
-
-	:global(.hero[data-game-bear='stirring']) .bear-ear-front {
-		translate: 0 -1.5px;
-	}
-
-	/* Crevaison : la roue arrière (ou celle du monocycle) s’écrase sur le sol. */
-	:global(.hero[data-playing][data-game-flat]) :is(.bike-frame > circle:first-child, .game-unicycle > circle:first-child) {
-		scale: 1 0.8;
-		transform-box: fill-box;
-		transform-origin: 50% 100%;
-	}
-
-	@media (prefers-reduced-motion: no-preference) {
-		:global(html:not([data-reduced-motion]) .hero[data-playing][data-game-chase]) .bear-run {
-			animation: bear-run 280ms ease-in-out infinite alternate;
-		}
-	}
-
-	@keyframes bear-run {
-		to {
-			translate: 0 -2px;
-		}
-	}
-
-	/* Compense la montée du groupe pour rester au sol, et rétrécit un peu. */
-	@keyframes hover-shadow {
-		from {
-			translate: 0 0;
-			scale: 1;
-		}
-		to {
-			translate: 0 2.5px;
-			scale: 0.8 1;
-		}
 	}
 
 	.spokes,

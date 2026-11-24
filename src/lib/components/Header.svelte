@@ -134,12 +134,6 @@
 			{#if systemReducesMotion}
 				<p id="motion-system">Activé dans les réglages du système.</p>
 			{/if}
-			<button class="setting game-setting" type="button" data-game-launch aria-controls="cyclist-game" hidden>
-				<span>Jouer avec le cycliste</span>
-				<svg class="icon play-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-					<path d="M8 5v14l11-7z" />
-				</svg>
-			</button>
 		</div>
 	</div>
 </header>
@@ -214,13 +208,6 @@
 
 	.setting + .setting { margin-top: var(--spacing-2); }
 
-	.game-setting[hidden] { display: none; }
-
-	.game-setting {
-		margin-top: var(--spacing-2);
-		border-top-color: var(--border-strong);
-	}
-
 	.setting-state {
 		flex: 0 0 1em;
 		color: var(--action-primary);
@@ -238,8 +225,6 @@
 		width: 1.25rem;
 		height: 1.25rem;
 	}
-
-	.play-icon { flex-shrink: 0; }
 
 	.settings-button:hover,
 	.setting:hover:not(:disabled) {
