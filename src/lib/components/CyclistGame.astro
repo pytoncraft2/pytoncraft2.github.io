@@ -27,7 +27,7 @@
 </section>
 
 <script>
-	import { createGameLandscape } from "../game-landscape";
+	import { createGameLandscape, midPlaneSpeed } from "../game-landscape";
 
 	const obstacles = ['web', 'grille', 'clavier', 'prototype', 'contraste'];
 	/*
@@ -50,8 +50,9 @@
 	 */
 	const suggestionErrorRate = 0.5;
 	const suggestionDelay = 0.12; // Part du mot écoulée avant que le train n’affiche sa suggestion.
-	// Un mot du milieu de partie : ni le premier (le joueur découvre le jeu), ni le dernier.
-	const pickSuggestionRound = (count: number) => 1 + Math.floor(Math.random() * Math.max(1, count - 2));
+	// Vers la fin du parcours : l’avant-dernier mot, les rails entrant dès le mot précédent.
+	const suggestionRound = obstacles.length - 2;
+	const railsRound = suggestionRound - 1;
 	// Inverse deux lettres voisines différentes, hors première lettre : « prototype » → « prototpye ».
 	const misspell = (word: string) => {
 		const positions = Array.from({ length: word.length - 2 }, (_, i) => i + 1).filter(i => word[i] !== word[i + 1]);
@@ -79,10 +80,13 @@
 	const announcement = game?.querySelector<HTMLElement>('.announcement');
 	const acceptButton = game?.querySelector<HTMLButtonElement>('[data-accept]');
 	const train = land?.querySelector<SVGGElement>('[data-game-train]');
+	const rails = land?.querySelector<SVGLineElement>('.game-rails');
+	const station = land?.querySelector<SVGGElement>('[data-game-station]');
 	const trainLabel = train?.querySelector<SVGTextElement>('.train-suggestion');
-	if (launch && game && hero && land && hazard && start && round && result && resultTitle && input && prompt && announcement && acceptButton && train && trainLabel) {
+	if (launch && game && hero && land && hazard && start && round && result && resultTitle && input && prompt && announcement && acceptButton && train && trainLabel && rails && station) {
 		let index = 0;
-		let suggestionRound = -1;
+		// Distance parcourue à l’entrée des rails ; undefined avant leur apparition.
+		let railsFrom: number | undefined;
 		// Suggestion du mot en cours : texte proposé, et s’il est déjà affiché.
 		let suggestion: { text: string; correct: boolean; shown: boolean } | undefined;
 		let missed = 0;
@@ -154,6 +158,11 @@
 			acceptButton.hidden = true;
 		};
 
+		const clearRails = () => {
+			railsFrom = undefined;
+			hero.removeAttribute('data-game-rails');
+		};
+
 		const draw = (progress: number) => {
 			renderedProgress = progress;
 			const reduced = document.documentElement.hasAttribute('data-reduced-motion') || motionPreference.matches;
@@ -167,10 +176,20 @@
 			if (!reduced && distance > 0) landscape.draw(distance);
 			hero.style.setProperty('--game-wheel-angle', `${distance / wheelRadius}rad`);
 			hazard.setAttribute('transform', `translate(${obstacleX} ${land.dataset.horizonY})`);
+			const sceneX = (share: number) => (bounds.left + bounds.width * share - matrix.e) / matrix.a;
+			// Les rails (et leur gare) commencent au bord droit et défilent avec le plan du milieu ; fixes en mouvement réduit.
+			let railsX = -Infinity;
+			if (railsFrom !== undefined) {
+				railsX = reduced ? sceneX(0.4) : sceneX(1) + 20 - (distance - railsFrom) * midPlaneSpeed;
+				rails.setAttribute('x1', String(railsX));
+				rails.setAttribute('x2', String(railsX + 3000));
+				station.setAttribute('transform', `translate(${railsX} 229)`);
+			}
 			if (suggestion) {
-				// Le train entre par la droite et traverse le plan du milieu pendant le mot ; immobile en mouvement réduit.
-				const share = reduced ? 0.55 : 1 - 0.75 * progress;
-				train.setAttribute('transform', `translate(${(bounds.left + bounds.width * share - matrix.e) / matrix.a} 228)`);
+				// Le train entre par la droite et traverse le plan du milieu, sans dépasser la gare au début des rails ;
+				// en mouvement réduit, il attend directement en gare.
+				const trainX = Math.max(sceneX(reduced ? 0.4 : 1 - 0.75 * progress), railsX + 6);
+				train.setAttribute('transform', `translate(${trainX} 228)`);
 				if (!suggestion.shown && (reduced || progress >= suggestionDelay)) revealSuggestion(progress === 0);
 			}
 			const groundY = Number(land.dataset.horizonY);
@@ -207,8 +226,8 @@
 			level = levels.bike;
 			streak = 0;
 			showLevel();
-			suggestionRound = pickSuggestionRound(obstacles.length);
 			clearSuggestion();
+			clearRails();
 			lettering.replaceChildren();
 			start.hidden = false;
 			round.hidden = true;
@@ -311,6 +330,11 @@
 				announcement.textContent = feedback;
 				input.focus({ preventScroll: true });
 			}
+			if (index === railsRound) {
+				railsFrom = distance;
+				hero.dataset.gameRails = '';
+				draw(0);
+			}
 			if (index === suggestionRound) {
 				const text = Math.random() < suggestionErrorRate ? misspell(obstacle) : obstacle;
 				suggestion = { text, correct: text === obstacle, shown: false };
@@ -329,6 +353,7 @@
 			hero.removeAttribute('data-game-missed');
 			hero.removeAttribute('data-game-mount');
 			clearSuggestion();
+			clearRails();
 			lettering.replaceChildren();
 			clearDroppedParts();
 			hero.style.removeProperty('--game-rider-x');

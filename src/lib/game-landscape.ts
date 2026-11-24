@@ -2,6 +2,8 @@
 const tileWidth = 480;
 const sceneWidth = 1440;
 const svgNS = 'http://www.w3.org/2000/svg';
+// Vitesse du plan du milieu par rapport à la route (aussi celle des rails du train).
+export const midPlaneSpeed = 0.43;
 
 function path(parent: SVGGElement, outline: string, color: string) {
 	const shape = document.createElementNS(svgNS, 'path');
@@ -13,7 +15,7 @@ function path(parent: SVGGElement, outline: string, color: string) {
 export function createGameLandscape(land: SVGSVGElement) {
 	const planes = [
 		{ color: 'far', speed: 0.14, edge: 172, amplitude: 62 },
-		{ color: 'mid', speed: 0.43, edge: 210, amplitude: 25 },
+		{ color: 'mid', speed: midPlaneSpeed, edge: 210, amplitude: 25 },
 		{ color: 'near', speed: 0.9, edge: 258, amplitude: 26 }
 	].map(config => {
 		const group = land.querySelector<SVGPathElement>('path[fill="var(--scene-' + config.color + ')"]')!.parentElement!;
