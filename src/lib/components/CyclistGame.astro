@@ -4,7 +4,7 @@
 		<button type="button" class="close" data-close aria-label="Fermer le jeu"><span aria-hidden="true">×</span></button>
 	</header>
 
-	<p id="cyclist-game-intro">Tape les lettres du mot posé sur la route pour le franchir. Échap permet de quitter la partie. Deux mots réussis d’affilée font passer du vélo au longboard, puis au hoverboard ; chaque obstacle manqué fait redescendre d’un cran. À vélo, il coûte une sacoche, puis le vélo devient un monocycle. Des mots bonus passent sur les collines : les taper rend une sacoche, ou fait monter d’un cran. La météo change à chaque partie : la pluie masque des lettres, le verglas fait déraper à chaque faute. Une fois par partie, un train propose le mot : flèche droite pour l’accepter, mais relis-le, il peut se tromper.</p>
+	<p id="cyclist-game-intro">Tape les lettres du mot posé sur la route pour le franchir. Échap permet de quitter la partie. Deux mots réussis d’affilée font passer du vélo au longboard, puis au hoverboard ; chaque obstacle manqué fait redescendre d’un cran. À vélo, il coûte une sacoche, puis le vélo devient un monocycle. Des mots bonus passent sur les collines : les taper rend une sacoche, ou fait monter d’un cran. La météo change à chaque partie : la pluie masque des lettres, le verglas fait déraper à chaque faute. Chaque partie cache aussi un obstacle spécial : du verre brisé qui fait crever. Une fois par partie, un train propose le mot : flèche droite pour l’accepter, mais relis-le, il peut se tromper.</p>
 
 	<div class="start" data-game-start>
 		<button type="button" data-start="timed">Jouer · 5 s par mot</button>
@@ -29,6 +29,7 @@
 <script>
 	import { createGameLandscape, midPlaneSpeed } from "../game-landscape";
 	import { homeTechs } from "../data/skills";
+	import { pickSpecial, specialInitials, specialWords, type Special, type SpecialKind } from "../game-specials";
 
 	const obstacles = ['web', 'grille', 'clavier', 'prototype', 'contraste'];
 	/*
@@ -70,7 +71,16 @@
 	// Entrée juste après le bord droit ; plus loin quand la gare entre au même moment, pour ne pas la croiser.
 	const bonusOffset = (round: number) => round === railsRound ? 160 : 10;
 	const roadInitials = new Set(obstacles.map(word => word[0]));
-	const bonusWords = homeTechs.map(tech => tech.label).filter(label => !roadInitials.has(label[0].toLocaleLowerCase('fr')));
+	const bonusWords = homeTechs.map(tech => tech.label).filter(label => {
+		const initial = label[0].toLocaleLowerCase('fr');
+		return !roadInitials.has(initial) && !specialInitials.has(initial);
+	});
+	/*
+	 * Obstacles spéciaux : un par partie, à la place du 2e ou du 3e mot (avant la gare et le train).
+	 * Verre brisé : raté à vélo ou en monocycle, le pneu crève (plus de montée tant qu’il n’est pas
+	 * réparé) ; les planches n’ont rien à craindre.
+	 */
+	const specialRounds = [1, 2];
 	/*
 	 * Météo, tirée au début de chaque partie. Elle gêne la lecture (pluie) ou la frappe (verglas),
 	 * jamais la direction ; l’orage n’est qu’une ambiance. Le hoverboard flotte au-dessus du verglas,
@@ -110,7 +120,8 @@
 	const trainLabel = train?.querySelector<SVGTextElement>('.train-suggestion');
 	const bonusText = land?.querySelector<SVGTextElement>('[data-game-bonus]');
 	const bolt = land?.querySelector<SVGPathElement>('[data-game-bolt]');
-	if (launch && game && hero && land && hazard && start && round && result && resultTitle && input && prompt && announcement && acceptButton && train && trainLabel && rails && station && bonusText && bolt) {
+	const repairText = land?.querySelector<SVGTextElement>('[data-game-repair]');
+	if (launch && game && hero && land && hazard && start && round && result && resultTitle && input && prompt && announcement && acceptButton && train && trainLabel && rails && station && bonusText && bolt && repairText) {
 		let index = 0;
 		// Distance parcourue à l’entrée des rails ; undefined avant leur apparition.
 		let railsFrom: number | undefined;
@@ -118,9 +129,15 @@
 		let railsOffset: number | undefined;
 		// Suggestion du mot en cours : texte proposé, et s’il est déjà affiché.
 		let suggestion: { text: string; correct: boolean; shown: boolean } | undefined;
-		// Mot bonus affiché : libellé, mot à taper, distance à son entrée et largeur ; bonusTarget quand la saisie le vise.
+		// Mot bonus affiché : libellé, mot à taper, distance à son entrée et largeur.
 		let bonus: { label: string; word: string; from: number; offset: number; width: number } | undefined;
-		let bonusTarget = false;
+		// Mot visé par la saisie : celui de la route, le mot bonus, ou la réparation du pneu.
+		let target: 'road' | 'bonus' | 'repair' = 'road';
+		// Mot de la route en cours (un obstacle spécial remplace l’un d’eux) et lettres déjà validées.
+		let roadWord = '';
+		let roadMatched = 0;
+		let special: Special | undefined;
+		let flat = false;
 		let usedBonuses: string[] = [];
 		let weather: Weather = 'clear';
 		// Prochaine goutte sur une lettre (pluie) et prochain éclair (orage), en temps de requestAnimationFrame.
@@ -204,16 +221,62 @@
 			});
 		};
 
+		const setLetters = (text: SVGTextElement, word: string) => {
+			text.replaceChildren(...Array.from(word, char => {
+				const letter = document.createElementNS(svg, 'tspan');
+				letter.textContent = char;
+				return letter;
+			}));
+		};
+
+		const isSpecialRound = (kind?: SpecialKind) => special !== undefined && index === special.round && (!kind || special.kind === kind);
+
+		// Mot de la route : un obstacle spécial remplace le mot prévu.
+		const wordFor = (round: number) => {
+			if (!special || round !== special.round) return obstacles[round];
+			return specialWords[special.kind];
+		};
+
+		const specialIntro = () => {
+			if (!special) return '';
+			return `Du verre brisé sur la route : tape « ${specialWords.glass} » pour passer.${level > levels.bike ? ' Les roues de ta planche ne crèvent pas.' : ' Si tu le rates, tu crèves.'}`;
+		};
+
+		// Pneu crevé : plus de montée de cran tant que « rustine » n’est pas tapé.
+		const setFlat = (value: boolean) => {
+			flat = value;
+			if (value) {
+				hero.dataset.gameFlat = '';
+				setLetters(repairText, specialWords.repair);
+				repairText.append(' ?');
+			} else {
+				hero.removeAttribute('data-game-flat');
+				repairText.replaceChildren();
+				if (target === 'repair') target = 'road';
+			}
+		};
+
+		const repairTire = () => {
+			setFlat(false);
+			input.value = '';
+			roadMatched = 0;
+			paintLetters(lettering, 0, false);
+			announcement.textContent = `Pneu réparé ! Tu peux de nouveau monter. Mot en cours : ${roadWord}.`;
+		};
+
+		// Remet à zéro les obstacles spéciaux (début et fin de partie).
+		const clearSpecials = () => {
+			special = undefined;
+			setFlat(false);
+			hero.removeAttribute('data-game-obstacle');
+		};
+
 		const showBonus = (feedback: string) => {
 			const available = bonusWords.filter(label => !usedBonuses.includes(label));
 			if (!available.length) return feedback;
 			const label = available[Math.floor(Math.random() * available.length)];
 			usedBonuses.push(label);
-			bonusText.replaceChildren(...Array.from(label, char => {
-				const letter = document.createElementNS(svg, 'tspan');
-				letter.textContent = char;
-				return letter;
-			}));
+			setLetters(bonusText, label);
 			hero.dataset.gameBonus = '';
 			bonus = { label, word: label.toLocaleLowerCase('fr'), from: distance, offset: bonusOffset(index), width: bonusText.getComputedTextLength() };
 			prompt.textContent += ` · Mot bonus : ${label}`;
@@ -221,12 +284,13 @@
 		};
 
 		const clearBonus = () => {
-			if (bonusTarget) {
+			if (target === 'bonus') {
 				input.value = '';
 				paintLetters(lettering, 0, false);
+				roadMatched = 0;
+				target = 'road';
 			}
 			bonus = undefined;
-			bonusTarget = false;
 			hero.removeAttribute('data-game-bonus');
 			bonusText.replaceChildren();
 			prompt.textContent = prompt.textContent.replace(/ · Mot bonus : .*$/, '');
@@ -236,6 +300,14 @@
 		const catchBonus = () => {
 			if (!bonus) return;
 			const { label } = bonus;
+			if (flat) {
+				clearBonus();
+				input.value = '';
+				roadMatched = 0;
+				paintLetters(lettering, 0, false);
+				announcement.textContent = `Mot bonus attrapé : ${label}, mais ton pneu est crevé : tape « ${specialWords.repair} » pour le réparer avant de remonter. Mot en cours : ${roadWord}.`;
+				return;
+			}
 			const previous = level;
 			level = Math.min(levels.hoverboard, level + 1);
 			showLevel();
@@ -246,7 +318,9 @@
 				previous < levels.bike ? 'Une sacoche retrouvée.' :
 				level === levels.longboard ? 'Tu passes au longboard !' :
 				level === levels.hoverboard && previous !== level ? 'Tu passes en hoverboard !' : 'Tu es déjà au sommet.';
-			announcement.textContent = `Mot bonus attrapé : ${label} ! ${change} Mot en cours : ${obstacles[index]}.`;
+			input.value = '';
+			roadMatched = 0;
+			announcement.textContent = `Mot bonus attrapé : ${label} ! ${change} Mot en cours : ${roadWord}.`;
 		};
 
 		const clearRails = () => {
@@ -295,6 +369,7 @@
 				else bonusText.setAttribute('x', String(bonusX));
 			}
 			const groundY = Number(land.dataset.horizonY);
+			repairText.setAttribute('x', String(riderX));
 			if (looseWheel) {
 				const { element, releasedAt, initialAngle } = looseWheel;
 				const elapsed = reduced ? 0 : Math.max(0, performance.now() - releasedAt);
@@ -332,6 +407,7 @@
 			clearRails();
 			clearBonus();
 			usedBonuses = [];
+			clearSpecials();
 			setWeather('clear');
 			lettering.replaceChildren();
 			start.hidden = false;
@@ -366,12 +442,18 @@
 			cancelAnimationFrame(frame);
 			clearSuggestion();
 			const previous = level;
+			// Le verre brisé raté à vélo ou en monocycle crève le pneu au lieu de faire perdre un cran.
+			const punctures = !success && isSpecialRound('glass') && level <= levels.bike && !flat;
 			if (success) {
 				streak += 1;
-				if (streak >= climbStreak && level >= levels.bike && level < levels.hoverboard) {
+				if (streak >= climbStreak && !flat && level >= levels.bike && level < levels.hoverboard) {
 					level += 1;
 					streak = 0;
 				}
+			} else if (punctures) {
+				missed += 1;
+				streak = 0;
+				setFlat(true);
 			} else {
 				missed += 1;
 				streak = 0;
@@ -392,7 +474,7 @@
 
 			if (index === obstacles.length) {
 				clearBonus();
-				hero.removeAttribute('data-game-flash');
+				for (const name of ['data-game-flash', 'data-game-obstacle']) hero.removeAttribute(name);
 				lettering.replaceChildren();
 				round.hidden = true;
 				draw(0);
@@ -401,14 +483,17 @@
 				const arrival = level === levels.hoverboard ? 'en hoverboard' :
 					level === levels.longboard ? 'en longboard' :
 					level === levels.unicycle ? 'en monocycle' : 'à vélo';
-				resultTitle.textContent = `${score} obstacle${score === 1 ? '' : 's'} franchi${score === 1 ? '' : 's'} sur ${obstacles.length}, arrivée ${arrival}${weatherArrival[weather]} !`;
+				resultTitle.textContent = `${score} obstacle${score === 1 ? '' : 's'} franchi${score === 1 ? '' : 's'} sur ${obstacles.length}, arrivée ${arrival}${weatherArrival[weather]}${flat ? ', pneu crevé' : ''} !`;
 				announcement.textContent = '';
 				resultTitle.focus({ preventScroll: true });
 				if (looseWheel) frame = requestAnimationFrame(tick);
 				return;
 			}
 
-			showObstacle(note ? `${note} ${describeChange(success, previous)}` : describeChange(success, previous));
+			const change = punctures
+				? `Obstacle manqué : crevaison ! Tape « ${specialWords.repair} » pour réparer ; en attendant, tu ne peux plus monter.`
+				: describeChange(success, previous);
+			showObstacle(note ? `${note} ${change}` : change);
 		};
 
 		const setWeather = (next: Weather) => {
@@ -473,11 +558,19 @@
 		};
 
 		const showObstacle = (feedback = '') => {
-			const obstacle = obstacles[index];
+			const obstacle = wordFor(index);
+			roadWord = obstacle;
 			const reduced = document.documentElement.hasAttribute('data-reduced-motion') || motionPreference.matches;
 			// En mouvement réduit, le mot bonus ne défile pas : il disparaît au mot suivant.
 			if (reduced) clearBonus();
-			bonusTarget = false;
+			target = 'road';
+			roadMatched = 0;
+			if (special && isSpecialRound()) {
+				hero.dataset.gameObstacle = special.kind;
+				feedback = `${feedback} ${specialIntro()}`.trim();
+			} else {
+				hero.removeAttribute('data-game-obstacle');
+			}
 			prompt.textContent = `Mot ${index + 1} sur ${obstacles.length} · ${obstacle}`;
 			lettering.replaceChildren(...Array.from(obstacle.toUpperCase(), char => {
 				const letter = document.createElementNS(svg, 'tspan');
@@ -521,6 +614,7 @@
 			clearSuggestion();
 			clearRails();
 			clearBonus();
+			clearSpecials();
 			setWeather('clear');
 			lettering.replaceChildren();
 			clearDroppedParts();
@@ -568,6 +662,7 @@
 				start.hidden = true;
 				round.hidden = false;
 				setWeather(weathers[Math.floor(Math.random() * weathers.length)]);
+				special = pickSpecial(specialRounds);
 				showObstacle(weatherIntro[weather]);
 			});
 		});
@@ -590,31 +685,31 @@
 			}
 		});
 		const updateLetters = () => {
-			const word = obstacles[index];
+			const word = roadWord;
 			if (!word || round.hidden) return;
 			const typed = input.value.toLocaleLowerCase('fr');
-			// La première lettre choisit la cible : le mot bonus si elle lui correspond, sinon la route.
-			if (!typed) bonusTarget = false;
-			else if (!bonusTarget && bonus && typed[0] === bonus.word[0]) bonusTarget = true;
-			const target = bonusTarget && bonus ? bonus.word : word;
+			// La première lettre choisit la cible : le mot bonus, la réparation du pneu, sinon la route.
+			if (!typed) target = 'road';
+			else if (target === 'road' && bonus && typed[0] === bonus.word[0]) target = 'bonus';
+			else if (target === 'road' && flat && typed[0] === specialWords.repair[0]) target = 'repair';
+			const goal = target === 'bonus' && bonus ? bonus.word : target === 'repair' ? specialWords.repair : word;
+			const text = target === 'bonus' ? bonusText : target === 'repair' ? repairText : lettering;
 			let matched = 0;
-			while (matched < target.length && typed[matched] === target[matched]) matched++;
+			while (matched < goal.length && typed[matched] === goal[matched]) matched++;
 			const hasError = matched < typed.length;
 			// Sur le verglas, une faute fait aussi perdre la dernière lettre validée ; le hoverboard flotte au-dessus.
 			const slips = hasError && weather === 'ice' && level !== levels.hoverboard && matched > 0;
 			if (slips) matched -= 1;
 			// Keep the valid prefix so the next key can retry the missed letter.
 			if (hasError) input.value = typed.slice(0, matched);
-			const expected = hasError ? `${slips ? 'Dérapage sur le verglas ! ' : ''}Lettre attendue · ${target[matched].toUpperCase()}` : '';
-			if (bonusTarget && bonus) {
-				paintLetters(bonusText, matched, hasError);
-				if (matched === target.length) catchBonus();
-				else if (hasError) announcement.textContent = expected;
-				return;
-			}
-			paintLetters(lettering, matched, hasError);
-			if (matched === word.length) finishObstacle(true);
-			else if (hasError) announcement.textContent = expected;
+			const expected = hasError ? `${slips ? 'Dérapage sur le verglas ! ' : ''}Lettre attendue · ${goal[matched].toUpperCase()}` : '';
+			paintLetters(text, matched, hasError);
+			if (target === 'road') roadMatched = matched;
+			if (matched === goal.length) {
+				if (target === 'bonus') catchBonus();
+				else if (target === 'repair') repairTire();
+				else finishObstacle(true);
+			} else if (hasError) announcement.textContent = expected;
 		};
 		input.addEventListener('input', event => {
 			if (!(event instanceof InputEvent && event.isComposing)) updateLetters();

@@ -249,6 +249,15 @@
 				<path class="game-puddle" d="M-16-2q6-6 12 0t12 0t12 0m-31-6q6-5 12 0t12 0" />
 				<path class="game-cones" d="M-15 0-7-18 1 0m-12-5H9m-5 5 6-14 6 14" />
 				<path class="game-gate" d="M-15 0v-22h30V0m-30-15h30" />
+				<!--
+					Obstacles spéciaux (un par partie, data-game-obstacle posé par CyclistGame.astro), dessinés
+					devant le mot, côté cycliste. Contour --scene-bike pour rester visibles de nuit.
+				-->
+				<g class="game-glass" fill="var(--scene-snow)" stroke="var(--scene-bike)" stroke-width="0.8" stroke-linejoin="round">
+					<path d="M-48 0l4-6 3 6ZM-38 0l2-9 4 9ZM-27 0l5-5 1 5ZM-17 0l2-7 3 7Z" />
+					<!-- Reflets fixes, sans scintillement. -->
+					<path d="M-44-3l1-1M-35-5l1-2M-16-4l1-1.5" fill="none" stroke="var(--scene-lamp)" stroke-width="1" />
+				</g>
 			</g>
 
 			<g transform="translate(0 289)">
@@ -337,6 +346,8 @@
 					</g>
 				</g>
 			</g>
+			<!-- Mot de réparation proposé au-dessus du cycliste tant que le pneu est crevé. -->
+			<text class="game-repair" data-game-repair x="360" y="205" text-anchor="middle"></text>
 		</svg>
 
 		<!-- Pluie du jeu (data-game-weather='rain'), par-dessus tout le décor. -->
@@ -547,7 +558,8 @@
 		transform: translateX(360px);
 	}
 
-	.game-obstacle, .game-obstacle path, .game-bag, .game-unicycle, .rack, .game-longboard, .game-hoverboard, .board-legs, .game-rails, .game-station, .game-train, .game-bonus, .game-ice, .game-bolt {
+	.game-obstacle, .game-obstacle path, .game-bag, .game-unicycle, .rack, .game-longboard, .game-hoverboard, .board-legs, .game-rails, .game-station, .game-train, .game-bonus, .game-ice, .game-bolt,
+	.game-glass, .game-repair {
 		display: none;
 	}
 
@@ -578,6 +590,8 @@
 	:global(.hero[data-playing][data-game-train]) .game-train,
 	:global(.hero[data-playing][data-game-bonus]) .game-bonus,
 	:global(.hero[data-playing][data-game-weather='ice']) .game-ice,
+	:global(.hero[data-playing][data-game-obstacle='glass']) :is(.game-glass, .game-glass path),
+	:global(.hero[data-playing][data-game-flat]) .game-repair,
 	:global(.hero[data-playing][data-game-weather='storm'][data-game-flash]) .game-bolt,
 	:global(.hero[data-playing]) .rack,
 	:global(.hero[data-playing][data-game-missed='0']) .game-bag-one,
@@ -657,6 +671,13 @@
 		to {
 			translate: 0 -2.5px;
 		}
+	}
+
+	/* Crevaison : la roue arrière (ou celle du monocycle) s’écrase sur le sol. */
+	:global(.hero[data-playing][data-game-flat]) :is(.bike-frame > circle:first-child, .game-unicycle > circle:first-child) {
+		scale: 1 0.8;
+		transform-box: fill-box;
+		transform-origin: 50% 100%;
 	}
 
 	/* Compense la montée du groupe pour rester au sol, et rétrécit un peu. */
