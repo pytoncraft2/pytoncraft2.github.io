@@ -633,6 +633,44 @@
 		transform-origin: 0 0;
 	}
 
+	/*
+	 * Flottement du hoverboard : le cycliste et sa planche montent et descendent doucement, l’ombre au
+	 * sol se resserre quand ils montent. Propriétés translate et scale, indépendantes des transform
+	 * qui placent le cycliste et ses poses. Immobile en mouvement réduit.
+	 */
+	@media (prefers-reduced-motion: no-preference) {
+		:global(html:not([data-reduced-motion]) .hero[data-playing][data-game-mount='hoverboard']) .rider {
+			animation: hover-float 1600ms ease-in-out infinite alternate;
+		}
+
+		:global(html:not([data-reduced-motion]) .hero[data-playing][data-game-mount='hoverboard']) .hover-shadow {
+			transform-box: fill-box;
+			transform-origin: center;
+			animation: hover-shadow 1600ms ease-in-out infinite alternate;
+		}
+	}
+
+	@keyframes hover-float {
+		from {
+			translate: 0 0;
+		}
+		to {
+			translate: 0 -2.5px;
+		}
+	}
+
+	/* Compense la montée du groupe pour rester au sol, et rétrécit un peu. */
+	@keyframes hover-shadow {
+		from {
+			translate: 0 0;
+			scale: 1;
+		}
+		to {
+			translate: 0 2.5px;
+			scale: 0.8 1;
+		}
+	}
+
 	.spokes,
 	.foliage {
 		transform-box: fill-box;
