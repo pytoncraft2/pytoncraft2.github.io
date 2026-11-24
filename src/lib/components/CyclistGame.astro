@@ -4,7 +4,7 @@
 		<button type="button" class="close" data-close aria-label="Fermer le jeu"><span aria-hidden="true">×</span></button>
 	</header>
 
-	<p id="cyclist-game-intro">Tape les lettres du mot posé sur la route pour le franchir. Échap permet de quitter la partie. Deux obstacles manqués coûtent deux sacoches, puis le vélo devient un monocycle au troisième.</p>
+	<p id="cyclist-game-intro">Tape les lettres du mot posé sur la route pour le franchir. Échap permet de quitter la partie. Deux mots réussis d’affilée font passer du vélo au longboard, puis au hoverboard ; chaque obstacle manqué fait redescendre d’un cran. À vélo, il coûte une sacoche, puis le vélo devient un monocycle.</p>
 
 	<div class="start" data-game-start>
 		<button type="button" data-start="timed">Jouer · 5 s par mot</button>
@@ -29,6 +29,18 @@
 	import { createGameLandscape } from "../game-landscape";
 
 	const obstacles = ['web', 'grille', 'clavier', 'prototype', 'contraste'];
+	/*
+	 * Échelle des montures. Départ à vélo avec deux sacoches (niveau 0) ; en dessous, la règle
+	 * des sacoches puis du monocycle. On ne monte qu’à partir du vélo complet.
+	 */
+	const levels = {
+		unicycle: -3,
+		bike: 0,
+		longboard: 1,
+		hoverboard: 2
+	} as const;
+	const climbStreak = 2; // Mots réussis d’affilée pour monter d’un niveau.
+	const mountOf = (level: number) => level === levels.longboard ? 'longboard' : level === levels.hoverboard ? 'hoverboard' : undefined;
 	const roundDuration = 5000;
 	const wheelRadius = 11; // Rayon des roues dans le repère du SVG.
 	const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
@@ -50,6 +62,8 @@
 	if (launch && game && hero && land && hazard && start && round && result && resultTitle && input && prompt && announcement) {
 		let index = 0;
 		let missed = 0;
+		let level: number = levels.bike;
+		let streak = 0;
 		let timed = true;
 		let frame = 0;
 		let deadline = 0;
@@ -143,7 +157,9 @@
 			clearDroppedParts();
 			landscape.reset();
 			missed = 0;
-			hero.dataset.gameMissed = '0';
+			level = levels.bike;
+			streak = 0;
+			showLevel();
 			lettering.replaceChildren();
 			start.hidden = false;
 			round.hidden = true;
@@ -152,18 +168,45 @@
 			draw(0);
 		};
 
+		// Sacoches et monocycle (data-game-missed) sous le vélo complet, planche (data-game-mount) au-dessus.
+		const showLevel = () => {
+			hero.dataset.gameMissed = String(Math.max(0, levels.bike - level));
+			const mount = mountOf(level);
+			if (mount) hero.dataset.gameMount = mount;
+			else hero.removeAttribute('data-game-mount');
+		};
+
+		const describeChange = (success: boolean, previous: number) => {
+			if (success) {
+				if (level === previous) return 'Obstacle franchi.';
+				return level === levels.hoverboard ? 'Obstacle franchi. Tu passes en hoverboard !' : 'Obstacle franchi. Tu passes au longboard !';
+			}
+			if (previous === levels.hoverboard) return 'Obstacle manqué. Retour au longboard.';
+			if (previous === levels.longboard) return 'Obstacle manqué. Retour au vélo.';
+			if (previous > levels.bike - 2) return 'Obstacle manqué. Une sacoche en moins.';
+			if (previous === levels.bike - 2) return 'Obstacle manqué. Le vélo devient un monocycle !';
+			return 'Obstacle manqué.';
+		};
+
 		const finishObstacle = (success: boolean) => {
 			cancelAnimationFrame(frame);
-			if (!success) {
-				if (missed < 2) {
-					const bag = missed === 0 ? '.game-bag-one' : '.game-bag-two';
-					dropBag(land.querySelector<SVGRectElement>(bag));
-				} else if (missed === 2) {
-					releaseWheel();
+			const previous = level;
+			if (success) {
+				streak += 1;
+				if (streak >= climbStreak && level >= levels.bike && level < levels.hoverboard) {
+					level += 1;
+					streak = 0;
 				}
+			} else {
 				missed += 1;
+				streak = 0;
+				// Les pièces perdues tombent avant que le nouvel état ne les masque.
+				if (level === levels.bike) dropBag(land.querySelector<SVGRectElement>('.game-bag-one'));
+				else if (level === levels.bike - 1) dropBag(land.querySelector<SVGRectElement>('.game-bag-two'));
+				else if (level === levels.bike - 2) releaseWheel();
+				level = Math.max(levels.unicycle, level - 1);
 			}
-			hero.dataset.gameMissed = String(missed);
+			showLevel();
 			index += 1;
 
 			if (index === obstacles.length) {
@@ -172,7 +215,9 @@
 				draw(0);
 				result.hidden = false;
 				const score = obstacles.length - missed;
-				const arrival = missed >= 3 ? 'en monocycle' : 'à vélo';
+				const arrival = level === levels.hoverboard ? 'en hoverboard' :
+					level === levels.longboard ? 'en longboard' :
+					level === levels.unicycle ? 'en monocycle' : 'à vélo';
 				resultTitle.textContent = `${score} obstacle${score === 1 ? '' : 's'} franchi${score === 1 ? '' : 's'} sur ${obstacles.length}, arrivée ${arrival} !`;
 				announcement.textContent = '';
 				resultTitle.focus({ preventScroll: true });
@@ -180,10 +225,7 @@
 				return;
 			}
 
-			const feedback = success ? 'Obstacle franchi.' :
-				missed <= 2 ? 'Obstacle manqué. Une sacoche en moins.' :
-				missed === 3 ? 'Obstacle manqué. Le vélo devient un monocycle !' : 'Obstacle manqué.';
-			showObstacle(feedback);
+			showObstacle(describeChange(success, previous));
 		};
 
 		const tick = (now: number) => {
@@ -229,6 +271,7 @@
 			game.hidden = true;
 			hero.removeAttribute('data-playing');
 			hero.removeAttribute('data-game-missed');
+			hero.removeAttribute('data-game-mount');
 			lettering.replaceChildren();
 			clearDroppedParts();
 			hero.style.removeProperty('--game-rider-x');

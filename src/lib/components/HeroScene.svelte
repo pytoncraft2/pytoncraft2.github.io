@@ -212,7 +212,7 @@
 			<g transform="translate(0 289)">
 				<g class="rider">
 					<!-- Faisceau du phare avant, dont la pointe part de la lampe. -->
-					<polygon class="night beam unicycle-pose" points="19,-33 100,-17 100,0" fill="url(#hero-scene-beam)" style:--unicycle-pose="matrix(1, 0, 0, 1, -5, -4.5)" />
+					<polygon class="night beam unicycle-pose longboard-pose hoverboard-hidden" points="19,-33 100,-17 100,0" fill="url(#hero-scene-beam)" style:--unicycle-pose="matrix(1, 0, 0, 1, -5, -4.5)" style:--longboard-pose="matrix(1, 0, 0, 1, -5, -4.5)" />
 					<g class="bike-frame" fill="none" stroke="var(--scene-bike)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
 						<circle cx="-20" cy="-11" r="11" />
 						<circle cx="20" cy="-11" r="11" />
@@ -241,23 +241,45 @@
 						<path d="M0-11-5-32m-5 0h9" />
 						<path class="spokes" stroke-width="0.8" d="M-10-11H10M0-21V-1M-7-18 7-4M-7-4 7-18" />
 					</g>
+					<!-- Longboard : planche à kicktails, trucks et roues (deux visibles de profil). -->
+					<g class="game-longboard" fill="var(--scene-bike)">
+						<path d="M-24.5 -8 Q-23 -5.5 -19.5 -5.5 H10.5 Q14 -5.5 15.5 -8" fill="none" stroke="var(--scene-bike)" stroke-width="2.5" stroke-linecap="round" />
+						<path d="M-17 -4.5 h4 l-1 1.5 h-2 Z" />
+						<path d="M4 -4.5 h4 l-1 1.5 h-2 Z" />
+						<circle class="board-wheel" cx="-15" cy="-2" r="2" />
+						<circle class="board-wheel" cx="6" cy="-2" r="2" />
+					</g>
+					<!-- Hoverboard : la même planche, plus haut, avec des réacteurs à la place des roues. -->
+					<g class="game-hoverboard" fill="var(--scene-lamp)">
+						<ellipse class="hover-shadow" cx="-4.5" cy="-0.5" rx="14" ry="1" fill="var(--scene-bike)" opacity="0.2" />
+						<ellipse class="hover-glow" cx="-15" cy="-5" rx="3" ry="4" opacity="0.3" />
+						<ellipse class="hover-glow" cx="6" cy="-5" rx="3" ry="4" opacity="0.3" />
+						<ellipse cx="-15" cy="-8.5" rx="3.5" ry="1.2" />
+						<ellipse cx="6" cy="-8.5" rx="3.5" ry="1.2" />
+						<path d="M-24.5 -13 Q-23 -10.5 -19.5 -10.5 H10.5 Q14 -10.5 15.5 -13" fill="none" stroke="var(--scene-bike)" stroke-width="2.5" stroke-linecap="round" />
+					</g>
 					<rect class="game-bag game-bag-one" x="-30" y="-32.5" width="15.5" height="6.5" rx="2" fill="var(--scene-lamp)" />
 					<rect class="game-bag game-bag-two" x="-29.5" y="-23" width="15" height="10.5" rx="2" fill="var(--scene-lamp)" />
 
-					<!-- Phare avant, sur le tube de direction (allumé la nuit). -->
-					<rect class="unicycle-pose" x="15.5" y="-35" width="4" height="3.4" rx="1.2" fill="var(--scene-bike)" style:--unicycle-pose="matrix(1, 0, 0, 1, -5, -4.5)" />
-					<circle class="night unicycle-pose" cx="19" cy="-33.3" r="1.7" fill="var(--scene-lamp)" style:--unicycle-pose="matrix(1, 0, 0, 1, -5, -4.5)" />
-					<!-- Feu arrière, sur le hauban (contre la selle en monocycle) : visible seulement la nuit. -->
-					<circle class="night unicycle-pose" cx="-11" cy="-25.3" r="3.8" fill="var(--scene-rear-glow)" style:--unicycle-pose="matrix(1, 0, 0, 1, -1.5, -6.7)" />
-					<rect class="night unicycle-pose" x="-12.3" y="-26.5" width="2.6" height="2.4" rx="0.8" fill="var(--scene-rear)" style:--unicycle-pose="matrix(1, 0, 0, 1, -1.5, -6.7)" />
+					<!-- Phare avant, sur le tube de direction (allumé la nuit) ; dans la main en monocycle et en longboard. -->
+					<rect class="unicycle-pose longboard-pose hoverboard-hidden" x="15.5" y="-35" width="4" height="3.4" rx="1.2" fill="var(--scene-bike)" style:--unicycle-pose="matrix(1, 0, 0, 1, -5, -4.5)" style:--longboard-pose="matrix(1, 0, 0, 1, -5, -4.5)" />
+					<circle class="night unicycle-pose longboard-pose hoverboard-hidden" cx="19" cy="-33.3" r="1.7" fill="var(--scene-lamp)" style:--unicycle-pose="matrix(1, 0, 0, 1, -5, -4.5)" style:--longboard-pose="matrix(1, 0, 0, 1, -5, -4.5)" />
+					<!-- Feu arrière, sur le hauban (contre la selle en monocycle, sur le casque en longboard) : visible seulement la nuit. -->
+					<circle class="night unicycle-pose longboard-pose hoverboard-hidden" cx="-11" cy="-25.3" r="3.8" fill="var(--scene-rear-glow)" style:--unicycle-pose="matrix(1, 0, 0, 1, -1.5, -6.7)" style:--longboard-pose="matrix(1, 0, 0, 1, 2, -40.2)" />
+					<rect class="night unicycle-pose longboard-pose hoverboard-hidden" x="-12.3" y="-26.5" width="2.6" height="2.4" rx="0.8" fill="var(--scene-rear)" style:--unicycle-pose="matrix(1, 0, 0, 1, -1.5, -6.7)" style:--longboard-pose="matrix(1, 0, 0, 1, 2, -40.2)" />
 					<g fill="none" stroke="var(--scene-rider)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
 						<!-- Bras qui reste sur le guidon (épaule, coude, main), derrière le buste. -->
-						<polyline class="unicycle-pose" points="6,-50 11,-41 19,-37" style:--unicycle-pose="matrix(0.9562, 0.2923, -0.2923, 0.9562, -21.492, -9.659)" />
-						<polyline points="-8,-35 2,-24 -1,-12" />
-						<polyline class="unicycle-pose" points="-8,-35 6,-52" style:--unicycle-pose="matrix(0.9204, -0.3908, 0.3908, 0.9204, 13.253, -5.58)" />
+						<polyline class="unicycle-pose longboard-pose hoverboard-pose" points="6,-50 11,-41 19,-37" style:--unicycle-pose="matrix(0.9562, 0.2923, -0.2923, 0.9562, -21.492, -9.659)" style:--longboard-pose="matrix(0.9562, 0.2923, -0.2923, 0.9562, -21.492, -9.659)" style:--hoverboard-pose="matrix(0.9562, 0.2923, -0.2923, 0.9562, -21.492, -14.659)" />
+						<polyline class="longboard-hidden hoverboard-hidden" points="-8,-35 2,-24 -1,-12" />
+						<polyline class="unicycle-pose longboard-pose hoverboard-pose" points="-8,-35 6,-52" style:--unicycle-pose="matrix(0.9204, -0.3908, 0.3908, 0.9204, 13.253, -5.58)" style:--longboard-pose="matrix(0.9204, -0.3908, 0.3908, 0.9204, 13.253, -5.58)" style:--hoverboard-pose="matrix(0.9204, -0.3908, 0.3908, 0.9204, 13.253, -10.58)" />
 					</g>
-					<circle class="unicycle-pose" cx="10" cy="-60" r="6.5" fill="var(--scene-rider)" style:--unicycle-pose="matrix(0.9993, -0.035, 0.035, 0.9993, -9.092, -4.16)" />
-					<path class="unicycle-pose" d="M2.4,-61 A7.7,7.7 0 0 1 17.8,-61.6 L19.5,-60.4 Z" fill="var(--scene-helmet)" style:--unicycle-pose="matrix(0.9993, -0.035, 0.035, 0.9993, -9.092, -4.16)" />
+					<!-- Jambes debout sur la planche (longboard et hoverboard), à la place de la jambe qui pédale. -->
+					<g class="board-legs hoverboard-pose" fill="none" stroke="var(--scene-rider)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" style:--hoverboard-pose="matrix(1, 0, 0, 1, 0, -5)">
+						<polyline points="-7.8,-34.7 -11,-21 -13,-8.5" />
+						<polyline points="-7.8,-34.7 -1,-21.5 4,-8.5" />
+					</g>
+					<circle class="unicycle-pose longboard-pose hoverboard-pose" cx="10" cy="-60" r="6.5" fill="var(--scene-rider)" style:--unicycle-pose="matrix(0.9993, -0.035, 0.035, 0.9993, -9.092, -4.16)" style:--longboard-pose="matrix(0.9993, -0.035, 0.035, 0.9993, -9.092, -4.16)" style:--hoverboard-pose="matrix(0.9993, -0.035, 0.035, 0.9993, -9.092, -9.16)" />
+					<path class="unicycle-pose longboard-pose hoverboard-pose" d="M2.4,-61 A7.7,7.7 0 0 1 17.8,-61.6 L19.5,-60.4 Z" fill="var(--scene-helmet)" style:--unicycle-pose="matrix(0.9993, -0.035, 0.035, 0.9993, -9.092, -4.16)" style:--longboard-pose="matrix(0.9993, -0.035, 0.035, 0.9993, -9.092, -4.16)" style:--hoverboard-pose="matrix(0.9993, -0.035, 0.035, 0.9993, -9.092, -9.16)" />
 					<!--
 						Bras qui fait coucou : même forme que le bras du guidon, avec lequel il se confond au
 						repos. Il tourne à l'épaule (.wave-arm) et l'avant-bras se déplie au coude
@@ -265,9 +287,9 @@
 					-->
 					<g fill="none" stroke="var(--scene-rider)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(6 -50)">
 						<g class="wave-arm">
-							<polyline class="unicycle-pose" points="0,0 5,9" style:--unicycle-pose="matrix(0.9876, 0.1563, -0.1563, 0.9876, -7.694, -3.793)" />
+							<polyline class="unicycle-pose longboard-pose hoverboard-pose" points="0,0 5,9" style:--unicycle-pose="matrix(0.9876, 0.1563, -0.1563, 0.9876, -7.694, -3.793)" style:--longboard-pose="matrix(0.9876, 0.1563, -0.1563, 0.9876, -7.694, -3.793)" style:--hoverboard-pose="matrix(0.9876, 0.1563, -0.1563, 0.9876, -7.694, -8.793)" />
 							<g transform="translate(5 9)">
-								<polyline class="wave-forearm unicycle-pose" points="0,0 8,4" style:--unicycle-pose="matrix(0.9876, 0.1563, -0.1563, 0.9876, -8.429, -2.198)" />
+								<polyline class="wave-forearm unicycle-pose longboard-pose hoverboard-pose" points="0,0 8,4" style:--unicycle-pose="matrix(0.9876, 0.1563, -0.1563, 0.9876, -8.429, -2.198)" style:--longboard-pose="matrix(0.9876, 0.1563, -0.1563, 0.9876, -8.429, -2.198)" style:--hoverboard-pose="matrix(0.9876, 0.1563, -0.1563, 0.9876, -8.429, -7.198)" />
 							</g>
 						</g>
 					</g>
@@ -442,7 +464,7 @@
 		transform: translateX(360px);
 	}
 
-	.game-obstacle, .game-obstacle path, .game-bag, .game-unicycle, .rack {
+	.game-obstacle, .game-obstacle path, .game-bag, .game-unicycle, .rack, .game-longboard, .game-hoverboard, .board-legs {
 		display: none;
 	}
 
@@ -491,6 +513,34 @@
 	 */
 	:global(.hero[data-playing]:is([data-game-missed='3'], [data-game-missed='4'], [data-game-missed='5'])) .unicycle-pose {
 		transform: var(--unicycle-pose);
+		transform-box: view-box;
+		transform-origin: 0 0;
+	}
+
+	/*
+	 * Planches (longboard, puis hoverboard) : data-game-mount remplace le vélo. Chaque pièce du
+	 * cycliste porte sa pose par monture (--longboard-pose, --hoverboard-pose) ; les pièces
+	 * inutiles sur une planche portent la classe <monture>-hidden.
+	 */
+	:global(.hero[data-playing][data-game-mount='longboard']) :is(.game-longboard, .board-legs),
+	:global(.hero[data-playing][data-game-mount='hoverboard']) :is(.game-hoverboard, .board-legs) {
+		display: inline;
+	}
+
+	:global(.hero[data-playing][data-game-mount]) :is(.bike-frame, .game-bag, .game-unicycle),
+	:global(.hero[data-playing][data-game-mount='longboard']) .longboard-hidden,
+	:global(.hero[data-playing][data-game-mount='hoverboard']) .hoverboard-hidden {
+		display: none;
+	}
+
+	:global(.hero[data-playing][data-game-mount='longboard']) .longboard-pose {
+		transform: var(--longboard-pose);
+		transform-box: view-box;
+		transform-origin: 0 0;
+	}
+
+	:global(.hero[data-playing][data-game-mount='hoverboard']) .hoverboard-pose {
+		transform: var(--hoverboard-pose);
 		transform-box: view-box;
 		transform-origin: 0 0;
 	}
