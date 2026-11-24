@@ -1,6 +1,6 @@
 // Obstacles spéciaux du jeu du cycliste : un par partie, à la place d’un mot ordinaire de la route.
 
-export type SpecialKind = 'glass' | 'bear';
+export type SpecialKind = 'glass' | 'bear' | 'tree';
 
 export type Special = {
 	kind: SpecialKind;
@@ -10,6 +10,9 @@ export type Special = {
 export const specialWords = {
 	glass: 'verre',
 	bear: 'chut',
+	// L’arbre tombé : plus long à franchir, sauf en hoverboard, qui le survole.
+	tree: 'branchage',
+	treeHover: 'tronc',
 	// Réparation d’une crevaison, proposée tant que le pneu est à plat.
 	repair: 'rustine'
 } as const;
@@ -21,10 +24,10 @@ export const specialInitials = new Set(Object.values(specialWords).map(word => w
 export const bearMinInterval = 250;
 
 /**
- * Tire l’obstacle spécial d’une partie, sur l’un des mots proposés.
+ * Tire l’obstacle spécial d’une partie : l’arbre seulement pendant l’orage, sur l’un des mots proposés.
  */
-export function pickSpecial(rounds: readonly number[], random: () => number = Math.random): Special {
-	const kinds: SpecialKind[] = ['glass', 'bear'];
+export function pickSpecial(storm: boolean, rounds: readonly number[], random: () => number = Math.random): Special {
+	const kinds: SpecialKind[] = storm ? ['glass', 'bear', 'tree'] : ['glass', 'bear'];
 	return {
 		kind: kinds[Math.floor(random() * kinds.length)],
 		round: rounds[Math.floor(random() * rounds.length)]

@@ -233,6 +233,9 @@
 				</g>
 			</g>
 
+			<!-- Éclair qui frappe un arbre avant l’arbre tombé (orage), devant les collines ; position posée par CyclistGame.astro. -->
+			<path class="game-strike" data-game-strike d="M0 120 L-10 170 L-2 170 L-14 245 L12 160 L3 160 L10 120 Z" fill="var(--scene-lamp)" />
+
 			<g class="layer" style:--i="4">
 				<path fill="var(--scene-ground)" d="M0 292 C300 286 600 288 720 288 C900 288 1200 286 1440 290 L1440 320 L0 320 Z" />
 			</g>
@@ -267,6 +270,15 @@
 					<line class="bear-eye-closed" x1="-12" y1="-10.5" x2="-9" y2="-10.5" stroke-linecap="round" />
 					<circle class="bear-eye-open" cx="-10.5" cy="-10.5" r="1" fill="var(--scene-bike)" stroke="none" />
 					<text class="bear-zzz" x="-6" y="-21">z Z</text>
+				</g>
+				<g class="game-tree" stroke="var(--scene-bike)" stroke-width="0.8">
+					<line x1="-30" y1="-6" x2="-34" y2="-13" stroke="var(--scene-trunk)" stroke-width="2" stroke-linecap="round" />
+					<rect x="-46" y="-7" width="40" height="7" rx="3.5" fill="var(--scene-trunk)" />
+					<circle cx="-58" cy="-5" r="6" fill="var(--scene-tree-shade)" />
+					<circle cx="-51" cy="-9" r="8" fill="var(--scene-tree)" />
+					<circle cx="-46" cy="-16" r="6" fill="var(--scene-tree)" />
+					<!-- Bout cassé du tronc. -->
+					<circle cx="-6" cy="-3.5" r="3" fill="var(--scene-snow)" />
 				</g>
 			</g>
 
@@ -582,7 +594,7 @@
 	}
 
 	.game-obstacle, .game-obstacle path, .game-bag, .game-unicycle, .rack, .game-longboard, .game-hoverboard, .board-legs, .game-rails, .game-station, .game-train, .game-bonus, .game-ice, .game-bolt,
-	.game-glass, .game-bear, .game-bear-chase, .game-repair {
+	.game-glass, .game-bear, .game-tree, .game-bear-chase, .game-strike, .game-repair {
 		display: none;
 	}
 
@@ -615,7 +627,9 @@
 	:global(.hero[data-playing][data-game-weather='ice']) .game-ice,
 	:global(.hero[data-playing][data-game-obstacle='glass']) :is(.game-glass, .game-glass path),
 	:global(.hero[data-playing][data-game-obstacle='bear']) .game-bear,
+	:global(.hero[data-playing][data-game-obstacle='tree']) .game-tree,
 	:global(.hero[data-playing][data-game-chase]) .game-bear-chase,
+	:global(.hero[data-playing][data-game-strike]) .game-strike,
 	:global(.hero[data-playing][data-game-flat]) .game-repair,
 	:global(.hero[data-playing][data-game-weather='storm'][data-game-flash]) .game-bolt,
 	:global(.hero[data-playing]) .rack,

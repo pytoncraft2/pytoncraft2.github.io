@@ -4,7 +4,7 @@
 		<button type="button" class="close" data-close aria-label="Fermer le jeu"><span aria-hidden="true">×</span></button>
 	</header>
 
-	<p id="cyclist-game-intro">Tape les lettres du mot posé sur la route pour le franchir. Échap permet de quitter la partie. Deux mots réussis d’affilée font passer du vélo au longboard, puis au hoverboard ; chaque obstacle manqué fait redescendre d’un cran. À vélo, il coûte une sacoche, puis le vélo devient un monocycle. Des mots bonus passent sur les collines : les taper rend une sacoche, ou fait monter d’un cran. La météo change à chaque partie : la pluie masque des lettres, le verglas fait déraper à chaque faute. Chaque partie cache aussi un obstacle spécial : du verre brisé qui fait crever ou un ours endormi à passer lentement. Une fois par partie, un train propose le mot : flèche droite pour l’accepter, mais relis-le, il peut se tromper.</p>
+	<p id="cyclist-game-intro">Tape les lettres du mot posé sur la route pour le franchir. Échap permet de quitter la partie. Deux mots réussis d’affilée font passer du vélo au longboard, puis au hoverboard ; chaque obstacle manqué fait redescendre d’un cran. À vélo, il coûte une sacoche, puis le vélo devient un monocycle. Des mots bonus passent sur les collines : les taper rend une sacoche, ou fait monter d’un cran. La météo change à chaque partie : la pluie masque des lettres, le verglas fait déraper à chaque faute. Chaque partie cache aussi un obstacle spécial : du verre brisé qui fait crever, un ours endormi à passer lentement ou, pendant l’orage, un arbre tombé. Une fois par partie, un train propose le mot : flèche droite pour l’accepter, mais relis-le, il peut se tromper.</p>
 
 	<div class="start" data-game-start>
 		<button type="button" data-start="timed">Jouer · 5 s par mot</button>
@@ -78,7 +78,8 @@
 	/*
 	 * Obstacles spéciaux : un par partie, à la place du 2e ou du 3e mot (avant la gare et le train).
 	 * Verre brisé : raté à vélo ou en monocycle, le pneu crève (plus de montée tant qu’il n’est pas
-	 * réparé) ; les planches n’ont rien à craindre. Ours endormi : il faut taper lentement.
+	 * réparé) ; les planches n’ont rien à craindre. Ours endormi : il faut taper lentement. Arbre
+	 * tombé (orage) : mot plus long, sauf en hoverboard qui le survole.
 	 */
 	const specialRounds = [1, 2];
 	/*
@@ -120,9 +121,10 @@
 	const trainLabel = train?.querySelector<SVGTextElement>('.train-suggestion');
 	const bonusText = land?.querySelector<SVGTextElement>('[data-game-bonus]');
 	const bolt = land?.querySelector<SVGPathElement>('[data-game-bolt]');
+	const strike = land?.querySelector<SVGPathElement>('[data-game-strike]');
 	const chaseBear = land?.querySelector<SVGGElement>('[data-game-bear-chase]');
 	const repairText = land?.querySelector<SVGTextElement>('[data-game-repair]');
-	if (launch && game && hero && land && hazard && start && round && result && resultTitle && input && prompt && announcement && acceptButton && train && trainLabel && rails && station && bonusText && bolt && chaseBear && repairText) {
+	if (launch && game && hero && land && hazard && start && round && result && resultTitle && input && prompt && announcement && acceptButton && train && trainLabel && rails && station && bonusText && bolt && strike && chaseBear && repairText) {
 		let index = 0;
 		// Distance parcourue à l’entrée des rails ; undefined avant leur apparition.
 		let railsFrom: number | undefined;
@@ -143,6 +145,7 @@
 		let bearLetterAt: number | undefined;
 		let bearWarned = false;
 		let chaseFrom: number | undefined;
+		let strikeUntil = 0;
 		let usedBonuses: string[] = [];
 		let weather: Weather = 'clear';
 		// Prochaine goutte sur une lettre (pluie) et prochain éclair (orage), en temps de requestAnimationFrame.
@@ -236,9 +239,10 @@
 
 		const isSpecialRound = (kind?: SpecialKind) => special !== undefined && index === special.round && (!kind || special.kind === kind);
 
-		// Mot de la route : un obstacle spécial remplace le mot prévu.
+		// Mot de la route : un obstacle spécial remplace le mot prévu ; l’arbre se survole en hoverboard.
 		const wordFor = (round: number) => {
 			if (!special || round !== special.round) return obstacles[round];
+			if (special.kind === 'tree') return level === levels.hoverboard ? specialWords.treeHover : specialWords.tree;
 			return specialWords[special.kind];
 		};
 
@@ -247,7 +251,10 @@
 			if (special.kind === 'glass') {
 				return `Du verre brisé sur la route : tape « ${specialWords.glass} » pour passer.${level > levels.bike ? ' Les roues de ta planche ne crèvent pas.' : ' Si tu le rates, tu crèves.'}`;
 			}
-			return `Un ours dort au bord du chemin : tape « ${specialWords.bear} » lentement, une lettre à la fois, sinon il se réveille.`;
+			if (special.kind === 'bear') {
+				return `Un ours dort au bord du chemin : tape « ${specialWords.bear} » lentement, une lettre à la fois, sinon il se réveille.`;
+			}
+			return `Un éclair a frappé un arbre : un tronc barre la route.${level === levels.hoverboard ? ` En hoverboard, tu le survoles : tape « ${specialWords.treeHover} ».` : ` Tape « ${specialWords.tree} » pour le franchir.`}`;
 		};
 
 		// Pneu crevé : plus de montée de cran tant que « rustine » n’est pas tapé.
@@ -282,7 +289,8 @@
 			special = undefined;
 			setFlat(false);
 			endChase();
-			for (const name of ['data-game-obstacle', 'data-game-bear']) hero.removeAttribute(name);
+			strikeUntil = 0;
+			for (const name of ['data-game-obstacle', 'data-game-bear', 'data-game-strike']) hero.removeAttribute(name);
 		};
 
 		const showBonus = (feedback: string) => {
@@ -383,6 +391,8 @@
 				else bonusText.setAttribute('x', String(bonusX));
 			}
 			const groundY = Number(land.dataset.horizonY);
+			// L’éclair qui frappe l’arbre tombe à droite, là où le tronc va entrer.
+			strike.setAttribute('transform', `translate(${sceneX(0.86)} 0)`);
 			repairText.setAttribute('x', String(riderX));
 			if (chaseFrom !== undefined) {
 				// L’ours court derrière le cycliste, puis renonce et repart vers la gauche.
@@ -496,7 +506,7 @@
 			if (index === obstacles.length) {
 				clearBonus();
 				endChase();
-				for (const name of ['data-game-flash', 'data-game-obstacle']) hero.removeAttribute(name);
+				for (const name of ['data-game-flash', 'data-game-obstacle', 'data-game-strike']) hero.removeAttribute(name);
 				lettering.replaceChildren();
 				round.hidden = true;
 				draw(0);
@@ -532,6 +542,10 @@
 
 		// Effets animés de la météo, absents en mouvement réduit (aucun clignotement).
 		const updateWeather = (now: number) => {
+			if (strikeUntil && now >= strikeUntil) {
+				hero.removeAttribute('data-game-strike');
+				strikeUntil = 0;
+			}
 			if (weather === 'rain') {
 				if (dropUntil && now >= dropUntil) {
 					lettering.querySelector('.drenched')?.classList.remove('drenched');
@@ -592,6 +606,13 @@
 			if (special && isSpecialRound()) {
 				hero.dataset.gameObstacle = special.kind;
 				feedback = `${feedback} ${specialIntro()}`.trim();
+				if (special.kind === 'tree' && !reduced) {
+					// Un seul éclair bref, à la place du prochain éclair lointain.
+					const now = performance.now();
+					hero.dataset.gameStrike = '';
+					strikeUntil = now + 180;
+					nextFlash = now + 5000;
+				}
 			} else {
 				hero.removeAttribute('data-game-obstacle');
 			}
@@ -686,7 +707,7 @@
 				start.hidden = true;
 				round.hidden = false;
 				setWeather(weathers[Math.floor(Math.random() * weathers.length)]);
-				special = pickSpecial(specialRounds);
+				special = pickSpecial(weather === 'storm', specialRounds);
 				showObstacle(weatherIntro[weather]);
 			});
 		});
