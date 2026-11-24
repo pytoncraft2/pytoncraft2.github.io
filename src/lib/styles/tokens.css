@@ -56,6 +56,10 @@
   /* Feu arrière, allumé seulement la nuit */
   --scene-rear: #ff6b5e;
   --scene-rear-glow: rgb(255 90 70 / 0.35);
+  /* Météo du jeu du cycliste : pluie, verglas sur la route, ciel d’orage */
+  --scene-rain: rgb(60 100 120 / 0.45);
+  --scene-ice: rgb(225 245 255 / 0.7);
+  --scene-storm: rgb(40 50 70 / 0.35);
 
   /* Layout */
   --spacing-0: 0;
@@ -140,6 +144,9 @@
   --scene-rider: var(--color-smoke);
   --scene-bike: var(--color-frost);
   --scene-helmet: var(--color-frost);
+  --scene-rain: rgb(170 204 204 / 0.35);
+  --scene-ice: rgb(150 200 230 / 0.22);
+  --scene-storm: rgb(0 0 0 / 0.35);
 }
 
 /* Permet au ciel de la scène d’accueil de passer en douceur du jour à la nuit */

@@ -68,6 +68,8 @@
 	<!-- Tout le décor, agrandi vers le vélo en bas de l'accueil (voir contact-bubble.ts). -->
 	<div class="zoom">
 		<div class="sky"></div>
+		<!-- Ciel d’orage du jeu (data-game-weather='storm'), par-dessus le dégradé du ciel. -->
+		<div class="weather-storm"></div>
 
 		<svg class="sky-layer" viewBox="0 0 1440 640" preserveAspectRatio="xMidYMin slice" focusable="false">
 			<defs>
@@ -147,6 +149,9 @@
 					<circle cx="1010" cy="92" r="28" fill="var(--scene-moon)" mask="url(#hero-scene-moon-mask)" />
 				</g>
 			</g>
+
+			<!-- Éclair lointain de l’orage, derrière les montagnes : position et affichage posés par CyclistGame.astro. -->
+			<path class="game-bolt" data-game-bolt d="M0 20 L-9 62 L-1 62 L-12 112 L10 54 L2 54 L9 20 Z" fill="var(--scene-lamp)" transform="translate(400 0)" />
 
 			<g class="layer" style:--i="1" style:--depth-offset="12px" style:--game-pan="30px" style:--game-overscan=".09">
 				<path
@@ -230,6 +235,11 @@
 
 			<g class="layer" style:--i="4">
 				<path fill="var(--scene-ground)" d="M0 292 C300 286 600 288 720 288 C900 288 1200 286 1440 290 L1440 320 L0 320 Z" />
+			</g>
+			<!-- Verglas du jeu : voile glacé sur la route, avec quelques reflets. -->
+			<g class="game-ice">
+				<path fill="var(--scene-ice)" d="M0 292 C300 286 600 288 720 288 C900 288 1200 286 1440 290 L1440 320 L0 320 Z" />
+				<path d="M80 300h46M330 306h30M560 298h52M820 304h36M1060 299h48M1290 305h34" stroke="var(--scene-snow)" stroke-width="1.5" stroke-linecap="round" />
 			</g>
 
 			<g class="game-obstacle" data-game-obstacle transform="translate(1240 289)" fill="none"
@@ -328,6 +338,9 @@
 				</g>
 			</g>
 		</svg>
+
+		<!-- Pluie du jeu (data-game-weather='rain'), par-dessus tout le décor. -->
+		<div class="weather-rain"></div>
 	</div>
 </div>
 
@@ -418,6 +431,44 @@
 		height: 100%;
 	}
 
+	/* Météo du jeu : couches absentes hors partie. */
+	.weather-storm,
+	.weather-rain {
+		position: absolute;
+		inset: 0;
+		display: none;
+		pointer-events: none;
+	}
+
+	.weather-storm {
+		background: var(--scene-storm);
+	}
+
+	/* Gouttes en traits obliques : motif répété en masque, coloré par --scene-rain. */
+	.weather-rain {
+		background: var(--scene-rain);
+		mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cpath d='M12 4l-3 12M44 22l-3 12M70 6l-3 12M26 44l-3 12M58 54l-3 12M76 34l-3 12M8 62l-3 12' stroke='black' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E");
+		mask-size: 80px 80px;
+	}
+
+	:global(.hero[data-playing][data-game-weather='storm']) .weather-storm,
+	:global(.hero[data-playing][data-game-weather='rain']) .weather-rain {
+		display: block;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		:global(html:not([data-reduced-motion]) .hero[data-playing]) .weather-rain {
+			animation: rain-fall 900ms linear infinite;
+		}
+	}
+
+	/* Un motif entier par cycle (80 px en x, 320 px en y), dans le sens des traits : pas de saut. */
+	@keyframes rain-fall {
+		to {
+			mask-position: -80px 320px;
+		}
+	}
+
 	/* Légèrement débordante pour éviter un liseré de ciel sous le sol. */
 	.land {
 		bottom: -2px;
@@ -496,7 +547,7 @@
 		transform: translateX(360px);
 	}
 
-	.game-obstacle, .game-obstacle path, .game-bag, .game-unicycle, .rack, .game-longboard, .game-hoverboard, .board-legs, .game-rails, .game-station, .game-train, .game-bonus {
+	.game-obstacle, .game-obstacle path, .game-bag, .game-unicycle, .rack, .game-longboard, .game-hoverboard, .board-legs, .game-rails, .game-station, .game-train, .game-bonus, .game-ice, .game-bolt {
 		display: none;
 	}
 
@@ -526,6 +577,8 @@
 	:global(.hero[data-playing][data-game-rails]) :is(.game-rails, .game-station),
 	:global(.hero[data-playing][data-game-train]) .game-train,
 	:global(.hero[data-playing][data-game-bonus]) .game-bonus,
+	:global(.hero[data-playing][data-game-weather='ice']) .game-ice,
+	:global(.hero[data-playing][data-game-weather='storm'][data-game-flash]) .game-bolt,
 	:global(.hero[data-playing]) .rack,
 	:global(.hero[data-playing][data-game-missed='0']) .game-bag-one,
 	:global(.hero[data-playing]:is([data-game-missed='0'], [data-game-missed='1'])) .game-bag-two,

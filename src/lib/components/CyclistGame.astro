@@ -4,7 +4,7 @@
 		<button type="button" class="close" data-close aria-label="Fermer le jeu"><span aria-hidden="true">×</span></button>
 	</header>
 
-	<p id="cyclist-game-intro">Tape les lettres du mot posé sur la route pour le franchir. Échap permet de quitter la partie. Deux mots réussis d’affilée font passer du vélo au longboard, puis au hoverboard ; chaque obstacle manqué fait redescendre d’un cran. À vélo, il coûte une sacoche, puis le vélo devient un monocycle. Des mots bonus passent sur les collines : les taper rend une sacoche, ou fait monter d’un cran. Une fois par partie, un train propose le mot : flèche droite pour l’accepter, mais relis-le, il peut se tromper.</p>
+	<p id="cyclist-game-intro">Tape les lettres du mot posé sur la route pour le franchir. Échap permet de quitter la partie. Deux mots réussis d’affilée font passer du vélo au longboard, puis au hoverboard ; chaque obstacle manqué fait redescendre d’un cran. À vélo, il coûte une sacoche, puis le vélo devient un monocycle. Des mots bonus passent sur les collines : les taper rend une sacoche, ou fait monter d’un cran. La météo change à chaque partie : la pluie masque des lettres, le verglas fait déraper à chaque faute. Une fois par partie, un train propose le mot : flèche droite pour l’accepter, mais relis-le, il peut se tromper.</p>
 
 	<div class="start" data-game-start>
 		<button type="button" data-start="timed">Jouer · 5 s par mot</button>
@@ -71,6 +71,20 @@
 	const bonusOffset = (round: number) => round === railsRound ? 160 : 10;
 	const roadInitials = new Set(obstacles.map(word => word[0]));
 	const bonusWords = homeTechs.map(tech => tech.label).filter(label => !roadInitials.has(label[0].toLocaleLowerCase('fr')));
+	/*
+	 * Météo, tirée au début de chaque partie. Elle gêne la lecture (pluie) ou la frappe (verglas),
+	 * jamais la direction ; l’orage n’est qu’une ambiance. Le hoverboard flotte au-dessus du verglas,
+	 * le longboard glisse sur la route mouillée.
+	 */
+	const weathers = ['clear', 'rain', 'ice', 'storm'] as const;
+	type Weather = typeof weathers[number];
+	const weatherIntro: Record<Weather, string> = {
+		clear: 'Météo : temps clair.',
+		rain: 'Météo : pluie. Des gouttes masquent parfois une lettre, et le longboard glisse sur la route mouillée.',
+		ice: 'Météo : verglas. Une faute fait aussi perdre la dernière lettre validée, sauf en hoverboard.',
+		storm: 'Météo : orage. Des éclairs au loin, sans effet sur la conduite.'
+	};
+	const weatherArrival: Record<Weather, string> = { clear: '', rain: ' sous la pluie', ice: ' sur le verglas', storm: ' sous l’orage' };
 	const roundDuration = 5000;
 	const wheelRadius = 11; // Rayon des roues dans le repère du SVG.
 	const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
@@ -95,16 +109,25 @@
 	const station = land?.querySelector<SVGGElement>('[data-game-station]');
 	const trainLabel = train?.querySelector<SVGTextElement>('.train-suggestion');
 	const bonusText = land?.querySelector<SVGTextElement>('[data-game-bonus]');
-	if (launch && game && hero && land && hazard && start && round && result && resultTitle && input && prompt && announcement && acceptButton && train && trainLabel && rails && station && bonusText) {
+	const bolt = land?.querySelector<SVGPathElement>('[data-game-bolt]');
+	if (launch && game && hero && land && hazard && start && round && result && resultTitle && input && prompt && announcement && acceptButton && train && trainLabel && rails && station && bonusText && bolt) {
 		let index = 0;
 		// Distance parcourue à l’entrée des rails ; undefined avant leur apparition.
 		let railsFrom: number | undefined;
+		// Décalage d’entrée des rails, fixé à leur première image pour laisser passer un mot bonus encore proche du bord.
+		let railsOffset: number | undefined;
 		// Suggestion du mot en cours : texte proposé, et s’il est déjà affiché.
 		let suggestion: { text: string; correct: boolean; shown: boolean } | undefined;
 		// Mot bonus affiché : libellé, mot à taper, distance à son entrée et largeur ; bonusTarget quand la saisie le vise.
 		let bonus: { label: string; word: string; from: number; offset: number; width: number } | undefined;
 		let bonusTarget = false;
 		let usedBonuses: string[] = [];
+		let weather: Weather = 'clear';
+		// Prochaine goutte sur une lettre (pluie) et prochain éclair (orage), en temps de requestAnimationFrame.
+		let nextDrop = 0;
+		let dropUntil = 0;
+		let nextFlash = 0;
+		let flashUntil = 0;
 		let missed = 0;
 		let level: number = levels.bike;
 		let streak = 0;
@@ -228,6 +251,7 @@
 
 		const clearRails = () => {
 			railsFrom = undefined;
+			railsOffset = undefined;
 			hero.removeAttribute('data-game-rails');
 		};
 
@@ -248,7 +272,11 @@
 			// Les rails (et leur gare) commencent au bord droit et défilent avec le plan du milieu ; fixes en mouvement réduit.
 			let railsX = -Infinity;
 			if (railsFrom !== undefined) {
-				railsX = reduced ? sceneX(0.4) : sceneX(1) + 20 - (distance - railsFrom) * midPlaneSpeed;
+				if (railsOffset === undefined) {
+					const bonusRight = bonus && !reduced ? sceneX(1) + bonus.offset - (distance - bonus.from) * midPlaneSpeed + bonus.width : -Infinity;
+					railsOffset = Math.max(20, bonusRight + 30 - sceneX(1));
+				}
+				railsX = reduced ? sceneX(0.4) : sceneX(1) + railsOffset - (distance - railsFrom) * midPlaneSpeed;
 				rails.setAttribute('x1', String(railsX));
 				rails.setAttribute('x2', String(railsX + 3000));
 				station.setAttribute('transform', `translate(${railsX} 229)`);
@@ -304,6 +332,7 @@
 			clearRails();
 			clearBonus();
 			usedBonuses = [];
+			setWeather('clear');
 			lettering.replaceChildren();
 			start.hidden = false;
 			round.hidden = true;
@@ -326,6 +355,7 @@
 				return level === levels.hoverboard ? 'Obstacle franchi. Tu passes en hoverboard !' : 'Obstacle franchi. Tu passes au longboard !';
 			}
 			if (previous === levels.hoverboard) return 'Obstacle manqué. Retour au longboard.';
+			if (previous === levels.longboard && level < levels.bike) return 'Obstacle manqué. Le longboard glisse sur la route mouillée : retour au vélo, une sacoche en moins.';
 			if (previous === levels.longboard) return 'Obstacle manqué. Retour au vélo.';
 			if (previous > levels.bike - 2) return 'Obstacle manqué. Une sacoche en moins.';
 			if (previous === levels.bike - 2) return 'Obstacle manqué. Le vélo devient un monocycle !';
@@ -349,13 +379,20 @@
 				if (level === levels.bike) dropBag(land.querySelector<SVGRectElement>('.game-bag-one'));
 				else if (level === levels.bike - 1) dropBag(land.querySelector<SVGRectElement>('.game-bag-two'));
 				else if (level === levels.bike - 2) releaseWheel();
+				const slides = weather === 'rain' && level === levels.longboard;
 				level = Math.max(levels.unicycle, level - 1);
+				// Sous la pluie, le longboard glisse : un cran de plus, la première sacoche tombe.
+				if (slides) {
+					dropBag(land.querySelector<SVGRectElement>('.game-bag-one'));
+					level -= 1;
+				}
 			}
 			showLevel();
 			index += 1;
 
 			if (index === obstacles.length) {
 				clearBonus();
+				hero.removeAttribute('data-game-flash');
 				lettering.replaceChildren();
 				round.hidden = true;
 				draw(0);
@@ -364,7 +401,7 @@
 				const arrival = level === levels.hoverboard ? 'en hoverboard' :
 					level === levels.longboard ? 'en longboard' :
 					level === levels.unicycle ? 'en monocycle' : 'à vélo';
-				resultTitle.textContent = `${score} obstacle${score === 1 ? '' : 's'} franchi${score === 1 ? '' : 's'} sur ${obstacles.length}, arrivée ${arrival} !`;
+				resultTitle.textContent = `${score} obstacle${score === 1 ? '' : 's'} franchi${score === 1 ? '' : 's'} sur ${obstacles.length}, arrivée ${arrival}${weatherArrival[weather]} !`;
 				announcement.textContent = '';
 				resultTitle.focus({ preventScroll: true });
 				if (looseWheel) frame = requestAnimationFrame(tick);
@@ -374,6 +411,48 @@
 			showObstacle(note ? `${note} ${describeChange(success, previous)}` : describeChange(success, previous));
 		};
 
+		const setWeather = (next: Weather) => {
+			weather = next;
+			if (next === 'clear') hero.removeAttribute('data-game-weather');
+			else hero.dataset.gameWeather = next;
+			hero.removeAttribute('data-game-flash');
+			const now = performance.now();
+			nextDrop = now + 1200;
+			dropUntil = 0;
+			nextFlash = now + 2500;
+			flashUntil = 0;
+		};
+
+		// Effets animés de la météo, absents en mouvement réduit (aucun clignotement).
+		const updateWeather = (now: number) => {
+			if (weather === 'rain') {
+				if (dropUntil && now >= dropUntil) {
+					lettering.querySelector('.drenched')?.classList.remove('drenched');
+					dropUntil = 0;
+				}
+				if (now >= nextDrop) {
+					// Une goutte masque brièvement une lettre pas encore tapée.
+					const dry = Array.from(lettering.children).filter(letter => !letter.classList.contains('matched'));
+					dry[Math.floor(Math.random() * dry.length)]?.classList.add('drenched');
+					dropUntil = now + 450;
+					nextDrop = now + 900 + Math.random() * 700;
+				}
+			}
+			if (weather === 'storm') {
+				if (flashUntil && now >= flashUntil) {
+					hero.removeAttribute('data-game-flash');
+					flashUntil = 0;
+				}
+				if (now >= nextFlash) {
+					// Un seul éclair bref et lointain toutes les 5 à 10 s, jamais tout l’écran.
+					bolt.setAttribute('transform', `translate(${200 + Math.random() * 1040} 0)`);
+					hero.dataset.gameFlash = '';
+					flashUntil = now + 140;
+					nextFlash = now + 5000 + Math.random() * 5000;
+				}
+			}
+		};
+
 		const tick = (now: number) => {
 			const reduced = document.documentElement.hasAttribute('data-reduced-motion') || motionPreference.matches;
 			if (round.hidden) {
@@ -381,7 +460,10 @@
 				if (looseWheel && !reduced) frame = requestAnimationFrame(tick);
 				return;
 			}
-			if (!reduced) distance += Math.min(now - previousTime, 64) * 0.18;
+			if (!reduced) {
+				distance += Math.min(now - previousTime, 64) * 0.18;
+				updateWeather(now);
+			}
 			previousTime = now;
 			const elapsed = Math.min(1, Math.max(0, 1 - (deadline - now) / roundDuration));
 			// Sans chrono, le mot ralentit puis attend devant la roue.
@@ -415,6 +497,7 @@
 			}
 			if (index === railsRound) {
 				railsFrom = distance;
+				railsOffset = undefined;
 				hero.dataset.gameRails = '';
 				draw(0);
 			}
@@ -438,6 +521,7 @@
 			clearSuggestion();
 			clearRails();
 			clearBonus();
+			setWeather('clear');
 			lettering.replaceChildren();
 			clearDroppedParts();
 			hero.style.removeProperty('--game-rider-x');
@@ -483,7 +567,8 @@
 				timed = button.dataset.start === 'timed';
 				start.hidden = true;
 				round.hidden = false;
-				showObstacle();
+				setWeather(weathers[Math.floor(Math.random() * weathers.length)]);
+				showObstacle(weatherIntro[weather]);
 			});
 		});
 		game.querySelector('[data-replay]')?.addEventListener('click', () => {
@@ -515,17 +600,21 @@
 			let matched = 0;
 			while (matched < target.length && typed[matched] === target[matched]) matched++;
 			const hasError = matched < typed.length;
+			// Sur le verglas, une faute fait aussi perdre la dernière lettre validée ; le hoverboard flotte au-dessus.
+			const slips = hasError && weather === 'ice' && level !== levels.hoverboard && matched > 0;
+			if (slips) matched -= 1;
 			// Keep the valid prefix so the next key can retry the missed letter.
 			if (hasError) input.value = typed.slice(0, matched);
+			const expected = hasError ? `${slips ? 'Dérapage sur le verglas ! ' : ''}Lettre attendue · ${target[matched].toUpperCase()}` : '';
 			if (bonusTarget && bonus) {
 				paintLetters(bonusText, matched, hasError);
 				if (matched === target.length) catchBonus();
-				else if (hasError) announcement.textContent = `Lettre attendue · ${target[matched].toUpperCase()}`;
+				else if (hasError) announcement.textContent = expected;
 				return;
 			}
 			paintLetters(lettering, matched, hasError);
 			if (matched === word.length) finishObstacle(true);
-			else if (hasError) announcement.textContent = `Lettre attendue · ${word[matched].toUpperCase()}`;
+			else if (hasError) announcement.textContent = expected;
 		};
 		input.addEventListener('input', event => {
 			if (!(event instanceof InputEvent && event.isComposing)) updateLetters();
@@ -619,6 +708,8 @@
 	}
 	:global(.road-word .matched) { fill: var(--action-primary); text-decoration: underline; }
 	:global(.road-word .retry) { text-decoration: underline wavy; }
+	/* Pluie : une goutte masque brièvement une lettre. */
+	:global(.road-word .drenched) { fill-opacity: 0.12; stroke-opacity: 0.12; }
 	:global(.hero:has(#cyclist-game-input:focus-visible) .road-word) {
 		filter: drop-shadow(0 2px 1px var(--surface-elevated));
 	}
