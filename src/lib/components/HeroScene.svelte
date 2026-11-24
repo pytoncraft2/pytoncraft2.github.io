@@ -247,11 +247,14 @@
 
 			<g class="game-obstacle" data-game-obstacle transform="translate(1240 289)" fill="none"
 				stroke="var(--scene-bike)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-				<path class="game-rock" d="M-13 0-5-16l8 1L13 0Z" />
-				<path class="game-fence" d="M-12 0v-10h24V0m-18-10v10m12-10v10" />
-				<path class="game-puddle" d="M-16-2q6-6 12 0t12 0t12 0m-31-6q6-5 12 0t12 0" />
-				<path class="game-cones" d="M-15 0-7-18 1 0m-12-5H9m-5 5 6-14 6 14" />
-				<path class="game-gate" d="M-15 0v-22h30V0m-30-15h30" />
+				<!-- Obstacles ordinaires, un par mot (data-game-obstacle = rang du mot), devant le mot côté cycliste. -->
+				<g transform="translate(-24 0)">
+					<path class="game-rock" d="M-13 0-5-16l8 1L13 0Z" />
+					<path class="game-fence" d="M-12 0v-10h24V0m-18-10v10m12-10v10" />
+					<path class="game-puddle" d="M-16-2q6-6 12 0t12 0t12 0m-31-6q6-5 12 0t12 0" />
+					<path class="game-cones" d="M-15 0-7-18 1 0m-12-5H9m-5 5 6-14 6 14" />
+					<path class="game-gate" d="M-15 0v-22h30V0m-30-15h30" />
+				</g>
 				<!--
 					Obstacles spéciaux (un par partie, data-game-obstacle posé par CyclistGame.astro), dessinés
 					devant le mot, côté cycliste. Contour --scene-bike pour rester visibles de nuit.

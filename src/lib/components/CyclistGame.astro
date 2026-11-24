@@ -614,7 +614,8 @@
 					nextFlash = now + 5000;
 				}
 			} else {
-				hero.removeAttribute('data-game-obstacle');
+				// Obstacle ordinaire dessiné devant le mot : rocher, barrière, flaque, cônes ou portique selon le rang.
+				hero.dataset.gameObstacle = String(index);
 			}
 			prompt.textContent = `Mot ${index + 1} sur ${obstacles.length} · ${obstacle}`;
 			lettering.replaceChildren(...Array.from(obstacle.toUpperCase(), char => {
