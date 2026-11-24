@@ -177,6 +177,9 @@
 				/>
 			</g>
 
+			<!-- Mot bonus du jeu, posé sur les collines du plan du milieu (texte et position : CyclistGame.astro). -->
+			<text class="game-bonus" data-game-bonus x="1440" y="206"></text>
+
 			<!--
 				Train du jeu, sur le plan du milieu : les rails et leur gare entrent par la droite vers la fin du parcours,
 				le train arrive pendant le mot où il propose une suggestion (début des rails, position et texte
@@ -493,7 +496,7 @@
 		transform: translateX(360px);
 	}
 
-	.game-obstacle, .game-obstacle path, .game-bag, .game-unicycle, .rack, .game-longboard, .game-hoverboard, .board-legs, .game-rails, .game-station, .game-train {
+	.game-obstacle, .game-obstacle path, .game-bag, .game-unicycle, .rack, .game-longboard, .game-hoverboard, .board-legs, .game-rails, .game-station, .game-train, .game-bonus {
 		display: none;
 	}
 
@@ -522,6 +525,7 @@
 	:global(.hero[data-playing]) .game-obstacle,
 	:global(.hero[data-playing][data-game-rails]) :is(.game-rails, .game-station),
 	:global(.hero[data-playing][data-game-train]) .game-train,
+	:global(.hero[data-playing][data-game-bonus]) .game-bonus,
 	:global(.hero[data-playing]) .rack,
 	:global(.hero[data-playing][data-game-missed='0']) .game-bag-one,
 	:global(.hero[data-playing]:is([data-game-missed='0'], [data-game-missed='1'])) .game-bag-two,

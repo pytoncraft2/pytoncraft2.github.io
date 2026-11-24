@@ -4,7 +4,7 @@
 		<button type="button" class="close" data-close aria-label="Fermer le jeu"><span aria-hidden="true">×</span></button>
 	</header>
 
-	<p id="cyclist-game-intro">Tape les lettres du mot posé sur la route pour le franchir. Échap permet de quitter la partie. Deux mots réussis d’affilée font passer du vélo au longboard, puis au hoverboard ; chaque obstacle manqué fait redescendre d’un cran. À vélo, il coûte une sacoche, puis le vélo devient un monocycle. Une fois par partie, un train propose le mot : flèche droite pour l’accepter, mais relis-le, il peut se tromper.</p>
+	<p id="cyclist-game-intro">Tape les lettres du mot posé sur la route pour le franchir. Échap permet de quitter la partie. Deux mots réussis d’affilée font passer du vélo au longboard, puis au hoverboard ; chaque obstacle manqué fait redescendre d’un cran. À vélo, il coûte une sacoche, puis le vélo devient un monocycle. Des mots bonus passent sur les collines : les taper rend une sacoche, ou fait monter d’un cran. Une fois par partie, un train propose le mot : flèche droite pour l’accepter, mais relis-le, il peut se tromper.</p>
 
 	<div class="start" data-game-start>
 		<button type="button" data-start="timed">Jouer · 5 s par mot</button>
@@ -28,6 +28,7 @@
 
 <script>
 	import { createGameLandscape, midPlaneSpeed } from "../game-landscape";
+	import { homeTechs } from "../data/skills";
 
 	const obstacles = ['web', 'grille', 'clavier', 'prototype', 'contraste'];
 	/*
@@ -60,6 +61,16 @@
 		const i = positions[Math.floor(Math.random() * positions.length)];
 		return word.slice(0, i) + word[i + 1] + word[i] + word.slice(i + 2);
 	};
+	/*
+	 * Mots bonus : des technologies du profil passent sur les collines du plan du milieu. Les taper
+	 * avant qu’elles sortent de l’écran fait remonter d’un cran (sacoche, roue ou planche). Leur
+	 * première lettre diffère de celle de tous les mots de la route : elle suffit à choisir la cible.
+	 */
+	const bonusRounds = [1, 2]; // Mots de la route pendant lesquels un mot bonus apparaît.
+	// Entrée juste après le bord droit ; plus loin quand la gare entre au même moment, pour ne pas la croiser.
+	const bonusOffset = (round: number) => round === railsRound ? 160 : 10;
+	const roadInitials = new Set(obstacles.map(word => word[0]));
+	const bonusWords = homeTechs.map(tech => tech.label).filter(label => !roadInitials.has(label[0].toLocaleLowerCase('fr')));
 	const roundDuration = 5000;
 	const wheelRadius = 11; // Rayon des roues dans le repère du SVG.
 	const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
@@ -83,12 +94,17 @@
 	const rails = land?.querySelector<SVGLineElement>('.game-rails');
 	const station = land?.querySelector<SVGGElement>('[data-game-station]');
 	const trainLabel = train?.querySelector<SVGTextElement>('.train-suggestion');
-	if (launch && game && hero && land && hazard && start && round && result && resultTitle && input && prompt && announcement && acceptButton && train && trainLabel && rails && station) {
+	const bonusText = land?.querySelector<SVGTextElement>('[data-game-bonus]');
+	if (launch && game && hero && land && hazard && start && round && result && resultTitle && input && prompt && announcement && acceptButton && train && trainLabel && rails && station && bonusText) {
 		let index = 0;
 		// Distance parcourue à l’entrée des rails ; undefined avant leur apparition.
 		let railsFrom: number | undefined;
 		// Suggestion du mot en cours : texte proposé, et s’il est déjà affiché.
 		let suggestion: { text: string; correct: boolean; shown: boolean } | undefined;
+		// Mot bonus affiché : libellé, mot à taper, distance à son entrée et largeur ; bonusTarget quand la saisie le vise.
+		let bonus: { label: string; word: string; from: number; offset: number; width: number } | undefined;
+		let bonusTarget = false;
+		let usedBonuses: string[] = [];
 		let missed = 0;
 		let level: number = levels.bike;
 		let streak = 0;
@@ -158,6 +174,58 @@
 			acceptButton.hidden = true;
 		};
 
+		const paintLetters = (text: SVGTextElement, matched: number, retry: boolean) => {
+			Array.from(text.children).forEach((letter, i) => {
+				letter.classList.toggle('matched', i < matched);
+				letter.classList.toggle('retry', retry && i === matched);
+			});
+		};
+
+		const showBonus = (feedback: string) => {
+			const available = bonusWords.filter(label => !usedBonuses.includes(label));
+			if (!available.length) return feedback;
+			const label = available[Math.floor(Math.random() * available.length)];
+			usedBonuses.push(label);
+			bonusText.replaceChildren(...Array.from(label, char => {
+				const letter = document.createElementNS(svg, 'tspan');
+				letter.textContent = char;
+				return letter;
+			}));
+			hero.dataset.gameBonus = '';
+			bonus = { label, word: label.toLocaleLowerCase('fr'), from: distance, offset: bonusOffset(index), width: bonusText.getComputedTextLength() };
+			prompt.textContent += ` · Mot bonus : ${label}`;
+			return `${feedback} Mot bonus sur les collines : ${label}.`.trim();
+		};
+
+		const clearBonus = () => {
+			if (bonusTarget) {
+				input.value = '';
+				paintLetters(lettering, 0, false);
+			}
+			bonus = undefined;
+			bonusTarget = false;
+			hero.removeAttribute('data-game-bonus');
+			bonusText.replaceChildren();
+			prompt.textContent = prompt.textContent.replace(/ · Mot bonus : .*$/, '');
+		};
+
+		// Un mot bonus attrapé fait remonter d’un cran : sacoche ou roue retrouvée, puis planche.
+		const catchBonus = () => {
+			if (!bonus) return;
+			const { label } = bonus;
+			const previous = level;
+			level = Math.min(levels.hoverboard, level + 1);
+			showLevel();
+			clearBonus();
+			input.value = '';
+			paintLetters(lettering, 0, false);
+			const change = previous === levels.unicycle ? 'Le monocycle redevient un vélo.' :
+				previous < levels.bike ? 'Une sacoche retrouvée.' :
+				level === levels.longboard ? 'Tu passes au longboard !' :
+				level === levels.hoverboard && previous !== level ? 'Tu passes en hoverboard !' : 'Tu es déjà au sommet.';
+			announcement.textContent = `Mot bonus attrapé : ${label} ! ${change} Mot en cours : ${obstacles[index]}.`;
+		};
+
 		const clearRails = () => {
 			railsFrom = undefined;
 			hero.removeAttribute('data-game-rails');
@@ -191,6 +259,12 @@
 				const trainX = Math.max(sceneX(reduced ? 0.4 : 1 - 0.75 * progress), railsX + 6);
 				train.setAttribute('transform', `translate(${trainX} 228)`);
 				if (!suggestion.shown && (reduced || progress >= suggestionDelay)) revealSuggestion(progress === 0);
+			}
+			if (bonus) {
+				// Le mot bonus défile avec les collines ; fixe en mouvement réduit, jusqu’au mot suivant.
+				const bonusX = reduced ? sceneX(0.7) : sceneX(1) + bonus.offset - (distance - bonus.from) * midPlaneSpeed;
+				if (bonusX + bonus.width < sceneX(0)) clearBonus();
+				else bonusText.setAttribute('x', String(bonusX));
 			}
 			const groundY = Number(land.dataset.horizonY);
 			if (looseWheel) {
@@ -228,6 +302,8 @@
 			showLevel();
 			clearSuggestion();
 			clearRails();
+			clearBonus();
+			usedBonuses = [];
 			lettering.replaceChildren();
 			start.hidden = false;
 			round.hidden = true;
@@ -279,6 +355,7 @@
 			index += 1;
 
 			if (index === obstacles.length) {
+				clearBonus();
 				lettering.replaceChildren();
 				round.hidden = true;
 				draw(0);
@@ -315,6 +392,10 @@
 
 		const showObstacle = (feedback = '') => {
 			const obstacle = obstacles[index];
+			const reduced = document.documentElement.hasAttribute('data-reduced-motion') || motionPreference.matches;
+			// En mouvement réduit, le mot bonus ne défile pas : il disparaît au mot suivant.
+			if (reduced) clearBonus();
+			bonusTarget = false;
 			prompt.textContent = `Mot ${index + 1} sur ${obstacles.length} · ${obstacle}`;
 			lettering.replaceChildren(...Array.from(obstacle.toUpperCase(), char => {
 				const letter = document.createElementNS(svg, 'tspan');
@@ -323,6 +404,8 @@
 			}));
 			wordWidth = lettering.getComputedTextLength();
 			input.value = '';
+			if (bonusRounds.includes(index) && !bonus) feedback = showBonus(feedback);
+			else if (bonus) prompt.textContent += ` · Mot bonus : ${bonus.label}`;
 			draw(0);
 			if (document.activeElement === input && feedback) {
 				announcement.textContent = `${feedback} Mot suivant : ${obstacle}.`;
@@ -354,6 +437,7 @@
 			hero.removeAttribute('data-game-mount');
 			clearSuggestion();
 			clearRails();
+			clearBonus();
 			lettering.replaceChildren();
 			clearDroppedParts();
 			hero.style.removeProperty('--game-rider-x');
@@ -424,15 +508,22 @@
 			const word = obstacles[index];
 			if (!word || round.hidden) return;
 			const typed = input.value.toLocaleLowerCase('fr');
+			// La première lettre choisit la cible : le mot bonus si elle lui correspond, sinon la route.
+			if (!typed) bonusTarget = false;
+			else if (!bonusTarget && bonus && typed[0] === bonus.word[0]) bonusTarget = true;
+			const target = bonusTarget && bonus ? bonus.word : word;
 			let matched = 0;
-			while (matched < word.length && typed[matched] === word[matched]) matched++;
+			while (matched < target.length && typed[matched] === target[matched]) matched++;
 			const hasError = matched < typed.length;
 			// Keep the valid prefix so the next key can retry the missed letter.
 			if (hasError) input.value = typed.slice(0, matched);
-			Array.from(lettering.children).forEach((letter, i) => {
-				letter.classList.toggle('matched', i < matched);
-				letter.classList.toggle('retry', hasError && i === matched);
-			});
+			if (bonusTarget && bonus) {
+				paintLetters(bonusText, matched, hasError);
+				if (matched === target.length) catchBonus();
+				else if (hasError) announcement.textContent = `Lettre attendue · ${target[matched].toUpperCase()}`;
+				return;
+			}
+			paintLetters(lettering, matched, hasError);
 			if (matched === word.length) finishObstacle(true);
 			else if (hasError) announcement.textContent = `Lettre attendue · ${word[matched].toUpperCase()}`;
 		};
@@ -510,6 +601,15 @@
 		stroke-width: 3px;
 		paint-order: stroke fill;
 	}
+	:global(.game-bonus) {
+		font: 700 17px var(--font-sans);
+		fill: var(--text-primary);
+		stroke: var(--surface-elevated);
+		stroke-width: 3px;
+		paint-order: stroke fill;
+	}
+	:global(.game-bonus .matched) { fill: var(--action-primary); text-decoration: underline; }
+	:global(.game-bonus .retry) { text-decoration: underline wavy; }
 	:global(.train-suggestion) {
 		font: 700 17px var(--font-sans);
 		fill: var(--text-primary);
