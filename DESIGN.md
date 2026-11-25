@@ -89,8 +89,8 @@ Un petit paysage illustré qui raconte une histoire sans texte : collines et mon
 | Astre | Disque « PORTFOLIO » qui se lève | Soleil (clair) ou lune (sombre), lever court à l’arrivée, sans texte |
 | Étoiles | 160 particules JS qui montent | Quelques dizaines d’étoiles SVG fixes, scintillement léger ; étoile filante ponctuelle |
 | Relief | Trois ellipses de bleus voisins | Collines et montagnes en plusieurs plans, de plus en plus contrastées vers l’avant |
-| Vie | — | Arbre (feuillage qui ondule légèrement), cycliste qui traverse le chemin, nuages ou oiseaux de jour |
-| Entrée | Rideau noir de 2 s | Apparition brève des plans, sans masquer le contenu |
+| Vie | — | Arbre, cycliste qui traverse le chemin, nuages ou oiseaux de jour |
+| Entrée | Rideau noir de 2 s | Paysage complet dès la première image ; seuls l’astre, les étoiles, les oiseaux et le cycliste s’animent |
 
 Les éléments listés sont une direction, pas un inventaire obligatoire. Mieux vaut peu d’éléments soignés et cohérents qu’une accumulation.
 
@@ -111,7 +111,7 @@ Les éléments listés sont une direction, pas un inventaire obligatoire. Mieux 
 ### Mouvement
 
 - Animations CSS sur `transform` et `opacity` uniquement ; pas de boucle JavaScript continue ni de bibliothèque de particules.
-- Animations d’ambiance de faible amplitude, jouées une seule fois à l’arrivée : chaque élément (nuages, oiseaux, arbre, étoiles, étoile filante, cycliste) bouge puis s’arrête à la place qu’il occupe dans le décor fixe. Aucune boucle infinie. Les animations ne jouent qu’à la première arrivée sur l’accueil dans la session (onglet) : au retour arrière ou à une nouvelle visite, le décor fixe s’affiche directement (`data-scene-played`, `sessionStorage`).
+- Animations d’ambiance de faible amplitude, jouées une seule fois à l’arrivée : chaque élément (lever de l’astre, étoiles, étoile filante, oiseaux, cycliste) bouge puis s’arrête à la place qu’il occupe dans le décor fixe. Le relief, l’arbre et les nuages restent fixes : un décor qui s’anime en entier disperse l’attention et laisse le hero vide pendant les premières images ; le cycliste reste le seul mouvement du premier plan. Aucune boucle infinie. Les animations ne jouent qu’à la première arrivée sur l’accueil dans la session (onglet) : au retour arrière ou à une nouvelle visite, le décor fixe s’affiche directement (`data-scene-played`, `sessionStorage`).
 - Toute animation est terminée en moins de 5 secondes (WCAG 2.2.2) : il n’y a donc pas de bouton pause. Une nouvelle animation plus longue imposerait d’en rétablir un.
 - Avec `prefers-reduced-motion: reduce`, la scène est statique et complète, sans animation d’entrée.
 - Suspendre les animations quand la scène sort de l’écran ou quand l’onglet est masqué.

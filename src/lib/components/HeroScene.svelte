@@ -99,17 +99,17 @@
 			</g>
 
 			<g class="day">
-				<g class="cloud cloud-a" transform="translate(940 70)">
+				<g class="cloud" transform="translate(940 70)">
 					<rect x="-46" y="0" width="112" height="24" rx="12" />
 					<circle cx="-10" cy="2" r="18" />
 					<circle cx="22" cy="-4" r="24" />
 				</g>
-				<g class="cloud cloud-b" transform="translate(1290 420) scale(0.8)">
+				<g class="cloud" transform="translate(1290 420) scale(0.8)">
 					<rect x="-46" y="0" width="112" height="24" rx="12" />
 					<circle cx="-10" cy="2" r="18" />
 					<circle cx="22" cy="-4" r="24" />
 				</g>
-				<g class="cloud cloud-c" transform="translate(620 470) scale(0.6)">
+				<g class="cloud" transform="translate(620 470) scale(0.6)">
 					<rect x="-46" y="0" width="112" height="24" rx="12" />
 					<circle cx="-10" cy="2" r="18" />
 					<circle cx="22" cy="-4" r="24" />
@@ -148,7 +148,7 @@
 				</g>
 			</g>
 
-			<g class="layer" style:--i="1" style:--depth-offset="12px">
+			<g class="layer" style:--depth-offset="12px">
 				<path
 					fill="var(--scene-far)"
 					d="M0 210 L120 150 L210 185 L330 110 L440 170 L560 122 L690 180 L800 136 L930 175 L1050 105 L1180 165 L1300 130 L1440 172 L1440 320 L0 320 Z"
@@ -170,14 +170,14 @@
 				</g>
 			</g>
 
-			<g class="layer" style:--i="2" style:--depth-offset="7px">
+			<g class="layer" style:--depth-offset="7px">
 				<path
 					fill="var(--scene-mid)"
 					d="M0 230 C160 190 300 200 420 220 C560 245 700 195 860 200 C1010 205 1120 240 1260 225 C1350 215 1400 205 1440 210 L1440 320 L0 320 Z"
 				/>
 			</g>
 
-			<g class="layer" style:--i="3" style:--depth-offset="3px">
+			<g class="layer" style:--depth-offset="3px">
 				<path
 					fill="var(--scene-near)"
 					d="M0 250 C120 222 250 214 370 236 C450 251 520 266 620 270 C760 274 840 262 960 248 C1080 234 1200 230 1300 242 C1370 250 1410 256 1440 258 L1440 320 L0 320 Z"
@@ -189,14 +189,12 @@
 				</g>
 
 				<rect x="415" y="196" width="10" height="52" rx="3" fill="var(--scene-trunk)" />
-				<g class="foliage">
-					<circle cx="420" cy="178" r="34" fill="var(--scene-tree)" />
-					<circle cx="394" cy="194" r="24" fill="var(--scene-tree-shade)" />
-					<circle cx="448" cy="192" r="26" fill="var(--scene-tree)" />
-				</g>
+				<circle cx="420" cy="178" r="34" fill="var(--scene-tree)" />
+				<circle cx="394" cy="194" r="24" fill="var(--scene-tree-shade)" />
+				<circle cx="448" cy="192" r="26" fill="var(--scene-tree)" />
 			</g>
 
-			<g class="layer" style:--i="4">
+			<g class="layer">
 				<path fill="var(--scene-ground)" d="M0 292 C300 286 600 288 720 288 C900 288 1200 286 1440 290 L1440 320 L0 320 Z" />
 			</g>
 
@@ -420,26 +418,18 @@
 		transform: translateX(360px);
 	}
 
-	.spokes,
-	.foliage {
+	.spokes {
 		transform-box: fill-box;
 		transform-origin: center;
-	}
-
-	.foliage {
-		transform-origin: 50% 100%;
 	}
 
 	/*
 	 * Animations : uniquement transform et opacity. Chaque élément bouge une seule fois et
 	 * s’arrête avant 5 s à la place qu’il occupe dans le décor fixe (WCAG 2.2.2).
+	 * Le relief, l’arbre et les nuages restent fixes : le paysage est complet dès la
+	 * première image et seuls l’astre, le ciel nocturne, les oiseaux et le cycliste s’animent.
 	 */
 	@media (prefers-reduced-motion: no-preference) {
-		.layer {
-			animation: rise 1100ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
-			animation-delay: calc(var(--i, 0) * 120ms);
-		}
-
 		.astre-rise {
 			animation: astre-rise 1800ms cubic-bezier(0.2, 0.7, 0.2, 1) 200ms both;
 		}
@@ -450,14 +440,6 @@
 
 		.meteor {
 			animation: meteor 900ms ease-in 3s both;
-		}
-
-		.cloud {
-			animation: drift 4.5s cubic-bezier(0.25, 0.6, 0.3, 1) both;
-		}
-
-		.cloud-b {
-			animation-name: drift-reverse;
 		}
 
 		/*
@@ -482,10 +464,6 @@
 
 		.bird-c {
 			animation-delay: -340ms;
-		}
-
-		.foliage {
-			animation: sway 4.5s ease-in-out both;
 		}
 
 		/* Passage unique du cycliste, qui ralentit et s’arrête au quart avant 5 s (WCAG 2.2.2). */
@@ -537,13 +515,6 @@
 		}
 	}
 
-	@keyframes rise {
-		from {
-			transform: translateY(32px);
-			opacity: 0;
-		}
-	}
-
 	@keyframes astre-rise {
 		from {
 			transform: translateY(150px);
@@ -572,18 +543,6 @@
 		}
 	}
 
-	@keyframes drift {
-		from {
-			translate: -40px 0;
-		}
-	}
-
-	@keyframes drift-reverse {
-		from {
-			translate: 40px 0;
-		}
-	}
-
 	/* Arrivée par la droite jusqu’à la place de la nuée dans le décor fixe. */
 	/*
 	 * 80 % du temps à vitesse constante (89 % du trajet), puis une décélération dont la vitesse
@@ -608,16 +567,6 @@
 
 		to {
 			d: path('M-10 5 Q-5 -2 0 1 Q5 -2 10 5');
-		}
-	}
-
-	@keyframes sway {
-		25% {
-			transform: rotate(-1.5deg);
-		}
-
-		75% {
-			transform: rotate(1.5deg);
 		}
 	}
 
