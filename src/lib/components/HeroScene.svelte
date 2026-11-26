@@ -443,7 +443,7 @@
 		}
 
 		/*
-		 * Vol à vitesse constante depuis le quart droit du paysage, puis ralentissement
+		 * Vol à vitesse constante depuis la gauche du soleil, puis ralentissement
 		 * progressif (voir @keyframes fly) ; posé avant 5 s.
 		 */
 		.flock {
@@ -544,19 +544,20 @@
 	}
 
 	/*
-	 * Arrivée par la droite, en ligne droite, jusqu’à la place de la nuée dans le décor fixe.
-	 * 60 % du temps à vitesse constante (75 % du trajet), puis une décélération constante
+	 * Départ juste à gauche du halo du soleil (bord gauche à x = 948 ; la nuée s’étend jusqu’à
+	 * +60 px de son origine), pour ne pas croiser l’astre pendant son lever. Ligne droite
+	 * jusqu’à la place de la nuée dans le décor fixe. 60 % du temps à vitesse constante (75 % du trajet), puis une décélération constante
 	 * (courbe quadratique) dont la vitesse de départ égale celle du vol (pente initiale : 2),
 	 * pour éviter une cassure et un freinage sec.
 	 */
 	@keyframes fly {
 		from {
-			transform: translate(1080px, 49px);
+			transform: translate(880px, 53px);
 			animation-timing-function: linear;
 		}
 
 		60% {
-			transform: translate(750px, 55.75px);
+			transform: translate(700px, 56.75px);
 			animation-timing-function: cubic-bezier(0.33, 0.67, 0.67, 1);
 		}
 	}
