@@ -49,6 +49,8 @@ Utiliser les tokens sémantiques selon leur fonction : `--text-primary`, `--text
 
 Le thème sombre conserve la même hiérarchie et les mêmes informations. Vérifier séparément les textes secondaires, bordures, états interactifs et logos sombres. Des surfaces proches peuvent être distinguées par leur espacement et leurs bordures sans multiplier les nuances.
 
+Le thème se choisit dans le panneau Paramètres de l’en-tête : Système (par défaut, suit `prefers-color-scheme` et ses changements), Clair ou Sombre. Seuls Clair et Sombre sont mémorisés ; revenir à Système efface le choix.
+
 Le contraste entre un élément et son fond doit être vérifié dans son contexte réel. L’existence d’un token ne garantit pas à elle seule la lisibilité de toutes ses combinaisons.
 
 ## Typographie et composition

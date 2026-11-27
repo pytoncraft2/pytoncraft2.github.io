@@ -8,13 +8,29 @@
 		dark: '#0f0f0f'
 	} as const;
 
-	let theme = $state<'light' | 'dark'>('light');
+	type Theme = 'light' | 'dark';
+	type ThemeChoice = Theme | 'system';
+
+	const themeChoices: readonly { value: ThemeChoice; label: string }[] = [
+		{ value: 'system', label: 'Système' },
+		{ value: 'light', label: 'Clair' },
+		{ value: 'dark', label: 'Sombre' }
+	];
+
+	// « Système » n’est pas mémorisé : sans clé `theme`, le script de BaseLayout.astro suit
+	// `prefers-color-scheme`, et ce composant suit ensuite ses changements.
+	let themeChoice = $state<ThemeChoice>('system');
 	let themeTimer = 0;
+	let themeFrame = 0;
 	let settingsOpen = $state(false);
 	let reducedMotion = $state(false);
 	let systemReducesMotion = $state(false);
 
-	function syncBrowserChrome(next: 'light' | 'dark') {
+	function systemTheme(): Theme {
+		return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+	}
+
+	function syncBrowserChrome(next: Theme) {
 		document.documentElement.style.colorScheme = next;
 
 		let meta = document.querySelector('meta[name="theme-color"]');
@@ -27,13 +43,22 @@
 	}
 
 	onMount(() => {
-		const current = document.documentElement.dataset.theme;
-		if (current === 'dark' || current === 'light') {
-			theme = current;
-			syncBrowserChrome(current);
-		}
-
 		const root = document.documentElement;
+		try {
+			const stored = localStorage.getItem('theme');
+			if (stored === 'light' || stored === 'dark') themeChoice = stored;
+		} catch {
+			// Sans stockage, le thème suit le système.
+		}
+		const current = root.dataset.theme;
+		if (current === 'dark' || current === 'light') syncBrowserChrome(current);
+
+		const colorScheme = matchMedia('(prefers-color-scheme: dark)');
+		const syncSystemTheme = () => {
+			if (themeChoice === 'system') applyTheme(systemTheme());
+		};
+		colorScheme.addEventListener('change', syncSystemTheme);
+
 		const media = matchMedia('(prefers-reduced-motion: reduce)');
 		const syncMotion = () => {
 			systemReducesMotion = media.matches;
@@ -46,6 +71,9 @@
 		return () => {
 			observer.disconnect();
 			media.removeEventListener('change', syncMotion);
+			colorScheme.removeEventListener('change', syncSystemTheme);
+			window.cancelAnimationFrame(themeFrame);
+			window.clearTimeout(themeTimer);
 		};
 	});
 
@@ -66,31 +94,39 @@
 		}
 	}
 
-	function applyTheme(next: 'light' | 'dark') {
-		theme = next;
-		localStorage.setItem('theme', next);
+	function selectTheme(next: ThemeChoice) {
+		themeChoice = next;
+		try {
+			if (next === 'system') localStorage.removeItem('theme');
+			else localStorage.setItem('theme', next);
+		} catch {
+			// Le choix s’applique sur la page courante même sans stockage.
+		}
+		applyTheme(next === 'system' ? systemTheme() : next);
+	}
+
+	function applyTheme(next: Theme) {
 		syncBrowserChrome(next);
 
+		// Un changement encore en attente est annulé : sinon, deux choix rapprochés
+		// laisseraient la frame précédente appliquer l’ancien thème après le nouveau.
 		const root = document.documentElement;
+		window.cancelAnimationFrame(themeFrame);
 		window.clearTimeout(themeTimer);
 
-		if (prefersReducedMotion.current || reducedMotion) {
+		if (root.dataset.theme === next || prefersReducedMotion.current || reducedMotion) {
 			root.classList.remove('theme-transition');
 			root.dataset.theme = next;
 			return;
 		}
 
 		root.classList.add('theme-transition');
-		requestAnimationFrame(() => {
+		themeFrame = requestAnimationFrame(() => {
 			root.dataset.theme = next;
 			themeTimer = window.setTimeout(() => {
 				root.classList.remove('theme-transition');
 			}, themeDuration);
 		});
-	}
-
-	function toggleTheme() {
-		applyTheme(theme === 'dark' ? 'light' : 'dark');
 	}
 </script>
 
@@ -116,10 +152,23 @@
 			popover="auto"
 			ontoggle={(event) => (settingsOpen = event.newState === 'open')}
 		>
-			<button class="setting" type="button" onclick={toggleTheme} aria-pressed={theme === 'dark'}>
-				<span>Thème sombre</span>
-				<span aria-hidden="true" class="setting-state">{theme === 'dark' ? '✓' : ''}</span>
-			</button>
+			<fieldset class="theme-setting">
+				<legend>Thème</legend>
+				<div class="theme-options">
+					{#each themeChoices as option (option.value)}
+						<label class="theme-option">
+							<input
+								type="radio"
+								name="theme"
+								value={option.value}
+								checked={themeChoice === option.value}
+								onchange={() => selectTheme(option.value)}
+							/>
+							<span>{option.label}</span>
+						</label>
+					{/each}
+				</div>
+			</fieldset>
 			<button
 				class="setting"
 				type="button"
@@ -206,7 +255,69 @@
 		text-align: left;
 	}
 
-	.setting + .setting { margin-top: var(--spacing-2); }
+	.theme-setting + .setting { margin-top: var(--spacing-2); }
+
+	.theme-setting {
+		margin: 0;
+		padding: 0;
+		border: 0;
+		min-width: 0;
+	}
+
+	.theme-setting legend {
+		padding: 0 var(--spacing-2) var(--spacing-1);
+		color: var(--text-secondary);
+		font: 500 var(--text-label-m-size) / var(--text-label-m-line) var(--font-sans);
+	}
+
+	.theme-options {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: var(--spacing-1);
+	}
+
+	.theme-option {
+		position: relative;
+		display: grid;
+		place-items: center;
+		min-height: 44px;
+		padding: var(--spacing-1);
+		border: 1px solid var(--border-default);
+		border-radius: var(--radius-md);
+		background: var(--surface-elevated);
+		color: var(--text-primary);
+		font: 500 var(--text-label-m-size) / var(--text-label-m-line) var(--font-sans);
+		text-align: center;
+		cursor: pointer;
+	}
+
+	/* Bouton radio natif posé sur toute l’étiquette : il garde la sémantique, le clavier
+	   (flèches) et la cible tactile ; seul son dessin est remplacé par celui de l’étiquette. */
+	.theme-option input {
+		position: absolute;
+		inset: 0;
+		margin: 0;
+		opacity: 0;
+		cursor: inherit;
+	}
+
+	.theme-option:hover {
+		background: var(--surface-subtle);
+		border-color: var(--border-strong);
+	}
+
+	/* L’option choisie ne repose pas sur la seule couleur : bordure doublée et graisse. */
+	.theme-option:has(input:checked) {
+		border-color: var(--action-primary);
+		box-shadow: inset 0 0 0 1px var(--action-primary);
+		background: var(--surface-subtle);
+		font-weight: 600;
+	}
+
+	.theme-option:has(input:focus-visible) {
+		outline: 2px solid var(--action-focus);
+		outline-offset: 2px;
+	}
 
 	.setting-state {
 		flex: 0 0 1em;
