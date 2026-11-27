@@ -124,9 +124,18 @@ Les éléments listés sont une direction, pas un inventaire obligatoire. Mieux 
 - Implémentée dans `src/lib/components/HeroScene.svelte` (SVG inline, sans requête réseau ni image), placée dans le `.hero` de l’accueil comme île Astro hydratée en différé (`client:idle`) : sans JavaScript, le décor et ses animations CSS s’affichent, seule la suspension hors écran reste inactive. Le hero fournit la hauteur de la bande de paysage (`--hero-scene-band`) et la réserve en `padding-bottom` pour que les collines restent sous le texte. La scène déborde en pleine largeur (`100vw`, recentrée pour compenser la place du dock à gauche) ; `.app` coupe le débordement horizontal (`overflow-x: clip`).
 - Le premier plan du paysage a la couleur du fond de page : le relief semble sortir de la page, sans bord visible avec la section suivante. Le haut du ciel suit le même principe.
 - Le cycliste entre par la gauche et s’arrête au quart du paysage ; les oiseaux partent juste à gauche du soleil, pour ne pas croiser l’astre pendant son lever, volent à vitesse constante en battant des ailes, ralentissent progressivement (sans freinage sec) puis restent en vol plané. Hors écran, les animations sont seulement suspendues. L’animation d’entrée n’est jamais gelée.
-- Scène décorative : `aria-hidden="true"`, aucun élément focusable, `pointer-events: none`. Une interaction ludique éventuelle (par exemple un clic sur l’astre pour changer de thème) doit doubler une commande existante et rester accessible au clavier, jamais en être la seule voie.
+- Scène décorative : `aria-hidden="true"`, aucun élément focusable, `pointer-events: none`. Une interaction ludique éventuelle (par exemple un clic sur l’astre pour changer de thème) doit doubler une commande existante et rester accessible au clavier, jamais en être la seule voie. Seule exception : l’easter-egg du cycliste (ci-dessous).
 - Les couleurs suivent `data-theme` sur `<html>` via les tokens, sans JavaScript, pour rester correctes dès le HTML généré au build et sans flash.
 - Le composant ne doit pas perturber `snapBlocks` ni la hauteur du bloc `.hero`.
+
+### Easter-egg du cycliste
+
+Un clic sur le cycliste du hero, une fois son entrée terminée, le fait saluer (même coucou que sur Contact, fini en 2,7 s) et ouvre au-dessus de sa tête une bulle de BD : « Salut ! Une petite balade ? », avec [Jouer] et [Non merci]. Le mini-jeu lancé par [Jouer] est en cours de conception : pour l’instant, le bouton ferme la bulle.
+
+- Proposé seulement dans le hero (`data-section="accueil"`), sur un écran d’au moins `40rem` avec un pointeur fin (`hover: hover`, `pointer: fine`), hors mouvement réduit (préférence système et réglage du site). Ailleurs, le cycliste n’est pas cliquable.
+- Volontairement hors de la navigation : une zone transparente sur le cycliste, cliquable à la souris seulement, sans arrêt de tabulation ; la scène reste `aria-hidden`. C’est un écart assumé à la règle « utilisable au clavier », acceptable parce que l’easter-egg n’est pas un contenu essentiel.
+- La bulle, hors de la scène, contient de vrais boutons et reçoit le focus à l’ouverture (sur [Jouer]) : la suite se fait aussi au clavier. Échap, un clic ailleurs, un second clic sur le cycliste ou la sortie du hero la ferment. Une condition qui cesse (fenêtre réduite, réglage activé) la ferme aussi.
+- Même dessin que la bulle de Contact (contour, ombre décalée, pointe vers le casque), apparition avec un léger rebond pendant que le bras se lève.
 
 ## Études de cas et visuels
 

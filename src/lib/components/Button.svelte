@@ -7,6 +7,7 @@
     type = 'button',
     disabled = false,
     ariaLabel,
+    onclick,
     children
   }: {
     href?: string;
@@ -14,6 +15,8 @@
     type?: 'button' | 'submit' | 'reset';
     disabled?: boolean;
     ariaLabel?: string;
+    /** Bouton seulement (sans `href`) : action au clic, dans une île hydratée. */
+    onclick?: (event: MouseEvent) => void;
     children: Snippet;
   } = $props();
 </script>
@@ -23,7 +26,7 @@
     {@render children()}
   </a>
 {:else}
-  <button class:primary={variant === 'primary'} class:secondary={variant === 'secondary'} class="button" {type} {disabled} aria-label={ariaLabel}>
+  <button class:primary={variant === 'primary'} class:secondary={variant === 'secondary'} class="button" {type} {disabled} aria-label={ariaLabel} {onclick}>
     {@render children()}
   </button>
 {/if}

@@ -1,5 +1,7 @@
 <script lang="ts">
 	import type { Attachment } from 'svelte/attachments';
+	import { on } from 'svelte/events';
+	import Button from './Button.svelte';
 
 	type Star = {
 		x: number;
@@ -62,9 +64,140 @@
 		observer.observe(node);
 		return () => observer.disconnect();
 	};
+
+	/*
+	 * Easter-egg : un clic sur le cycliste au repos le fait saluer et ouvre une bulle qui
+	 * propose de jouer. Volontairement hors de la navigation (souris seulement, pas d’arrêt de
+	 * tabulation) et proposé seulement sur ordinateur, dans le hero, hors mouvement réduit.
+	 */
+	const deviceQuery =
+		'(min-width: 40rem) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)';
+	let allowed = $state(false);
+	let riderReady = $state(false);
+	const playable = $derived(allowed && riderReady);
+
+	let invitationOpen = $state(false);
+	let anchor = $state({ x: 0, y: 0 });
+	let scene: HTMLElement | undefined;
+	let rider: SVGGElement | undefined;
+	let riderHit: SVGRectElement | undefined;
+
+	/*
+	 * Conditions du jeu : ordinateur à pointeur fin, réglage « Réduire les animations » du site
+	 * inactif et hero affiché (`data-section` sur <html>). Une condition qui cesse ferme la bulle.
+	 */
+	const watchConditions: Attachment<HTMLElement> = (node) => {
+		scene = node;
+		const html = document.documentElement;
+		const device = matchMedia(deviceQuery);
+		const read = () => {
+			allowed = device.matches && !html.hasAttribute('data-reduced-motion') &&
+				(html.dataset.section ?? 'accueil') === 'accueil';
+			if (!allowed) {
+				invitationOpen = false;
+			}
+		};
+		read();
+		const observer = new MutationObserver(read);
+		observer.observe(html, { attributes: true, attributeFilter: ['data-reduced-motion', 'data-section'] });
+		const off = on(device, 'change', read);
+		return () => {
+			observer.disconnect();
+			off();
+			scene = undefined;
+		};
+	};
+
+	const keepRiderHit: Attachment<SVGRectElement> = (node) => {
+		riderHit = node;
+		return () => {
+			riderHit = undefined;
+		};
+	};
+
+	// Cycliste « au repos » : une fois son entrée terminée (immédiat si déjà jouée).
+	const watchRider: Attachment<SVGGElement> = (node) => {
+		rider = node;
+		let active = true;
+		Promise.allSettled(node.getAnimations().map((animation) => animation.finished)).then(() => {
+			if (active) {
+				riderReady = true;
+			}
+		});
+		return () => {
+			active = false;
+		};
+	};
+
+	/*
+	 * Haut du casque, dans le repère du hero : l’ancêtre positionné de la scène et de la bulle
+	 * (leur parent direct est l’<astro-island>, en `display: contents`, sans boîte à mesurer).
+	 */
+	function placeBubble() {
+		const hero = scene?.offsetParent;
+		const matrix = rider?.getScreenCTM();
+		if (!hero || !matrix) {
+			return;
+		}
+		const head = new DOMPoint(10, -70).matrixTransform(matrix);
+		const bounds = hero.getBoundingClientRect();
+		anchor = { x: head.x - bounds.left, y: head.y - bounds.top };
+	}
+
+	function toggleInvitation() {
+		if (!playable) {
+			return;
+		}
+		if (!invitationOpen) {
+			placeBubble();
+		}
+		invitationOpen = !invitationOpen;
+	}
+
+	function closeInvitation() {
+		invitationOpen = false;
+	}
+
+	// Étape suivante : lancer la partie. Pour l’instant, le bouton ferme la bulle.
+	function play() {
+		closeInvitation();
+	}
+
+	/*
+	 * Bulle ouverte : le focus passe sur « Jouer » (la suite se fait aussi au clavier) ; Échap
+	 * ou un clic ailleurs la ferme ; elle suit le cycliste au redimensionnement.
+	 */
+	const invitation: Attachment<HTMLElement> = (node) => {
+		node.querySelector('button')?.focus({ preventScroll: true });
+		const offs = [
+			on(document, 'pointerdown', (event) => {
+				const target = event.target;
+				if (target instanceof Node && (node.contains(target) || riderHit?.contains(target))) {
+					return;
+				}
+				closeInvitation();
+			}),
+			on(document, 'keydown', (event) => {
+				if (event.key === 'Escape') {
+					closeInvitation();
+				}
+			}),
+			on(window, 'resize', placeBubble)
+		];
+		return () => {
+			for (const off of offs) {
+				off();
+			}
+		};
+	};
 </script>
 
-<div class={['scene', { offscreen: !inView }]} aria-hidden="true" {@attach watchVisibility}>
+<div
+	class={['scene', { offscreen: !inView, playable, waving: invitationOpen }]}
+	aria-hidden="true"
+	{@attach watchVisibility}
+	{@attach watchConditions}
+>
 	<!-- Tout le décor, agrandi vers le vélo en bas de l'accueil (voir contact-bubble.ts). -->
 	<div class="zoom">
 		<div class="sky"></div>
@@ -199,7 +332,7 @@
 			</g>
 
 			<g transform="translate(0 289)">
-				<g class="rider">
+				<g class="rider" {@attach watchRider}>
 					<!-- Faisceau du phare avant, dont la pointe part de la lampe. -->
 					<polygon class="night beam" points="19,-33 100,-17 100,0" fill="url(#hero-scene-beam)" />
 					<g fill="none" stroke="var(--scene-bike)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -247,12 +380,35 @@
 							</g>
 						</g>
 					</g>
+					<!--
+						Zone cliquable de l’easter-egg, transparente, active seulement quand le jeu est
+						proposé (.playable). Souris seulement, à dessein : la scène reste hors de la
+						navigation et des technologies d’assistance.
+					-->
+					<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+					<rect class="rider-hit" x="-34" y="-72" width="66" height="74" {@attach keepRiderHit} onclick={toggleInvitation} />
 				</g>
 			</g>
 		</svg>
 	</div>
 </div>
 
+{#if invitationOpen}
+	<div
+		class="invitation"
+		role="dialog"
+		aria-labelledby="hero-invitation-title"
+		style:--anchor-x="{anchor.x}px"
+		style:--anchor-y="{anchor.y}px"
+		{@attach invitation}
+	>
+		<p id="hero-invitation-title" class="invitation-title ds-body-l">Salut&nbsp;! Une petite balade&nbsp;?</p>
+		<div class="invitation-actions">
+			<Button onclick={play}>Jouer</Button>
+			<Button variant="secondary" onclick={closeInvitation}>Non merci</Button>
+		</div>
+	</div>
+{/if}
 
 <style>
 	/* Décor pleine largeur, derrière le contenu du hero (qui fournit --hero-scene-band). */
@@ -304,6 +460,94 @@
 		:global(html[data-section='contact']:not([data-reduced-motion])) :is(.sky-layer, .layer) {
 			translate: 0 var(--depth-offset, 0px);
 		}
+	}
+
+	/* Zone cliquable du cycliste : inerte tant que le jeu n’est pas proposé. */
+	.rider-hit {
+		fill: transparent;
+	}
+
+	.playable .rider-hit {
+		pointer-events: auto;
+		cursor: pointer;
+	}
+
+	/*
+	 * Bulle d’invitation : même dessin que la bulle de Contact (index.astro), pointe en bas à
+	 * gauche vers le casque (--anchor-x / --anchor-y, dans le repère du hero).
+	 */
+	.invitation {
+		--bubble-ink: var(--text-primary);
+		--pointer-x: 2rem;
+		--pointer-size: 1.5rem;
+		position: absolute;
+		z-index: 1;
+		top: calc(var(--anchor-y) - var(--pointer-size) - 0.625rem);
+		left: calc(var(--anchor-x) - var(--pointer-x));
+		translate: 0 -100%;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: var(--spacing-4);
+		width: max-content;
+		max-width: min(24rem, calc(100vw - var(--anchor-x)));
+		padding: var(--spacing-5);
+		border: 2px solid var(--bubble-ink);
+		border-radius: var(--radius-xl);
+		background: var(--surface-elevated);
+		box-shadow: 4px 4px 0 var(--bubble-ink);
+		transform-origin: var(--pointer-x) calc(100% + var(--pointer-size));
+		transition:
+			opacity 250ms ease 300ms,
+			scale 450ms cubic-bezier(0.34, 1.56, 0.64, 1) 300ms;
+	}
+
+	/* Apparition pendant que le bras se lève, avec un léger rebond. */
+	@starting-style {
+		.invitation {
+			opacity: 0;
+			scale: 0.6;
+		}
+	}
+
+	:global(html[data-theme='dark']) .invitation {
+		--bubble-ink: var(--text-secondary);
+	}
+
+	/* Pointe : un triangle bordé (contour) et un triangle plein (fond) superposés. */
+	.invitation::before,
+	.invitation::after {
+		content: '';
+		position: absolute;
+		top: 100%;
+		left: var(--pointer-x);
+		width: 0;
+		height: 0;
+		border-style: solid;
+	}
+
+	.invitation::before {
+		border-width: var(--pointer-size) var(--pointer-size) 0 0;
+		border-color: var(--bubble-ink) transparent transparent transparent;
+	}
+
+	.invitation::after {
+		margin-top: -3px;
+		margin-left: 2px;
+		border-width: calc(var(--pointer-size) - 4px) calc(var(--pointer-size) - 4px) 0 0;
+		border-color: var(--surface-elevated) transparent transparent transparent;
+	}
+
+	.invitation-title {
+		margin: 0;
+		color: var(--text-primary);
+		font-family: var(--font-heading);
+		font-weight: 600;
+	}
+
+	.invitation-actions {
+		display: flex;
+		gap: var(--spacing-3);
 	}
 
 	/* Bras qui fait coucou : rotations autour de l'épaule et du coude (origine de leur groupe). */
@@ -506,6 +750,23 @@
 			animation:
 				unfold 450ms cubic-bezier(0.3, 0, 0.2, 1) 600ms both,
 				fold 450ms ease-in-out 2850ms forwards;
+		}
+
+		/*
+		 * Coucou de l’easter-egg, au clic sur le cycliste : mêmes étapes que celui de Contact,
+		 * sans attendre de zoom (fini en 2,7 s). Plus précis que la règle des animations déjà jouées.
+		 */
+		.scene.waving .wave-arm {
+			animation:
+				raise 450ms cubic-bezier(0.3, 0, 0.2, 1) both,
+				wave 300ms ease-in-out 450ms 6 alternate forwards,
+				lower 450ms ease-in-out 2250ms forwards;
+		}
+
+		.scene.waving .wave-forearm {
+			animation:
+				unfold 450ms cubic-bezier(0.3, 0, 0.2, 1) both,
+				fold 450ms ease-in-out 2250ms forwards;
 		}
 
 		/* Hors écran : suspension, l’animation reprend là où elle s’était arrêtée. */
