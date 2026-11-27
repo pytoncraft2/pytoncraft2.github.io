@@ -130,12 +130,19 @@ Les éléments listés sont une direction, pas un inventaire obligatoire. Mieux 
 
 ### Easter-egg du cycliste
 
-Un clic sur le cycliste du hero, une fois son entrée terminée, le fait saluer (même coucou que sur Contact, fini en 2,7 s) et ouvre au-dessus de sa tête une bulle de BD : « Salut ! Une petite balade ? », avec [Jouer] et [Non merci]. Le mini-jeu lancé par [Jouer] est en cours de conception : pour l’instant, le bouton ferme la bulle.
+Un clic sur le cycliste du hero, une fois son entrée terminée, le fait saluer (même coucou que sur Contact, fini en 2,7 s) et ouvre au-dessus de sa tête une bulle de BD : « Salut ! Une petite balade ? », avec [Jouer] et [Non merci]. [Jouer] lance un mini-jeu dans la bande de paysage, sans zoom, le texte du hero restant affiché.
 
 - Proposé seulement dans le hero (`data-section="accueil"`), sur un écran d’au moins `40rem` avec un pointeur fin (`hover: hover`, `pointer: fine`), hors mouvement réduit (préférence système et réglage du site). Ailleurs, le cycliste n’est pas cliquable.
 - Volontairement hors de la navigation : une zone transparente sur le cycliste, cliquable à la souris seulement, sans arrêt de tabulation ; la scène reste `aria-hidden`. C’est un écart assumé à la règle « utilisable au clavier », acceptable parce que l’easter-egg n’est pas un contenu essentiel.
 - La bulle, hors de la scène, contient de vrais boutons et reçoit le focus à l’ouverture (sur [Jouer]) : la suite se fait aussi au clavier. Échap, un clic ailleurs, un second clic sur le cycliste ou la sortie du hero la ferment. Une condition qui cesse (fenêtre réduite, réglage activé) la ferme aussi.
 - Même dessin que la bulle de Contact (contour, ombre décalée, pointe vers le casque), apparition avec un léger rebond pendant que le bras se lève.
+
+Mini-jeu (version minimale) :
+
+- Runner horizontal : le vélo reste au quart du paysage, les roues tournent, des repères défilent au sol et des obstacles (rocher, cône de travaux, tronc) arrivent par la droite, de plus en plus vite. Espace, ↑ ou un clic dans le paysage font sauter ; Échap quitte. Le premier obstacle touché termine la partie (l’échelle des véhicules viendra ensuite).
+- La distance s’affiche en haut à droite de la bande, avec la consigne jusqu’au premier obstacle. À la chute, la bulle affiche « Fin de la balade : X km ! » avec [Rejouer] (focus) et [Me contacter] (`#contact`).
+- Exceptions aux règles de la scène, limitées à la partie, que le visiteur lance et peut arrêter à tout moment : boucle `requestAnimationFrame` (pas de temps plafonné, suspendue avec l’onglet), animation des roues de plus de 5 s, scène qui reçoit les clics. La partie s’arrête aussi en quittant le hero ou quand une condition cesse.
+- Code chargé seulement à l’invitation (`import()` de `HeroRunner.svelte`) ; logique sans DOM dans `src/lib/hero-runner.ts`. Couleurs des obstacles : tokens `--scene-rock*`, `--scene-log*`, `--scene-cone*`.
 
 ## Études de cas et visuels
 

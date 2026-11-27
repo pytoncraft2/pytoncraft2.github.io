@@ -67,8 +67,9 @@
 
 	/*
 	 * Easter-egg : un clic sur le cycliste au repos le fait saluer et ouvre une bulle qui
-	 * propose de jouer. Volontairement hors de la navigation (souris seulement, pas d’arrêt de
-	 * tabulation) et proposé seulement sur ordinateur, dans le hero, hors mouvement réduit.
+	 * propose de jouer (mini-jeu : HeroRunner.svelte, chargé à la demande). Volontairement hors
+	 * de la navigation (souris seulement, pas d’arrêt de tabulation) et proposé seulement sur
+	 * ordinateur, dans le hero, hors mouvement réduit.
 	 */
 	const deviceQuery =
 		'(min-width: 40rem) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)';
@@ -76,15 +77,23 @@
 	let riderReady = $state(false);
 	const playable = $derived(allowed && riderReady);
 
-	let invitationOpen = $state(false);
+	/** Repos, invitation, partie en cours, fin de partie (bulle du score). */
+	type Phase = 'idle' | 'invite' | 'playing' | 'over';
+	let phase = $state<Phase>('idle');
+	/** Numéro de partie : « Rejouer » recrée la partie. */
+	let gameRound = $state(0);
+	/** Hauteur du saut, transmise par la partie en cours. */
+	let lift = $state(0);
+	let finalDistance = $state('');
+	let runnerModule = $state<Promise<typeof import('./HeroRunner.svelte')>>();
 	let anchor = $state({ x: 0, y: 0 });
-	let scene: HTMLElement | undefined;
+	let scene = $state<HTMLElement>();
 	let rider: SVGGElement | undefined;
 	let riderHit: SVGRectElement | undefined;
 
 	/*
 	 * Conditions du jeu : ordinateur à pointeur fin, réglage « Réduire les animations » du site
-	 * inactif et hero affiché (`data-section` sur <html>). Une condition qui cesse ferme la bulle.
+	 * inactif et hero affiché (`data-section` sur <html>). Une condition qui cesse arrête le jeu.
 	 */
 	const watchConditions: Attachment<HTMLElement> = (node) => {
 		scene = node;
@@ -94,7 +103,7 @@
 			allowed = device.matches && !html.hasAttribute('data-reduced-motion') &&
 				(html.dataset.section ?? 'accueil') === 'accueil';
 			if (!allowed) {
-				invitationOpen = false;
+				backToRest();
 			}
 		};
 		read();
@@ -148,26 +157,39 @@
 		if (!playable) {
 			return;
 		}
-		if (!invitationOpen) {
+		if (phase === 'idle') {
 			placeBubble();
+			// Chargé dès l’invitation : la partie démarre sans attente au clic sur « Jouer ».
+			runnerModule ??= import('./HeroRunner.svelte');
+			phase = 'invite';
+		} else if (phase === 'invite') {
+			phase = 'idle';
 		}
-		invitationOpen = !invitationOpen;
 	}
 
-	function closeInvitation() {
-		invitationOpen = false;
+	/** Bulle fermée, partie abandonnée : décor fixe, cycliste au sol. */
+	function backToRest() {
+		phase = 'idle';
+		lift = 0;
 	}
 
-	// Étape suivante : lancer la partie. Pour l’instant, le bouton ferme la bulle.
 	function play() {
-		closeInvitation();
+		lift = 0;
+		gameRound += 1;
+		phase = 'playing';
+	}
+
+	function endGame(distance: string) {
+		finalDistance = distance;
+		placeBubble();
+		phase = 'over';
 	}
 
 	/*
-	 * Bulle ouverte : le focus passe sur « Jouer » (la suite se fait aussi au clavier) ; Échap
-	 * ou un clic ailleurs la ferme ; elle suit le cycliste au redimensionnement.
+	 * Bulle ouverte : le focus passe sur son premier bouton (la suite se fait aussi au clavier) ;
+	 * Échap ou un clic ailleurs la ferme ; elle suit le cycliste au redimensionnement.
 	 */
-	const invitation: Attachment<HTMLElement> = (node) => {
+	const bubble: Attachment<HTMLElement> = (node) => {
 		node.querySelector('button')?.focus({ preventScroll: true });
 		const offs = [
 			on(document, 'pointerdown', (event) => {
@@ -175,11 +197,11 @@
 				if (target instanceof Node && (node.contains(target) || riderHit?.contains(target))) {
 					return;
 				}
-				closeInvitation();
+				backToRest();
 			}),
 			on(document, 'keydown', (event) => {
 				if (event.key === 'Escape') {
-					closeInvitation();
+					backToRest();
 				}
 			}),
 			on(window, 'resize', placeBubble)
@@ -193,7 +215,7 @@
 </script>
 
 <div
-	class={['scene', { offscreen: !inView, playable, waving: invitationOpen }]}
+	class={['scene', { offscreen: !inView, playable, waving: phase === 'invite', running: phase === 'playing' }]}
 	aria-hidden="true"
 	{@attach watchVisibility}
 	{@attach watchConditions}
@@ -331,7 +353,22 @@
 				<path fill="var(--scene-ground)" d="M0 292 C300 286 600 288 720 288 C900 288 1200 286 1440 290 L1440 320 L0 320 Z" />
 			</g>
 
-			<g transform="translate(0 289)">
+			<!-- Mini-jeu : obstacles, repères au sol et distance, sous le cycliste. -->
+			{#if (phase === 'playing' || phase === 'over') && runnerModule && scene}
+				{#await runnerModule then { default: HeroRunner }}
+					{#key gameRound}
+						<HeroRunner
+							surface={scene}
+							onlift={(value) => (lift = value)}
+							onend={endGame}
+							onquit={backToRest}
+						/>
+					{/key}
+				{/await}
+			{/if}
+
+			<!-- Le cycliste monte de la hauteur du saut pendant le mini-jeu. -->
+			<g transform="translate(0 {289 - lift})">
 				<g class="rider" {@attach watchRider}>
 					<!-- Faisceau du phare avant, dont la pointe part de la lampe. -->
 					<polygon class="night beam" points="19,-33 100,-17 100,0" fill="url(#hero-scene-beam)" />
@@ -393,20 +430,28 @@
 	</div>
 </div>
 
-{#if invitationOpen}
+{#if phase === 'invite' || phase === 'over'}
 	<div
 		class="invitation"
 		role="dialog"
 		aria-labelledby="hero-invitation-title"
 		style:--anchor-x="{anchor.x}px"
 		style:--anchor-y="{anchor.y}px"
-		{@attach invitation}
+		{@attach bubble}
 	>
-		<p id="hero-invitation-title" class="invitation-title ds-body-l">Salut&nbsp;! Une petite balade&nbsp;?</p>
-		<div class="invitation-actions">
-			<Button onclick={play}>Jouer</Button>
-			<Button variant="secondary" onclick={closeInvitation}>Non merci</Button>
-		</div>
+		{#if phase === 'invite'}
+			<p id="hero-invitation-title" class="invitation-title ds-body-l">Salut&nbsp;! Une petite balade&nbsp;?</p>
+			<div class="invitation-actions">
+				<Button onclick={play}>Jouer</Button>
+				<Button variant="secondary" onclick={backToRest}>Non merci</Button>
+			</div>
+		{:else}
+			<p id="hero-invitation-title" class="invitation-title ds-body-l">Fin de la balade&nbsp;: {finalDistance}&nbsp;!</p>
+			<div class="invitation-actions">
+				<Button onclick={play}>Rejouer</Button>
+				<Button href="#contact" variant="secondary">Me contacter</Button>
+			</div>
+		{/if}
 	</div>
 {/if}
 
@@ -470,6 +515,11 @@
 	.playable .rider-hit {
 		pointer-events: auto;
 		cursor: pointer;
+	}
+
+	/* Partie en cours : un clic dans le paysage fait sauter (HeroRunner). */
+	.scene.running {
+		pointer-events: auto;
 	}
 
 	/*
@@ -769,6 +819,15 @@
 				fold 450ms ease-in-out 2250ms forwards;
 		}
 
+		/*
+		 * Partie en cours : les roues tournent tant qu’elle dure (lancée et arrêtée par le
+		 * visiteur, d’où l’exception à la règle des 5 s). Plus précis que la règle des
+		 * animations déjà jouées.
+		 */
+		.scene.running .rider .spokes {
+			animation: spin 240ms linear infinite;
+		}
+
 		/* Hors écran : suspension, l’animation reprend là où elle s’était arrêtée. */
 		.offscreen,
 		.offscreen * {
@@ -843,6 +902,12 @@
 	@keyframes roll {
 		from {
 			transform: rotate(-2610deg);
+		}
+	}
+
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
 		}
 	}
 

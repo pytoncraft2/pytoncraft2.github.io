@@ -56,6 +56,13 @@
   /* Feu arrière, allumé seulement la nuit */
   --scene-rear: #ff6b5e;
   --scene-rear-glow: rgb(255 90 70 / 0.35);
+  /* Obstacles du mini-jeu (easter-egg du cycliste), lisibles sur les collines proches */
+  --scene-rock: #7f9493;
+  --scene-rock-shade: #64797a;
+  --scene-log: #8a6a5c;
+  --scene-log-end: #c9a98f;
+  --scene-cone: #ef8a3c;
+  --scene-cone-stripe: #ffffff;
 
   /* Layout */
   --spacing-0: 0;
@@ -140,6 +147,12 @@
   --scene-rider: var(--color-smoke);
   --scene-bike: var(--color-frost);
   --scene-helmet: var(--color-frost);
+  --scene-rock: #5a7690;
+  --scene-rock-shade: #44607a;
+  --scene-log: #7a5e50;
+  --scene-log-end: #b0917a;
+  --scene-cone: #e07a32;
+  --scene-cone-stripe: #e8eef0;
 }
 
 /* Permet au ciel de la scène d’accueil de passer en douceur du jour à la nuit */
