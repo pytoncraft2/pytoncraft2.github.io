@@ -63,6 +63,12 @@
   --scene-log-end: #c9a98f;
   --scene-cone: #ef8a3c;
   --scene-cone-stripe: #ffffff;
+  /* Bonus (pile) et hoverboard du mini-jeu */
+  --scene-bonus: #f2b45a;
+  --scene-bonus-glow: rgb(242 180 90 / 0.3);
+  --scene-bonus-mark: #6b3f06;
+  --scene-hover-light: #2fa3b5;
+  --scene-hover-glow: rgb(47 163 181 / 0.3);
 
   /* Layout */
   --spacing-0: 0;
@@ -153,6 +159,10 @@
   --scene-log-end: #b0917a;
   --scene-cone: #e07a32;
   --scene-cone-stripe: #e8eef0;
+  --scene-bonus: #ffd36b;
+  --scene-bonus-glow: rgb(255 211 107 / 0.25);
+  --scene-hover-light: #7fe3f0;
+  --scene-hover-glow: rgb(127 227 240 / 0.35);
 }
 
 /* Permet au ciel de la scène d’accueil de passer en douceur du jour à la nuit */

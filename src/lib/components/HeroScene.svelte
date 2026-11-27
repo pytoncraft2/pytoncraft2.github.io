@@ -528,6 +528,23 @@
 								<polyline points="3,-52 12,-46 19,-42" />
 							</g>
 							{@render head(-3, -2)}
+						{:else if vehicle === 'hoverboard'}
+							<!-- Hoverboard : planche sans roues qui flotte (.hover), lueur dessous. -->
+							<g class="hover">
+								<ellipse cx="0" cy="-2" rx="20" ry="2.5" fill="var(--scene-hover-glow)" />
+								<rect x="-24" y="-12" width="48" height="5" rx="2.5" fill="var(--scene-bike)" />
+								<rect x="-16" y="-8" width="32" height="2" rx="1" fill="var(--scene-hover-light)" />
+								<g transform="translate(0 -4)">
+									<g fill="none" stroke="var(--scene-rider)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+										<polyline points="0,-34 -5,-21 -9,-9" />
+										<polyline points="0,-34 6,-22 8,-9" />
+										<polyline points="0,-34 3,-54" />
+										<polyline points="3,-52 -7,-46 -14,-44" />
+										<polyline points="3,-52 12,-46 19,-42" />
+									</g>
+									{@render head(-3, -2)}
+								</g>
+							</g>
 						{:else}
 							<!-- À pied : course, jambes et bras en balancier (.stride). -->
 							<g fill="none" stroke="var(--scene-rider)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
@@ -962,9 +979,16 @@
 			animation: spin 240ms linear infinite;
 		}
 
-		/* Véhicules du mini-jeu : oscillation du monocycle, foulée à pied, clignotement après un choc. */
+		/*
+		 * Véhicules du mini-jeu : oscillation du monocycle, flottement du hoverboard, foulée à pied,
+		 * clignotement après un choc.
+		 */
 		.scene.running .rider .wobble {
 			animation: wobble 700ms ease-in-out infinite alternate;
+		}
+
+		.scene.running .rider .hover {
+			animation: hover 600ms ease-in-out infinite alternate;
 		}
 
 		.scene.running .rider .stride {
@@ -1069,6 +1093,16 @@
 
 		to {
 			transform: rotate(6deg);
+		}
+	}
+
+	@keyframes hover {
+		from {
+			transform: translateY(1px);
+		}
+
+		to {
+			transform: translateY(-3px);
 		}
 	}
 
