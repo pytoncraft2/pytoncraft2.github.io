@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ProjectStack from './ProjectStack.svelte';
 	import ProjectTags from './ProjectTags.svelte';
 
 	let {
@@ -52,6 +53,7 @@
 	data-transition={restored ? '' : undefined}
 	style:--vt-title={`project-${slug}-title`}
 	style:--vt-media={`project-${slug}-media`}
+	style:--vt-stack={`project-${slug}-stack`}
 	style:--vt-tags={`project-${slug}-tags`}
 	style:--vt-summary={`project-${slug}-summary`}
 	style:--vt-card={`project-${slug}-card`}
@@ -62,13 +64,7 @@
 		{/if}
 	</div>
 	<h3 class="title">{title}</h3>
-	{#if stack.length > 0}
-		<ul class="stack" aria-label="Technologies">
-			{#each stack as tech (tech)}
-				<li>{tech}</li>
-			{/each}
-		</ul>
-	{/if}
+	<ProjectStack {stack} />
 	<ProjectTags {tags} />
 	<p class="description">{description}</p>
 	<a class="link" {href} onclick={arm}>{linkLabel}</a>
@@ -110,29 +106,9 @@
 	}
 
 	.title,
+	.card :global(.stack),
 	.card :global(.tags) {
 		width: fit-content;
-	}
-
-	/*
-	 * Technologies : pastilles arrondies à contour, sans fond, pour se distinguer des tags
-	 * (ProjectTags : fond plein, angles peu arrondis) tout en gardant leur taille.
-	 */
-	.stack {
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--spacing-2);
-		margin: 0;
-		padding: 0;
-		list-style: none;
-	}
-
-	.stack li {
-		padding: var(--spacing-1) var(--spacing-3);
-		border: 1px solid var(--border-strong);
-		border-radius: var(--radius-full);
-		color: var(--text-primary);
-		font: 500 0.75rem / 1rem var(--font-sans);
 	}
 
 	.description {
@@ -154,6 +130,11 @@
 	.card[data-transition] .media {
 		view-transition-name: var(--vt-media);
 		view-transition-class: project-media;
+	}
+
+	.card[data-transition] :global(.stack) {
+		view-transition-name: var(--vt-stack);
+		view-transition-class: project-text;
 	}
 
 	.card[data-transition] :global(.tags) {

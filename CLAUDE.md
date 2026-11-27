@@ -63,7 +63,7 @@ Il n’existe pas de page « À propos » séparée : le parcours est la section
 
 Points qui demandent de lire plusieurs fichiers :
 
-- **Îles** : seuls `Header`, `Dock` (`client:load`), `ProjectCarousel` (`client:load`) et `HeroScene` (`client:idle`) envoient du JavaScript. Les autres composants Svelte (`Button`, `TechIcon`, `WindowFrame`, `ProjectTags`, `ProjectImage`, `Footer`) sont rendus en HTML au build. Une île ne reçoit que des props sérialisables (pas d’objet de collection, pas de fonction) ; c’est la raison du type `CarouselProject`.
+- **Îles** : seuls `Header`, `Dock` (`client:load`), `ProjectCarousel` (`client:load`) et `HeroScene` (`client:idle`) envoient du JavaScript. Les autres composants Svelte (`Button`, `TechIcon`, `WindowFrame`, `ProjectStack`, `ProjectTags`, `ProjectImage`, `Footer`) sont rendus en HTML au build. Une île ne reçoit que des props sérialisables (pas d’objet de collection, pas de fonction) ; c’est la raison du type `CarouselProject`.
 - **Chemins** : le chemin de base vient de `BASE_PATH` (workflow `.github/workflows/deploy.yml`, vide pour `<user>.github.io`). Liens internes et fichiers de `public/` passent par `withBase()` / `projectPath()` (`src/lib/paths.ts`) ; dans le Markdown, les images sont référencées en relatif (`./<slug>/image.webp`) : Astro les optimise et ajoute la base lui-même. Ne jamais écrire de chemin préfixé en dur.
 - **Alias `#lib`** : les imports utilisent `#lib/...` (champ `imports` de `package.json`), et les modules TS sont importés avec l’extension `.js` (ex. `#lib/projects.js`).
 - **Thème et dock** : le script inline de `BaseLayout.astro` lit `localStorage` (`theme` : `light` ou `dark`, absente pour suivre `prefers-color-scheme`) et pose `data-theme` sur `<html>` avant le rendu ; `Header.svelte` (choix Système / Clair / Sombre) écrit ou supprime la même clé, pose le même attribut et, en mode Système, suit les changements de `prefers-color-scheme`. Le dock est en bas sur mobile et sur le bord gauche à partir de `40rem` (media queries, sans attribut ; la page réserve `--dock-gutter` à gauche). `trackSection` (`snap-blocks.ts`) pose `data-section` (section affichée, d’après le `data-section` des blocs de l’accueil) ; le dock en déduit son élément actif (`aria-current="location"`), et l’ancre de l’adresse sur les autres pages. Garder les trois synchronisés. Le dock reçoit le chemin courant en prop (`pathname`) pour son état actif.
@@ -86,7 +86,7 @@ Les règles détaillées sont dans `DESIGN.md`. En résumé :
 
 - Utiliser les tokens sémantiques de `tokens.css` ; ajouter un token seulement si son rôle et sa réutilisation le justifient, et le définir pour les deux thèmes.
 - Vérifier les thèmes clair et sombre, mobile et ordinateur, clavier et mouvement réduit.
-- Réutiliser `Button`, `ProjectCard`, `ProjectTags`, `ProjectImage`, `WindowFrame` et `CaseStudyLayout` selon leur usage réel.
+- Réutiliser `Button`, `ProjectCard`, `ProjectStack`, `ProjectTags`, `ProjectImage`, `WindowFrame` et `CaseStudyLayout` selon leur usage réel.
 - Conserver la navigation, le dock, les liens d’évitement et les préférences existantes.
 - Pour une correction locale, limiter les changements aux styles concernés ; éviter les sélecteurs globaux qui touchent d’autres pages.
 

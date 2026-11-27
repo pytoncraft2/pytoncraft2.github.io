@@ -1,6 +1,7 @@
 ---
 import Button from '#lib/components/Button.svelte';
 import ProjectImage from '#lib/components/ProjectImage.svelte';
+import ProjectStack from '#lib/components/ProjectStack.svelte';
 import ProjectTags from '#lib/components/ProjectTags.svelte';
 import WindowFrame from '#lib/components/WindowFrame.svelte';
 import { projectPath, withBase } from '#lib/paths.js';
@@ -37,6 +38,7 @@ const { id: slug, data } = project;
 				>
 					{data.title}
 				</h1>
+				<ProjectStack stack={data.stack} transitionName={`project-${slug}-stack`} />
 				<ProjectTags tags={data.tags} transitionName={`project-${slug}-tags`} />
 				<div
 					class="brief"
