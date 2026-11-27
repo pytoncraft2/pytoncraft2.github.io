@@ -331,8 +331,29 @@ export const snapBlocks: Attachment<HTMLElement> = (root) => {
  * plus haut que l'écran ne se colle qu'une fois son bas atteint, pour rester lisible
  * jusqu'au bout. Le dernier bloc se colle à sa place de fin de page (au-dessus du pied de
  * page) plutôt qu'en haut de l'écran. Sans ce script, les blocs défilent normalement.
+ *
+ * Réservé aux écrans d'au moins 40rem (dock à gauche) : sur mobile, les blocs défilent
+ * dans le flux, comme en mouvement réduit. Suit les changements de largeur.
  */
 export const stackBlocks: Attachment<HTMLElement> = (root) => {
+	const query = window.matchMedia('(min-width: 40rem)');
+	let stop: (() => void) | undefined;
+
+	function update() {
+		stop?.();
+		stop = query.matches ? stack(root) : undefined;
+	}
+
+	update();
+	query.addEventListener('change', update);
+
+	return () => {
+		query.removeEventListener('change', update);
+		stop?.();
+	};
+};
+
+function stack(root: HTMLElement): () => void {
 	const blocks = [...root.querySelectorAll<HTMLElement>('.snap-block')];
 	const lastIndex = blocks.length - 1;
 	// Défilement, depuis le moment où un bloc se colle, sur lequel il s'efface.
@@ -465,7 +486,7 @@ export const stackBlocks: Attachment<HTMLElement> = (root) => {
 			block.removeAttribute('data-covered');
 		}
 	};
-};
+}
 
 /**
  * Section courante, exposée sur `<html>` en `data-section` (valeur du `data-section` du

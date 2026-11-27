@@ -703,7 +703,15 @@ const cards: CarouselProject[] = (await getFeaturedProjects()).map(({ id, data }
 		}
 	}
 
+	/*
+	 * Mobile : sans empilement (stackBlocks), le paysage remonte avec le hero. Contact
+	 * n'occupe plus la hauteur de l'écran : sa carte suit le Profil, comme en mouvement réduit.
+	 */
 	@media (max-width: 39.99rem) {
+		.contact {
+			min-height: auto;
+		}
+
 		.bubble {
 			border: 1px solid var(--border-default);
 			border-radius: var(--radius-lg);
