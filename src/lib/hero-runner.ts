@@ -94,6 +94,16 @@ export interface RunnerFrame {
 	hurt: boolean;
 }
 
+/** Fin de partie, mise en forme pour la bulle (HeroRunner → HeroScene). */
+export interface RunnerResult {
+	/** Distance parcourue (« 1,4 km »). */
+	distance: string;
+	/** Meilleure distance avant cette partie, ou `null` à la première partie. */
+	best: string | null;
+	/** La partie bat le meilleur score précédent. */
+	record: boolean;
+}
+
 /** Message affiché après un changement de véhicule. */
 export type Notice = 'hit' | 'boost' | null;
 

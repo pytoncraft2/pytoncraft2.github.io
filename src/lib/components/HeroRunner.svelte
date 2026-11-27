@@ -3,7 +3,16 @@
 <script lang="ts">
 	import type { Attachment } from 'svelte/attachments';
 	import { on } from 'svelte/events';
-	import { createRunner, formatDistance, jump, notice, step, type RunnerFrame, type Vehicle } from '#lib/hero-runner.js';
+	import {
+		createRunner,
+		formatDistance,
+		jump,
+		notice,
+		step,
+		type RunnerFrame,
+		type RunnerResult,
+		type Vehicle
+	} from '#lib/hero-runner.js';
 
 	/*
 	 * Partie en cours du mini-jeu de la scène d’accueil, dessinée dans le SVG `.land` de
@@ -20,8 +29,8 @@
 		/** Zone qui fait sauter au clic (la scène). */
 		surface: HTMLElement;
 		onframe: (frame: RunnerFrame) => void;
-		/** Chute : distance parcourue, mise en forme (« 1,4 km »). */
-		onend: (distance: string) => void;
+		/** Chute : distance parcourue et meilleur score. */
+		onend: (result: RunnerResult) => void;
 		onquit: () => void;
 	} = $props();
 
@@ -51,6 +60,30 @@
 		return game.distance < 900 ? 'Espace ou clic : sauter · Échap : quitter' : '';
 	});
 
+	/*
+	 * Meilleur score, gardé dans le navigateur (distance en unités du paysage). Stockage
+	 * indisponible (navigation privée, données bloquées) : pas de record, la partie continue.
+	 */
+	const bestKey = 'hero-runner-best';
+
+	function saveBest(distance: number): RunnerResult {
+		let previous = 0;
+		try {
+			const stored = Number.parseFloat(localStorage.getItem(bestKey) ?? '');
+			previous = Number.isFinite(stored) && stored > 0 ? stored : 0;
+			if (distance > previous) {
+				localStorage.setItem(bestKey, String(Math.round(distance)));
+			}
+		} catch {
+			previous = 0;
+		}
+		return {
+			distance: formatDistance(distance),
+			best: previous > 0 ? formatDistance(previous) : null,
+			record: previous > 0 && distance > previous
+		};
+	}
+
 	/** Boucle de jeu : une image par rafraîchissement, à l’arrêt après la chute. */
 	const run: Attachment<SVGGElement> = () => {
 		let frame = 0;
@@ -64,7 +97,7 @@
 			onframe({ lift: game.lift, distance: game.distance, vehicle: game.vehicle, hurt: game.recovery > 0 });
 			if (game.crashed) {
 				stop();
-				onend(formatDistance(game.distance));
+				onend(saveBest(game.distance));
 				return;
 			}
 			frame = requestAnimationFrame(tick);

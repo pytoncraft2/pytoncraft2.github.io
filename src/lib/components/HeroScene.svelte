@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { Attachment } from 'svelte/attachments';
-	import type { Vehicle } from '#lib/hero-runner.js';
+	import type { RunnerResult, Vehicle } from '#lib/hero-runner.js';
 	import { on } from 'svelte/events';
 	import Button from './Button.svelte';
 
@@ -149,7 +149,7 @@
 		const x = cloud.x + 100 - travel * 0.05 * cloud.scale;
 		return ((x % span) + span) % span - 100;
 	}
-	let finalDistance = $state('');
+	let result = $state<RunnerResult>();
 	let runnerModule = $state<Promise<typeof import('./HeroRunner.svelte')>>();
 	let anchor = $state({ x: 0, y: 0 });
 	let scene = $state<HTMLElement>();
@@ -255,8 +255,8 @@
 		phase = 'playing';
 	}
 
-	function endGame(distance: string) {
-		finalDistance = distance;
+	function endGame(outcome: RunnerResult) {
+		result = outcome;
 		resetWheels(true);
 		placeBubble();
 		phase = 'over';
@@ -637,7 +637,16 @@
 				<Button variant="secondary" onclick={backToRest}>Non merci</Button>
 			</div>
 		{:else}
-			<p id="hero-invitation-title" class="invitation-title ds-body-l">Fin de la balade&nbsp;: {finalDistance}&nbsp;!</p>
+			<div class="invitation-text">
+				{#if result?.record}
+					<p id="hero-invitation-title" class="invitation-title ds-body-l">Nouveau record&nbsp;: {result.distance}&nbsp;!</p>
+				{:else}
+					<p id="hero-invitation-title" class="invitation-title ds-body-l">Fin de la balade&nbsp;: {result?.distance}&nbsp;!</p>
+					{#if result?.best}
+						<p class="invitation-note ds-body-s">Record&nbsp;: {result.best}</p>
+					{/if}
+				{/if}
+			</div>
 			<div class="invitation-actions">
 				<Button onclick={play}>Rejouer</Button>
 				<Button href="#contact" variant="secondary">Me contacter</Button>
@@ -784,6 +793,17 @@
 		color: var(--text-primary);
 		font-family: var(--font-heading);
 		font-weight: 600;
+	}
+
+	.invitation-note {
+		margin: 0;
+		color: var(--text-secondary);
+	}
+
+	.invitation-text {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-1);
 	}
 
 	.invitation-actions {
