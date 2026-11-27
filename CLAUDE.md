@@ -54,7 +54,7 @@ Astro (site statique multipage), îles Svelte 5 (runes), TypeScript, CSS avec pr
 | `src/lib/components/` | Composants Svelte : rendus en HTML statique, ou îles hydratées avec `client:*` |
 | `src/lib/components/ProjectCarousel.svelte` | Île du carrousel des projets |
 | `src/lib/components/HeroScene.svelte` | Île du paysage jour/nuit derrière le hero (règles dans `DESIGN.md`, « Scène d’accueil ») ; couleurs `--scene-*` dans `tokens.css`. Porte aussi l’easter-egg du cycliste (clic → coucou, bulle d’invitation et mini-jeu, « Easter-egg du cycliste ») |
-| `src/lib/components/HeroRunner.svelte`, `src/lib/hero-runner.ts` | Mini-jeu de l’easter-egg : rendu SVG et boucle de la partie (chargés à la demande par `HeroScene`), logique sans DOM (véhicules, saut, obstacles, piles, collisions, distance). Les véhicules sont dessinés dans `HeroScene` (groupe `.vehicle` du cycliste), la bulle vise leur casque (`.helmet`) |
+| `src/lib/components/HeroRunner.svelte`, `src/lib/hero-runner.ts` | Mini-jeu de l’easter-egg : rendu SVG et boucle de la partie (chargés à la demande par `HeroScene`), logique sans DOM (véhicules, saut, obstacles et falaise, piles, collisions, distance). Les véhicules sont dessinés dans `HeroScene` (groupe `.vehicle` du cycliste), la bulle vise leur casque (`.helmet`) |
 | `src/lib/data/skills.ts`, `tech-icons.ts` | Compétences (`TechId`) et logos de `src/lib/assets/tech/` |
 | `src/lib/styles/` | `tokens.css` (couleurs, thèmes, espacements, rayons, tailles), `typography.css` (classes `ds-*`), `global.css` |
 | `src/lib/snap-blocks.ts` | Défilement (`snapBlocks`) et empilement (`stackBlocks`, à partir de `40rem` seulement) des blocs `.snap-block` de l’accueil, appelés par un `<script>` de `index.astro` |

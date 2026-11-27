@@ -7,7 +7,8 @@
  * Unités : celles du dessin du paysage (SVG `.land`, 1440 × 320, sol à y = 289), en secondes.
  */
 
-export type ObstacleKind = 'rock' | 'cone' | 'log';
+/** `gap` : falaise, un trou dans le chemin à franchir en sautant. */
+export type ObstacleKind = 'rock' | 'cone' | 'log' | 'gap';
 
 export interface Obstacle {
 	id: number;
@@ -125,8 +126,11 @@ const unitsPerKilometer = 10000;
 const shapes: Record<ObstacleKind, { width: number; height: number }> = {
 	rock: { width: 34, height: 20 },
 	cone: { width: 24, height: 32 },
-	log: { width: 64, height: 18 }
+	log: { width: 64, height: 18 },
+	gap: { width: 90, height: 0 }
 };
+/** Falaise : on tombe si l’on est au sol quand le centre passe au-dessus du trou (moins ce bord). */
+const gapEdge = 6;
 const kinds = Object.keys(shapes) as ObstacleKind[];
 
 /** Message du moment : le dernier changement de véhicule, s’il est récent. */
@@ -175,6 +179,9 @@ function reaches(state: RunnerState, bonus: Bonus): boolean {
 }
 
 function collides(state: RunnerState, obstacle: Obstacle): boolean {
+	if (obstacle.kind === 'gap') {
+		return state.lift === 0 && riderX > obstacle.x + gapEdge && riderX < obstacle.x + obstacle.width - gapEdge;
+	}
 	const halfWidth = handling[state.vehicle].halfWidth;
 	const overlaps = obstacle.x < riderX + halfWidth && obstacle.x + obstacle.width > riderX - halfWidth;
 	return overlaps && state.lift < obstacle.height - heightTolerance;

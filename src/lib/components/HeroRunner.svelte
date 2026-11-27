@@ -114,6 +114,11 @@
 				<polygon fill="var(--scene-cone-stripe)" points="4.7,-12 5.8,-17 18.2,-17 19.3,-12" />
 				<polygon fill="var(--scene-cone-stripe)" points="6.9,-22 7.7,-26 16.3,-26 17.1,-22" />
 				<rect fill="var(--scene-cone)" x="0" y="-4" width="24" height="4" rx="1" />
+			{:else if obstacle.kind === 'gap'}
+				<!-- Falaise : un trou dans le chemin, parois rocheuses de chaque côté. -->
+				<rect fill="var(--scene-gap)" x="0" y="-1" width={obstacle.width} height="34" />
+				<polygon fill="var(--scene-rock-shade)" points="0,-1 7,-1 3,33 0,33" />
+				<polygon fill="var(--scene-rock-shade)" points="{obstacle.width - 7},-1 {obstacle.width},-1 {obstacle.width},33 {obstacle.width - 3},33" />
 			{:else}
 				<rect fill="var(--scene-log)" x="0" y="-18" width="64" height="18" rx="9" />
 				<circle fill="var(--scene-log-end)" cx="55" cy="-9" r="8" />

@@ -63,7 +63,8 @@
   --scene-log-end: #c9a98f;
   --scene-cone: #ef8a3c;
   --scene-cone-stripe: #ffffff;
-  /* Bonus (pile) et hoverboard du mini-jeu */
+  /* Falaise, bonus (pile) et hoverboard du mini-jeu */
+  --scene-gap: #2f4a46;
   --scene-bonus: #f2b45a;
   --scene-bonus-glow: rgb(242 180 90 / 0.3);
   --scene-bonus-mark: #6b3f06;
@@ -159,6 +160,7 @@
   --scene-log-end: #b0917a;
   --scene-cone: #e07a32;
   --scene-cone-stripe: #e8eef0;
+  --scene-gap: #03080f;
   --scene-bonus: #ffd36b;
   --scene-bonus-glow: rgb(255 211 107 / 0.25);
   --scene-hover-light: #7fe3f0;
