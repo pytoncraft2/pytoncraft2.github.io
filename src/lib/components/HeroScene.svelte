@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import type { Attachment } from 'svelte/attachments';
 	import { on } from 'svelte/events';
 	import Button from './Button.svelte';
@@ -82,8 +83,30 @@
 	let phase = $state<Phase>('idle');
 	/** Numéro de partie : « Rejouer » recrée la partie. */
 	let gameRound = $state(0);
-	/** Hauteur du saut, transmise par la partie en cours. */
+	/** Hauteur du saut et distance parcourue, transmises par la partie en cours. */
 	let lift = $state(0);
+	let travel = $state(0);
+
+	/** Largeur du dessin du paysage : le relief se répète tous les deux dessins (reflet compris). */
+	const landWidth = 1440;
+
+	/** Décalage d’un plan du relief qui défile à `factor` fois la vitesse du vélo. */
+	function loopOffset(factor: number) {
+		return (travel * factor) % (2 * landWidth);
+	}
+
+	const clouds = [
+		{ x: 940, y: 70, scale: 1 },
+		{ x: 1290, y: 420, scale: 0.8 },
+		{ x: 620, y: 470, scale: 0.6 }
+	];
+
+	/** Position d’un nuage : il ressort à droite après avoir quitté le ciel à gauche. */
+	function cloudX(cloud: (typeof clouds)[number]) {
+		const span = landWidth + 200;
+		const x = cloud.x + 100 - travel * 0.05 * cloud.scale;
+		return ((x % span) + span) % span - 100;
+	}
 	let finalDistance = $state('');
 	let runnerModule = $state<Promise<typeof import('./HeroRunner.svelte')>>();
 	let anchor = $state({ x: 0, y: 0 });
@@ -171,10 +194,12 @@
 	function backToRest() {
 		phase = 'idle';
 		lift = 0;
+		travel = 0;
 	}
 
 	function play() {
 		lift = 0;
+		travel = 0;
 		gameRound += 1;
 		phase = 'playing';
 	}
@@ -254,21 +279,14 @@
 			</g>
 
 			<g class="day">
-				<g class="cloud" transform="translate(940 70)">
-					<rect x="-46" y="0" width="112" height="24" rx="12" />
-					<circle cx="-10" cy="2" r="18" />
-					<circle cx="22" cy="-4" r="24" />
-				</g>
-				<g class="cloud" transform="translate(1290 420) scale(0.8)">
-					<rect x="-46" y="0" width="112" height="24" rx="12" />
-					<circle cx="-10" cy="2" r="18" />
-					<circle cx="22" cy="-4" r="24" />
-				</g>
-				<g class="cloud" transform="translate(620 470) scale(0.6)">
-					<rect x="-46" y="0" width="112" height="24" rx="12" />
-					<circle cx="-10" cy="2" r="18" />
-					<circle cx="22" cy="-4" r="24" />
-				</g>
+				<!-- Pendant le mini-jeu, les nuages dérivent lentement, les plus petits (lointains) moins vite. -->
+				{#each clouds as cloud, index (index)}
+					<g class="cloud" transform="translate({cloudX(cloud)} {cloud.y}) scale({cloud.scale})">
+						<rect x="-46" y="0" width="112" height="24" rx="12" />
+						<circle cx="-10" cy="2" r="18" />
+						<circle cx="22" cy="-4" r="24" />
+					</g>
+				{/each}
 			</g>
 		</svg>
 
@@ -303,13 +321,59 @@
 				</g>
 			</g>
 
-			<g class="layer" style:--depth-offset="12px">
+			<!--
+				Pendant le mini-jeu, chaque plan du relief défile à sa vitesse (parallaxe) : le dessin
+				est répété en boucle, en alternant avec son reflet pour que les bords se raccordent.
+			-->
+			{#snippet looping(drawing: Snippet, factor: number)}
+				<g transform="translate({-loopOffset(factor)} 0)">
+					{@render drawing()}
+					{#if phase !== 'idle'}
+						<g transform="translate({2 * landWidth} 0) scale(-1 1)">{@render drawing()}</g>
+						<g transform="translate({2 * landWidth} 0)">{@render drawing()}</g>
+					{/if}
+				</g>
+			{/snippet}
+
+			{#snippet far()}
 				<path
 					fill="var(--scene-far)"
 					d="M0 210 L120 150 L210 185 L330 110 L440 170 L560 122 L690 180 L800 136 L930 175 L1050 105 L1180 165 L1300 130 L1440 172 L1440 320 L0 320 Z"
 				/>
 				<path fill="var(--scene-snow)" d="M330 110 L303.6 126.5 L316 122 L326 128 L338 121 L354.2 123.2 Z" />
 				<path fill="var(--scene-snow)" d="M1050 105 L1023.6 120.4 L1036 117 L1046 123 L1060 116 L1078.6 118.2 Z" />
+			{/snippet}
+
+			{#snippet mid()}
+				<path
+					fill="var(--scene-mid)"
+					d="M0 230 C160 190 300 200 420 220 C560 245 700 195 860 200 C1010 205 1120 240 1260 225 C1350 215 1400 205 1440 210 L1440 320 L0 320 Z"
+				/>
+			{/snippet}
+
+			{#snippet near()}
+				<path
+					fill="var(--scene-near)"
+					d="M0 250 C120 222 250 214 370 236 C450 251 520 266 620 270 C760 274 840 262 960 248 C1080 234 1200 230 1300 242 C1370 250 1410 256 1440 258 L1440 320 L0 320 Z"
+				/>
+
+				<g fill="var(--scene-tree-shade)">
+					<path d="M1246 178 L1226 238 L1266 238 Z" />
+					<path d="M1278 200 L1264 240 L1292 240 Z" />
+				</g>
+
+				<rect x="415" y="196" width="10" height="52" rx="3" fill="var(--scene-trunk)" />
+				<circle cx="420" cy="178" r="34" fill="var(--scene-tree)" />
+				<circle cx="394" cy="194" r="24" fill="var(--scene-tree-shade)" />
+				<circle cx="448" cy="192" r="26" fill="var(--scene-tree)" />
+			{/snippet}
+
+			{#snippet ground()}
+				<path fill="var(--scene-ground)" d="M0 292 C300 286 600 288 720 288 C900 288 1200 286 1440 290 L1440 320 L0 320 Z" />
+			{/snippet}
+
+			<g class="layer" style:--depth-offset="12px">
+				{@render looping(far, 0.12)}
 			</g>
 
 			<g class="day">
@@ -326,31 +390,15 @@
 			</g>
 
 			<g class="layer" style:--depth-offset="7px">
-				<path
-					fill="var(--scene-mid)"
-					d="M0 230 C160 190 300 200 420 220 C560 245 700 195 860 200 C1010 205 1120 240 1260 225 C1350 215 1400 205 1440 210 L1440 320 L0 320 Z"
-				/>
+				{@render looping(mid, 0.28)}
 			</g>
 
 			<g class="layer" style:--depth-offset="3px">
-				<path
-					fill="var(--scene-near)"
-					d="M0 250 C120 222 250 214 370 236 C450 251 520 266 620 270 C760 274 840 262 960 248 C1080 234 1200 230 1300 242 C1370 250 1410 256 1440 258 L1440 320 L0 320 Z"
-				/>
-
-				<g fill="var(--scene-tree-shade)">
-					<path d="M1246 178 L1226 238 L1266 238 Z" />
-					<path d="M1278 200 L1264 240 L1292 240 Z" />
-				</g>
-
-				<rect x="415" y="196" width="10" height="52" rx="3" fill="var(--scene-trunk)" />
-				<circle cx="420" cy="178" r="34" fill="var(--scene-tree)" />
-				<circle cx="394" cy="194" r="24" fill="var(--scene-tree-shade)" />
-				<circle cx="448" cy="192" r="26" fill="var(--scene-tree)" />
+				{@render looping(near, 0.55)}
 			</g>
 
 			<g class="layer">
-				<path fill="var(--scene-ground)" d="M0 292 C300 286 600 288 720 288 C900 288 1200 286 1440 290 L1440 320 L0 320 Z" />
+				{@render looping(ground, 1)}
 			</g>
 
 			<!-- Mini-jeu : obstacles, repères au sol et distance, sous le cycliste. -->
@@ -359,7 +407,10 @@
 					{#key gameRound}
 						<HeroRunner
 							surface={scene}
-							onlift={(value) => (lift = value)}
+							onframe={(height, distance) => {
+								lift = height;
+								travel = distance;
+							}}
 							onend={endGame}
 							onquit={backToRest}
 						/>

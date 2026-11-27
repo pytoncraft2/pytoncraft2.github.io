@@ -7,18 +7,19 @@
 
 	/*
 	 * Partie en cours du mini-jeu de la scène d’accueil, dessinée dans le SVG `.land` de
-	 * HeroScene (chargée seulement au lancement du jeu). Le cycliste reste dans HeroScene :
-	 * sa hauteur lui est transmise par `onlift`.
+	 * HeroScene (chargée seulement au lancement du jeu). Le cycliste et le relief restent dans
+	 * HeroScene : la hauteur du saut et la distance (parallaxe) lui sont transmises par `onframe`.
 	 */
 	let {
 		surface,
-		onlift,
+		onframe,
 		onend,
 		onquit
 	}: {
 		/** Zone qui fait sauter au clic (la scène). */
 		surface: HTMLElement;
-		onlift: (lift: number) => void;
+		/** À chaque image : hauteur du saut et distance parcourue. */
+		onframe: (lift: number, distance: number) => void;
 		/** Chute : distance parcourue, mise en forme (« 1,4 km »). */
 		onend: (distance: string) => void;
 		onquit: () => void;
@@ -43,7 +44,7 @@
 			const dt = last ? Math.min((time - last) / 1000, 1 / 20) : 0;
 			last = time;
 			step(game, dt);
-			onlift(game.lift);
+			onframe(game.lift, game.distance);
 			if (game.crashed) {
 				stop();
 				onend(formatDistance(game.distance));

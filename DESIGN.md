@@ -139,9 +139,9 @@ Un clic sur le cycliste du hero, une fois son entrée terminée, le fait saluer 
 
 Mini-jeu (version minimale) :
 
-- Runner horizontal : le vélo reste au quart du paysage, les roues tournent, des repères défilent au sol et des obstacles (rocher, cône de travaux, tronc) arrivent par la droite, de plus en plus vite. Espace, ↑ ou un clic dans le paysage font sauter ; Échap quitte. Le premier obstacle touché termine la partie (l’échelle des véhicules viendra ensuite).
+- Runner horizontal : le vélo reste au quart du paysage et les roues tournent ; le paysage défile en parallaxe (sol, repères et obstacles à la vitesse du vélo, collines proches avec les arbres un peu plus lentement, collines du milieu, montagnes, puis nuages de plus en plus lentement ; astre, étoiles et oiseaux fixes). Chaque plan répète son dessin en alternant avec son reflet, pour que les bords se raccordent sans cassure ; le décor fixe revient tel quel à la fermeture de la bulle. Des obstacles (rocher, cône de travaux, tronc) arrivent par la droite, de plus en plus vite. Espace, ↑ ou un clic dans le paysage font sauter ; Échap quitte. Le premier obstacle touché termine la partie (l’échelle des véhicules viendra ensuite).
 - La distance s’affiche en haut à droite de la bande, avec la consigne jusqu’au premier obstacle. À la chute, la bulle affiche « Fin de la balade : X km ! » avec [Rejouer] (focus) et [Me contacter] (`#contact`).
-- Exceptions aux règles de la scène, limitées à la partie, que le visiteur lance et peut arrêter à tout moment : boucle `requestAnimationFrame` (pas de temps plafonné, suspendue avec l’onglet), animation des roues de plus de 5 s, scène qui reçoit les clics. La partie s’arrête aussi en quittant le hero ou quand une condition cesse.
+- Exceptions aux règles de la scène, limitées à la partie, que le visiteur lance et peut arrêter à tout moment : boucle `requestAnimationFrame` (pas de temps plafonné, suspendue avec l’onglet), relief, arbres et nuages qui bougent, animation de plus de 5 s, scène qui reçoit les clics. La partie s’arrête aussi en quittant le hero ou quand une condition cesse.
 - Code chargé seulement à l’invitation (`import()` de `HeroRunner.svelte`) ; logique sans DOM dans `src/lib/hero-runner.ts`. Couleurs des obstacles : tokens `--scene-rock*`, `--scene-log*`, `--scene-cone*`.
 
 ## Études de cas et visuels
