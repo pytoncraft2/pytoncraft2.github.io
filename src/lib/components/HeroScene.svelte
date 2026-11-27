@@ -91,6 +91,44 @@
 	let vehicle = $state<Vehicle>('bike');
 	let hurt = $state(false);
 
+	/*
+	 * Roues pendant le mini-jeu. Les 12 rayons se ressemblent tous les 30° : en théorie la roue
+	 * semble tourner à l’envers au-delà de 15° par image (effet stroboscopique), en pratique
+	 * l’œil hésite déjà au-delà d’un quart d’écart (7,5°). Or le sol défile bien plus vite (26° à
+	 * 56° par image à 60 images/s, encore 11° à 23° à 144 images/s). La rotation affichée est
+	 * donc plafonnée à 7,5° par image, quelle que soit la cadence de l’écran (comme l’ancien jeu
+	 * de frappe, à 180 unités/s, sur un écran rapide), et l’écart avec la rotation qu’exigerait
+	 * le sol se lit comme un léger flou : rayons un peu estompés.
+	 * Propriété `rotate`, qui s’ajoute aux animations d’entrée et du parcours (sur `transform`).
+	 */
+	const wheelRadius = 11;
+	const maxWheelStep = 7.5;
+	const fullBlurStep = 60;
+	let wheelAngle = $state(0);
+	let wheelBlur = $state(0);
+	let wheelTravel = 0;
+	const wheelRotation = $derived(wheelAngle ? `${wheelAngle}deg` : undefined);
+	const spokesOpacity = $derived(wheelBlur ? 1 - 0.25 * wheelBlur : undefined);
+
+	function turnWheels(distance: number) {
+		const needed = (Math.max(0, distance - wheelTravel) / wheelRadius) * (180 / Math.PI);
+		wheelTravel = distance;
+		wheelAngle = (wheelAngle + Math.min(needed, maxWheelStep)) % 360;
+		const target = Math.min(1, Math.max(0, (needed - maxWheelStep) / (fullBlurStep - maxWheelStep)));
+		// Lissé sur quelques images : pas de scintillement quand la cadence varie.
+		const blur = wheelBlur + (target - wheelBlur) * 0.2;
+		wheelBlur = blur < 0.01 ? 0 : blur;
+	}
+
+	/** Roues à l’arrêt : rayons nets, position d’origine (sauf `keepAngle`, à la chute). */
+	function resetWheels(keepAngle = false) {
+		wheelBlur = 0;
+		wheelTravel = 0;
+		if (!keepAngle) {
+			wheelAngle = 0;
+		}
+	}
+
 	/** Largeur du dessin du paysage : le relief se répète tous les deux dessins (reflet compris). */
 	const landWidth = 1440;
 
@@ -204,6 +242,7 @@
 		travel = 0;
 		vehicle = 'bike';
 		hurt = false;
+		resetWheels();
 	}
 
 	function play() {
@@ -211,12 +250,14 @@
 		travel = 0;
 		vehicle = 'bike';
 		hurt = false;
+		resetWheels();
 		gameRound += 1;
 		phase = 'playing';
 	}
 
 	function endGame(distance: string) {
 		finalDistance = distance;
+		resetWheels(true);
 		placeBubble();
 		phase = 'over';
 	}
@@ -432,6 +473,7 @@
 							onframe={(frame) => {
 								lift = frame.lift;
 								travel = frame.distance;
+								turnWheels(frame.distance);
 								vehicle = frame.vehicle;
 								hurt = frame.hurt;
 							}}
@@ -453,12 +495,15 @@
 							<g fill="none" stroke="var(--scene-bike)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
 								<circle cx="-20" cy="-11" r="11" />
 								<circle cx="20" cy="-11" r="11" />
-								<!-- Rayons : 12 par roue (6 diamètres tous les 30°), moyeu au centre. -->
-								<g class="spokes" stroke-width="0.8">
+								<!--
+									Rayons : 12 par roue (6 diamètres tous les 30°), moyeu au centre. Pendant le mini-jeu,
+									rotation et flou viennent de turnWheels (rotation plafonnée, rayons légèrement estompés).
+								-->
+								<g class="spokes" stroke-width="0.8" style:rotate={wheelRotation} style:opacity={spokesOpacity}>
 									<path d="M-29.5 -11H-10.5M-28.23 -15.75L-11.77 -6.25M-24.75 -19.23L-15.25 -2.77M-20 -20.5V-1.5M-15.25 -19.23L-24.75 -2.77M-11.77 -15.75L-28.23 -6.25" />
 									<circle cx="-20" cy="-11" r="1.6" fill="var(--scene-bike)" />
 								</g>
-								<g class="spokes" stroke-width="0.8">
+								<g class="spokes" stroke-width="0.8" style:rotate={wheelRotation} style:opacity={spokesOpacity}>
 									<path d="M10.5 -11H29.5M11.77 -15.75L28.23 -6.25M15.25 -19.23L24.75 -2.77M20 -20.5V-1.5M24.75 -19.23L15.25 -2.77M28.23 -15.75L11.77 -6.25" />
 									<circle cx="20" cy="-11" r="1.6" fill="var(--scene-bike)" />
 								</g>
@@ -499,7 +544,7 @@
 							<g class="wobble">
 								<g fill="none" stroke="var(--scene-bike)" stroke-width="2.5" stroke-linecap="round">
 									<circle cx="0" cy="-13" r="12" />
-									<g class="spokes" stroke-width="0.8">
+									<g class="spokes" stroke-width="0.8" style:rotate={wheelRotation} style:opacity={spokesOpacity}>
 										<path d="M-11.5 -13L11.5 -13M-9.96 -18.75L9.96 -7.25M-5.75 -22.96L5.75 -3.04M0 -24.5L0 -1.5M5.75 -22.96L-5.75 -3.04M9.96 -18.75L-9.96 -7.25" />
 										<circle cx="0" cy="-13" r="1.6" fill="var(--scene-bike)" />
 									</g>
@@ -971,15 +1016,6 @@
 		}
 
 		/*
-		 * Partie en cours : les roues tournent tant qu’elle dure (lancée et arrêtée par le
-		 * visiteur, d’où l’exception à la règle des 5 s). Plus précis que la règle des
-		 * animations déjà jouées.
-		 */
-		.scene.running .rider .spokes {
-			animation: spin 240ms linear infinite;
-		}
-
-		/*
 		 * Véhicules du mini-jeu : oscillation du monocycle, flottement du hoverboard, foulée à pied,
 		 * clignotement après un choc.
 		 */
@@ -1077,12 +1113,6 @@
 	@keyframes roll {
 		from {
 			transform: rotate(-2610deg);
-		}
-	}
-
-	@keyframes spin {
-		to {
-			transform: rotate(360deg);
 		}
 	}
 
