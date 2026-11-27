@@ -1,6 +1,8 @@
 /**
- * Logique du mini-jeu de la scène d’accueil (easter-egg du cycliste), sans DOM : le vélo
- * reste au quart du paysage, les obstacles arrivent par la droite et il faut sauter.
+ * Logique du mini-jeu de la scène d’accueil (easter-egg du cycliste), sans DOM : le cycliste
+ * reste au quart du paysage, les obstacles arrivent par la droite et il faut sauter. Chaque
+ * obstacle touché fait descendre d’un véhicule (vélo → monocycle → skateboard → à pied) ;
+ * à pied, c’est la chute.
  * Unités : celles du dessin du paysage (SVG `.land`, 1440 × 320, sol à y = 289), en secondes.
  */
 
@@ -13,13 +15,47 @@ export interface Obstacle {
 	x: number;
 	width: number;
 	height: number;
+	/** Déjà touché : ne compte plus. */
+	hit: boolean;
 }
+
+export type Vehicle = 'bike' | 'unicycle' | 'skateboard' | 'walk';
+
+/** Du plus rapide au plus lent : chaque obstacle touché fait passer au suivant. */
+export const vehicles: readonly Vehicle[] = ['bike', 'unicycle', 'skateboard', 'walk'];
+
+interface Handling {
+	/** Part de la vitesse de base : plus on perd de véhicules, plus on va lentement. */
+	pace: number;
+	/** Vitesse verticale au départ du saut. */
+	jump: number;
+	gravity: number;
+	/** Demi-largeur au sol, moins une petite tolérance. */
+	halfWidth: number;
+}
+
+/**
+ * Le vélo est équilibré ; le monocycle saute moins haut ; le skateboard saute court et vif ;
+ * à pied, on va lentement mais on saute le plus haut.
+ */
+const handling: Record<Vehicle, Handling> = {
+	bike: { pace: 1, jump: 560, gravity: 1800, halfWidth: 27 },
+	unicycle: { pace: 0.85, jump: 500, gravity: 1800, halfWidth: 12 },
+	skateboard: { pace: 0.75, jump: 580, gravity: 2000, halfWidth: 20 },
+	walk: { pace: 0.6, jump: 640, gravity: 1700, halfWidth: 10 }
+};
 
 export interface RunnerState {
 	/** Distance parcourue depuis le départ. */
 	distance: number;
+	/** Vitesse de base, qui augmente avec la distance. */
+	cruise: number;
+	/** Vitesse réelle : vitesse de base × allure du véhicule. */
 	speed: number;
-	/** Hauteur des roues au-dessus du sol (0 : au sol). */
+	vehicle: Vehicle;
+	/** Temps restant pendant lequel les obstacles ne comptent pas, après en avoir touché un. */
+	recovery: number;
+	/** Hauteur au-dessus du sol (0 : au sol). */
 	lift: number;
 	/** Vitesse verticale, positive vers le haut. */
 	velocity: number;
@@ -30,19 +66,26 @@ export interface RunnerState {
 	crashed: boolean;
 }
 
-/** Position du vélo (centre, entre les roues), comme dans le décor fixe. */
+/** Ce que la partie transmet au décor à chaque image (HeroRunner → HeroScene). */
+export interface RunnerFrame {
+	lift: number;
+	distance: number;
+	vehicle: Vehicle;
+	/** Clignotement : les obstacles ne comptent pas, après un choc. */
+	hurt: boolean;
+}
+
+/** Position du cycliste (centre, entre les roues du vélo), comme dans le décor fixe. */
 export const riderX = 360;
-/** Demi-largeur du vélo, roues comprises, moins une petite tolérance. */
-const riderHalfWidth = 27;
 /** Tolérance verticale : frôler un obstacle ne compte pas. */
 const heightTolerance = 4;
+/** Durée pendant laquelle les obstacles ne comptent pas après un choc (clignotement). */
+export const recoveryTime = 1.2;
 
 const startSpeed = 300;
 const maxSpeed = 560;
-/** Gain de vitesse par unité parcourue. */
+/** Gain de vitesse de base par unité parcourue. */
 const acceleration = 0.012;
-const gravity = 1800;
-const jumpVelocity = 560;
 /** Les obstacles apparaissent juste hors du paysage, à droite. */
 const spawnX = 1520;
 /** Distance avant le premier obstacle : le temps de lire la consigne. */
@@ -60,7 +103,10 @@ const kinds = Object.keys(shapes) as ObstacleKind[];
 export function createRunner(): RunnerState {
 	return {
 		distance: 0,
+		cruise: startSpeed,
 		speed: startSpeed,
+		vehicle: 'bike',
+		recovery: 0,
 		lift: 0,
 		velocity: 0,
 		obstacles: [],
@@ -73,20 +119,21 @@ export function createRunner(): RunnerState {
 /** Saut, seulement depuis le sol. */
 export function jump(state: RunnerState): void {
 	if (!state.crashed && state.lift === 0) {
-		state.velocity = jumpVelocity;
+		state.velocity = handling[state.vehicle].jump;
 	}
 }
 
 /**
- * Écart avant l’obstacle suivant, proportionnel à la vitesse : toujours assez pour
- * retomber et ressauter (un saut couvre environ 0,62 s de trajet).
+ * Écart avant l’obstacle suivant, proportionnel à la vitesse réelle : toujours assez pour
+ * retomber et ressauter, quel que soit le véhicule.
  */
 function nextGap(speed: number, random: () => number): number {
 	return speed * (1.3 + random() * 1.4);
 }
 
 function collides(state: RunnerState, obstacle: Obstacle): boolean {
-	const overlaps = obstacle.x < riderX + riderHalfWidth && obstacle.x + obstacle.width > riderX - riderHalfWidth;
+	const halfWidth = handling[state.vehicle].halfWidth;
+	const overlaps = obstacle.x < riderX + halfWidth && obstacle.x + obstacle.width > riderX - halfWidth;
 	return overlaps && state.lift < obstacle.height - heightTolerance;
 }
 
@@ -98,11 +145,13 @@ export function step(state: RunnerState, dt: number, random: () => number = Math
 
 	const travelled = state.speed * dt;
 	state.distance += travelled;
-	state.speed = Math.min(maxSpeed, startSpeed + state.distance * acceleration);
+	state.cruise = Math.min(maxSpeed, startSpeed + state.distance * acceleration);
+	state.speed = state.cruise * handling[state.vehicle].pace;
+	state.recovery = Math.max(0, state.recovery - dt);
 
 	// Saut : trajectoire balistique, retour exact au sol.
 	if (state.lift > 0 || state.velocity > 0) {
-		state.velocity -= gravity * dt;
+		state.velocity -= handling[state.vehicle].gravity * dt;
 		state.lift = Math.max(0, state.lift + state.velocity * dt);
 		if (state.lift === 0) {
 			state.velocity = 0;
@@ -117,11 +166,25 @@ export function step(state: RunnerState, dt: number, random: () => number = Math
 	state.untilNext -= travelled;
 	if (state.untilNext <= 0) {
 		const kind = kinds[Math.floor(random() * kinds.length)] ?? 'rock';
-		state.obstacles.push({ id: state.nextId++, kind, x: spawnX, ...shapes[kind] });
+		state.obstacles.push({ id: state.nextId++, kind, x: spawnX, ...shapes[kind], hit: false });
 		state.untilNext = nextGap(state.speed, random);
 	}
 
-	state.crashed = state.obstacles.some((obstacle) => collides(state, obstacle));
+	if (state.recovery > 0) {
+		return;
+	}
+	const obstacle = state.obstacles.find((candidate) => !candidate.hit && collides(state, candidate));
+	if (!obstacle) {
+		return;
+	}
+	const next = vehicles[vehicles.indexOf(state.vehicle) + 1];
+	if (next) {
+		obstacle.hit = true;
+		state.vehicle = next;
+		state.recovery = recoveryTime;
+	} else {
+		state.crashed = true;
+	}
 }
 
 const kilometers = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });

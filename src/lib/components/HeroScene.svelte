@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { Attachment } from 'svelte/attachments';
+	import type { Vehicle } from '#lib/hero-runner.js';
 	import { on } from 'svelte/events';
 	import Button from './Button.svelte';
 
@@ -86,6 +87,9 @@
 	/** Hauteur du saut et distance parcourue, transmises par la partie en cours. */
 	let lift = $state(0);
 	let travel = $state(0);
+	/** Véhicule en cours (vélo au repos) et clignotement après un choc. */
+	let vehicle = $state<Vehicle>('bike');
+	let hurt = $state(false);
 
 	/** Largeur du dessin du paysage : le relief se répète tous les deux dessins (reflet compris). */
 	const landWidth = 1440;
@@ -167,11 +171,14 @@
 	 */
 	function placeBubble() {
 		const hero = scene?.offsetParent;
-		const matrix = rider?.getScreenCTM();
-		if (!hero || !matrix) {
+		// Casque du véhicule affiché : sa place change d’un véhicule à l’autre.
+		const helmet = rider?.querySelector<SVGGraphicsElement>('.helmet');
+		const matrix = helmet?.getScreenCTM();
+		if (!hero || !helmet || !matrix) {
 			return;
 		}
-		const head = new DOMPoint(10, -70).matrixTransform(matrix);
+		const box = helmet.getBBox();
+		const head = new DOMPoint(box.x + box.width / 2, box.y - 1.5).matrixTransform(matrix);
 		const bounds = hero.getBoundingClientRect();
 		anchor = { x: head.x - bounds.left, y: head.y - bounds.top };
 	}
@@ -195,11 +202,15 @@
 		phase = 'idle';
 		lift = 0;
 		travel = 0;
+		vehicle = 'bike';
+		hurt = false;
 	}
 
 	function play() {
 		lift = 0;
 		travel = 0;
+		vehicle = 'bike';
+		hurt = false;
 		gameRound += 1;
 		phase = 'playing';
 	}
@@ -240,7 +251,10 @@
 </script>
 
 <div
-	class={['scene', { offscreen: !inView, playable, waving: phase === 'invite', running: phase === 'playing' }]}
+	class={[
+		'scene',
+		{ offscreen: !inView, playable, waving: phase === 'invite', running: phase === 'playing', hurt: phase === 'playing' && hurt }
+	]}
 	aria-hidden="true"
 	{@attach watchVisibility}
 	{@attach watchConditions}
@@ -325,6 +339,14 @@
 				Pendant le mini-jeu, chaque plan du relief défile à sa vitesse (parallaxe) : le dessin
 				est répété en boucle, en alternant avec son reflet pour que les bords se raccordent.
 			-->
+			{#snippet head(dx: number, dy: number)}
+				<!-- .helmet : repère de la bulle (placeBubble). -->
+				<g transform="translate({dx} {dy})">
+					<circle cx="10" cy="-60" r="6.5" fill="var(--scene-rider)" />
+					<path class="helmet" d="M2.4,-61 A7.7,7.7 0 0 1 17.8,-61.6 L19.5,-60.4 Z" fill="var(--scene-helmet)" />
+				</g>
+			{/snippet}
+
 			{#snippet looping(drawing: Snippet, factor: number)}
 				<g transform="translate({-loopOffset(factor)} 0)">
 					{@render drawing()}
@@ -407,9 +429,11 @@
 					{#key gameRound}
 						<HeroRunner
 							surface={scene}
-							onframe={(height, distance) => {
-								lift = height;
-								travel = distance;
+							onframe={(frame) => {
+								lift = frame.lift;
+								travel = frame.distance;
+								vehicle = frame.vehicle;
+								hurt = frame.hurt;
 							}}
 							onend={endGame}
 							onquit={backToRest}
@@ -421,52 +445,106 @@
 			<!-- Le cycliste monte de la hauteur du saut pendant le mini-jeu. -->
 			<g transform="translate(0 {289 - lift})">
 				<g class="rider" {@attach watchRider}>
-					<!-- Faisceau du phare avant, dont la pointe part de la lampe. -->
-					<polygon class="night beam" points="19,-33 100,-17 100,0" fill="url(#hero-scene-beam)" />
-					<g fill="none" stroke="var(--scene-bike)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-						<circle cx="-20" cy="-11" r="11" />
-						<circle cx="20" cy="-11" r="11" />
-						<!-- Rayons : 12 par roue (6 diamètres tous les 30°), moyeu au centre. -->
-						<g class="spokes" stroke-width="0.8">
-							<path d="M-29.5 -11H-10.5M-28.23 -15.75L-11.77 -6.25M-24.75 -19.23L-15.25 -2.77M-20 -20.5V-1.5M-15.25 -19.23L-24.75 -2.77M-11.77 -15.75L-28.23 -6.25" />
-							<circle cx="-20" cy="-11" r="1.6" fill="var(--scene-bike)" />
-						</g>
-						<g class="spokes" stroke-width="0.8">
-							<path d="M10.5 -11H29.5M11.77 -15.75L28.23 -6.25M15.25 -19.23L24.75 -2.77M20 -20.5V-1.5M24.75 -19.23L15.25 -2.77M28.23 -15.75L11.77 -6.25" />
-							<circle cx="20" cy="-11" r="1.6" fill="var(--scene-bike)" />
-						</g>
-						<polyline points="-20,-11 -2,-12 -8,-30 -20,-11" />
-						<polyline points="-8,-30 14,-31 -2,-12" />
-						<polyline points="14,-31 20,-11" />
-						<polyline points="14,-31 17,-37 22,-37" />
-						<line x1="-12" y1="-32" x2="-4" y2="-32" />
-					</g>
-					<!-- Phare avant, sur le tube de direction (allumé la nuit). -->
-					<rect x="15.5" y="-35" width="4" height="3.4" rx="1.2" fill="var(--scene-bike)" />
-					<circle class="night" cx="19" cy="-33.3" r="1.7" fill="var(--scene-lamp)" />
-					<!-- Feu arrière, sur le hauban : visible seulement la nuit. -->
-					<circle class="night" cx="-11" cy="-25.3" r="3.8" fill="var(--scene-rear-glow)" />
-					<rect class="night" x="-12.3" y="-26.5" width="2.6" height="2.4" rx="0.8" fill="var(--scene-rear)" />
-					<g fill="none" stroke="var(--scene-rider)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
-						<!-- Bras qui reste sur le guidon (épaule, coude, main), derrière le buste. -->
-						<polyline points="6,-50 11,-41 19,-37" />
-						<polyline points="-8,-35 2,-24 -1,-12" />
-						<polyline points="-8,-35 6,-52" />
-					</g>
-					<circle cx="10" cy="-60" r="6.5" fill="var(--scene-rider)" />
-					<path d="M2.4,-61 A7.7,7.7 0 0 1 17.8,-61.6 L19.5,-60.4 Z" fill="var(--scene-helmet)" />
-					<!--
-						Bras qui fait coucou : même forme que le bras du guidon, avec lequel il se confond au
-						repos. Il tourne à l'épaule (.wave-arm) et l'avant-bras se déplie au coude
-						(.wave-forearm). Dessiné après la tête pour passer devant le casque.
-					-->
-					<g fill="none" stroke="var(--scene-rider)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(6 -50)">
-						<g class="wave-arm">
-							<polyline points="0,0 5,9" />
-							<g transform="translate(5 9)">
-								<polyline class="wave-forearm" points="0,0 8,4" />
+					<!-- Véhicule du mini-jeu ; au repos, toujours le vélo. Clignote après un choc (.hurt). -->
+					<g class="vehicle">
+						{#if vehicle === 'bike'}
+							<!-- Faisceau du phare avant, dont la pointe part de la lampe. -->
+							<polygon class="night beam" points="19,-33 100,-17 100,0" fill="url(#hero-scene-beam)" />
+							<g fill="none" stroke="var(--scene-bike)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+								<circle cx="-20" cy="-11" r="11" />
+								<circle cx="20" cy="-11" r="11" />
+								<!-- Rayons : 12 par roue (6 diamètres tous les 30°), moyeu au centre. -->
+								<g class="spokes" stroke-width="0.8">
+									<path d="M-29.5 -11H-10.5M-28.23 -15.75L-11.77 -6.25M-24.75 -19.23L-15.25 -2.77M-20 -20.5V-1.5M-15.25 -19.23L-24.75 -2.77M-11.77 -15.75L-28.23 -6.25" />
+									<circle cx="-20" cy="-11" r="1.6" fill="var(--scene-bike)" />
+								</g>
+								<g class="spokes" stroke-width="0.8">
+									<path d="M10.5 -11H29.5M11.77 -15.75L28.23 -6.25M15.25 -19.23L24.75 -2.77M20 -20.5V-1.5M24.75 -19.23L15.25 -2.77M28.23 -15.75L11.77 -6.25" />
+									<circle cx="20" cy="-11" r="1.6" fill="var(--scene-bike)" />
+								</g>
+								<polyline points="-20,-11 -2,-12 -8,-30 -20,-11" />
+								<polyline points="-8,-30 14,-31 -2,-12" />
+								<polyline points="14,-31 20,-11" />
+								<polyline points="14,-31 17,-37 22,-37" />
+								<line x1="-12" y1="-32" x2="-4" y2="-32" />
 							</g>
-						</g>
+							<!-- Phare avant, sur le tube de direction (allumé la nuit). -->
+							<rect x="15.5" y="-35" width="4" height="3.4" rx="1.2" fill="var(--scene-bike)" />
+							<circle class="night" cx="19" cy="-33.3" r="1.7" fill="var(--scene-lamp)" />
+							<!-- Feu arrière, sur le hauban : visible seulement la nuit. -->
+							<circle class="night" cx="-11" cy="-25.3" r="3.8" fill="var(--scene-rear-glow)" />
+							<rect class="night" x="-12.3" y="-26.5" width="2.6" height="2.4" rx="0.8" fill="var(--scene-rear)" />
+							<g fill="none" stroke="var(--scene-rider)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+								<!-- Bras qui reste sur le guidon (épaule, coude, main), derrière le buste. -->
+								<polyline points="6,-50 11,-41 19,-37" />
+								<polyline points="-8,-35 2,-24 -1,-12" />
+								<polyline points="-8,-35 6,-52" />
+							</g>
+							{@render head(0, 0)}
+							<!--
+								Bras qui fait coucou : même forme que le bras du guidon, avec lequel il se confond au
+								repos. Il tourne à l'épaule (.wave-arm) et l'avant-bras se déplie au coude
+								(.wave-forearm). Dessiné après la tête pour passer devant le casque.
+							-->
+							<g fill="none" stroke="var(--scene-rider)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(6 -50)">
+								<g class="wave-arm">
+									<polyline points="0,0 5,9" />
+									<g transform="translate(5 9)">
+										<polyline class="wave-forearm" points="0,0 8,4" />
+									</g>
+								</g>
+							</g>
+						{:else if vehicle === 'unicycle'}
+							<!-- Monocycle : il oscille autour du point de contact (.wobble), bras écartés. -->
+							<g class="wobble">
+								<g fill="none" stroke="var(--scene-bike)" stroke-width="2.5" stroke-linecap="round">
+									<circle cx="0" cy="-13" r="12" />
+									<g class="spokes" stroke-width="0.8">
+										<path d="M-11.5 -13L11.5 -13M-9.96 -18.75L9.96 -7.25M-5.75 -22.96L5.75 -3.04M0 -24.5L0 -1.5M5.75 -22.96L-5.75 -3.04M9.96 -18.75L-9.96 -7.25" />
+										<circle cx="0" cy="-13" r="1.6" fill="var(--scene-bike)" />
+									</g>
+									<line x1="0" y1="-13" x2="0" y2="-36" />
+									<line x1="-6" y1="-37" x2="6" y2="-37" />
+								</g>
+								<g fill="none" stroke="var(--scene-rider)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+									<polyline points="0,-39 -3,-27 -4,-14" />
+									<polyline points="0,-39 6,-28 3,-17" />
+									<polyline points="0,-39 2,-58" />
+									<polyline points="2,-56 -8,-52 -15,-56" />
+									<polyline points="2,-56 11,-50 18,-53" />
+								</g>
+								{@render head(-4, -6)}
+							</g>
+						{:else if vehicle === 'skateboard'}
+							<!-- Skateboard : planche à deux roues, cycliste debout de profil. -->
+							<path d="M-24 -10 Q-22 -6 -17 -6 L17 -6 Q22 -6 24 -10" fill="none" stroke="var(--scene-bike)" stroke-width="3" stroke-linecap="round" />
+							<circle cx="-13" cy="-2.5" r="2.5" fill="var(--scene-bike)" />
+							<circle cx="13" cy="-2.5" r="2.5" fill="var(--scene-bike)" />
+							<g fill="none" stroke="var(--scene-rider)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+								<polyline points="0,-34 -5,-21 -9,-9" />
+								<polyline points="0,-34 6,-22 8,-9" />
+								<polyline points="0,-34 3,-54" />
+								<polyline points="3,-52 -7,-46 -14,-44" />
+								<polyline points="3,-52 12,-46 19,-42" />
+							</g>
+							{@render head(-3, -2)}
+						{:else}
+							<!-- À pied : course, jambes et bras en balancier (.stride). -->
+							<g fill="none" stroke="var(--scene-rider)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+								<g transform="translate(5 -50)">
+									<g class="stride stride-b"><polyline points="0,0 -3,10 3,17" /></g>
+								</g>
+								<g transform="translate(0 -32)">
+									<g class="stride stride-a"><polyline points="0,0 3,16 0,31" /></g>
+									<g class="stride stride-b"><polyline points="0,0 3,16 0,31" /></g>
+								</g>
+								<polyline points="0,-32 5,-52" />
+								<g transform="translate(5 -50)">
+									<g class="stride stride-a"><polyline points="0,0 -3,10 3,17" /></g>
+								</g>
+							</g>
+							{@render head(-1, 0)}
+						{/if}
 					</g>
 					<!--
 						Zone cliquable de l’easter-egg, transparente, active seulement quand le jeu est
@@ -651,9 +729,14 @@
 		gap: var(--spacing-3);
 	}
 
-	/* Bras qui fait coucou : rotations autour de l'épaule et du coude (origine de leur groupe). */
+	/*
+	 * Bras qui fait coucou : rotations autour de l'épaule et du coude (origine de leur groupe).
+	 * De même pour le monocycle (autour du point de contact) et la foulée (hanche, épaule).
+	 */
 	.wave-arm,
-	.wave-forearm {
+	.wave-forearm,
+	.wobble,
+	.stride {
 		transform-box: view-box;
 		transform-origin: 0 0;
 	}
@@ -879,6 +962,23 @@
 			animation: spin 240ms linear infinite;
 		}
 
+		/* Véhicules du mini-jeu : oscillation du monocycle, foulée à pied, clignotement après un choc. */
+		.scene.running .rider .wobble {
+			animation: wobble 700ms ease-in-out infinite alternate;
+		}
+
+		.scene.running .rider .stride {
+			animation: stride 300ms ease-in-out infinite alternate;
+		}
+
+		.scene.running .rider .stride-b {
+			animation-delay: -300ms;
+		}
+
+		.scene.hurt .rider .vehicle {
+			animation: blink 200ms steps(2, jump-none) infinite;
+		}
+
 		/* Hors écran : suspension, l’animation reprend là où elle s’était arrêtée. */
 		.offscreen,
 		.offscreen * {
@@ -959,6 +1059,36 @@
 	@keyframes spin {
 		to {
 			transform: rotate(360deg);
+		}
+	}
+
+	@keyframes wobble {
+		from {
+			transform: rotate(-6deg);
+		}
+
+		to {
+			transform: rotate(6deg);
+		}
+	}
+
+	@keyframes stride {
+		from {
+			transform: rotate(-28deg);
+		}
+
+		to {
+			transform: rotate(28deg);
+		}
+	}
+
+	@keyframes blink {
+		from {
+			opacity: 1;
+		}
+
+		to {
+			opacity: 0.25;
 		}
 	}
 

@@ -3,12 +3,13 @@
 <script lang="ts">
 	import type { Attachment } from 'svelte/attachments';
 	import { on } from 'svelte/events';
-	import { createRunner, formatDistance, jump, step } from '#lib/hero-runner.js';
+	import { createRunner, formatDistance, jump, step, type RunnerFrame, type Vehicle } from '#lib/hero-runner.js';
 
 	/*
 	 * Partie en cours du mini-jeu de la scène d’accueil, dessinée dans le SVG `.land` de
 	 * HeroScene (chargée seulement au lancement du jeu). Le cycliste et le relief restent dans
-	 * HeroScene : la hauteur du saut et la distance (parallaxe) lui sont transmises par `onframe`.
+	 * HeroScene : à chaque image, `onframe` lui transmet la hauteur du saut, la distance
+	 * (parallaxe), le véhicule et le clignotement après un choc.
 	 */
 	let {
 		surface,
@@ -18,8 +19,7 @@
 	}: {
 		/** Zone qui fait sauter au clic (la scène). */
 		surface: HTMLElement;
-		/** À chaque image : hauteur du saut et distance parcourue. */
-		onframe: (lift: number, distance: number) => void;
+		onframe: (frame: RunnerFrame) => void;
 		/** Chute : distance parcourue, mise en forme (« 1,4 km »). */
 		onend: (distance: string) => void;
 		onquit: () => void;
@@ -31,8 +31,20 @@
 	const markSpacing = 180;
 	const markCount = Math.ceil(1600 / markSpacing);
 	const markOffset = $derived(game.distance % markSpacing);
-	// Consigne affichée jusqu’à l’arrivée du premier obstacle.
-	const showHint = $derived(game.distance < 900);
+	// Consigne affichée jusqu’à l’arrivée du premier obstacle, puis message après chaque choc.
+	const onward: Record<Vehicle, string> = {
+		bike: 'à vélo',
+		unicycle: 'en monocycle',
+		skateboard: 'en skateboard',
+		walk: 'à pied'
+	};
+	const hint = $derived(
+		game.recovery > 0
+			? `Aïe ! On continue ${onward[game.vehicle]}`
+			: game.distance < 900
+				? 'Espace ou clic : sauter · Échap : quitter'
+				: ''
+	);
 
 	/** Boucle de jeu : une image par rafraîchissement, à l’arrêt après la chute. */
 	const run: Attachment<SVGGElement> = () => {
@@ -44,7 +56,7 @@
 			const dt = last ? Math.min((time - last) / 1000, 1 / 20) : 0;
 			last = time;
 			step(game, dt);
-			onframe(game.lift, game.distance);
+			onframe({ lift: game.lift, distance: game.distance, vehicle: game.vehicle, hurt: game.recovery > 0 });
 			if (game.crashed) {
 				stop();
 				onend(formatDistance(game.distance));
@@ -106,8 +118,8 @@
 	{/each}
 
 	<text class="hud distance" x="1410" y="128" text-anchor="end">{formatDistance(game.distance)}</text>
-	{#if showHint}
-		<text class="hud hint" x="1410" y="100" text-anchor="end">Espace ou clic : sauter · Échap : quitter</text>
+	{#if hint}
+		<text class="hud hint" x="1410" y="100" text-anchor="end">{hint}</text>
 	{/if}
 </g>
 
